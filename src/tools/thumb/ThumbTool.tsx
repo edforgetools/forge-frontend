@@ -17,7 +17,8 @@ export default function ThumbTool() {
   // overlay
   const [ovUrl, setOvUrl] = useState("");
   const [ovScale, setOvScale] = useState(1);
-  const [ovPos, setOvPos] = useState({ x: 640, y: 360 }); // center of 1280x720
+  const [ovPos, setOvPos] = useState({ x: 640, y: 360 }); // canvas center
+  const [ovAlpha, setOvAlpha] = useState(1);
 
   const [editMode, setEditMode] = useState<"base" | "overlay">("base");
 
@@ -27,7 +28,7 @@ export default function ThumbTool() {
   const dragStart = useRef<{ x: number; y: number } | null>(null);
   const saved = useRef<{ x: number; y: number } | null>(null);
 
-  // capture -> init transforms
+  // init transforms after capture
   useEffect(() => {
     if (!imgUrl) return;
     const img = new Image();
@@ -35,10 +36,7 @@ export default function ThumbTool() {
       const cover = Math.max(1280 / img.width, 720 / img.height);
       setMinScale(cover);
       setScale(cover);
-      setOffset({
-        x: (1280 - img.width * cover) / 2,
-        y: (720 - img.height * cover) / 2,
-      });
+      setOffset({ x: (1280 - img.width * cover) / 2, y: (720 - img.height * cover) / 2 });
       draw();
     };
     img.src = imgUrl;
@@ -47,7 +45,7 @@ export default function ThumbTool() {
   // redraw on state change
   useEffect(() => {
     draw();
-  }, [scale, offset, ovUrl, ovScale, ovPos]);
+  }, [scale, offset, ovUrl, ovScale, ovPos, ovAlpha]);
 
   function onPickVideo(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -64,8 +62,9 @@ export default function ThumbTool() {
     if (!/image\/(png|jpeg|webp)/.test(f.type)) return alert("Overlay must be PNG/JPEG/WEBP");
     ovUrl && URL.revokeObjectURL(ovUrl);
     setOvUrl(URL.createObjectURL(f));
-    setOvPos({ x: 640, y: 360 }); // center new overlay
+    setOvPos({ x: 640, y: 360 });
     setOvScale(1);
+    setOvAlpha(1);
   }
 
   async function captureFrame() {
@@ -106,7 +105,10 @@ export default function ThumbTool() {
           const base = Math.min(c.width, c.height) / 3;
           const ow = base * ovScale;
           const oh = (o.height / o.width) * ow;
+          ctx.save();
+          ctx.globalAlpha = ovAlpha;
           ctx.drawImage(o, ovPos.x - ow / 2, ovPos.y - oh / 2, ow, oh);
+          ctx.restore();
         };
         o.src = ovUrl;
       }
@@ -124,20 +126,44 @@ export default function ThumbTool() {
     if (!imgUrl) return;
     dragging.current = editMode === "overlay" ? "overlay" : "base";
     dragStart.current = { x: e.clientX, y: e.clientY };
-    saved.current = dragging.current === "overlay" ? { ...ovPos } : { ...offset };
+    saved.current  = dragging.current === "overlay" ? { ...ovPos } : { ...offset };
     (e.target as Element).setPointerCapture(e.pointerId);
   }
 
   function onPointerMove(e: React.PointerEvent) {
     if (!dragging.current || !dragStart.current || !saved.current) return;
-    const dx = e.clientX - dragStart.current.x;
-    const dy = e.clientY - dragStart.current.y;
-    dragging.current === "base"
-      ? setOffset({ x: saved.current.x + dx, y: saved.current.y + dy })
-      : setOvPos({ x: saved.current.x + dx, y: saved.current.y + dy });
+    const c = canvasRef.current!;
+    const rect = c.getBoundingClientRect();
+    const fx = c.width / rect.width;
+    const fy = c.height / rect.height;
+    const dx = (e.clientX - dragStart.current.x) * fx;
+    const dy = (e.clientY - dragStart.current.y) * fy;
+
+    if (dragging.current === "base") {
+      setOffset({ x: saved.current.x + dx, y: saved.current.y + dy });
+    } else {
+      setOvPos({ x: saved.current.x + dx, y: saved.current.y + dy });
+    }
+  }
+
+  function snap(pos: { x: number; y: number }) {
+    const pad = 40;
+    const corners = [
+      { x: pad, y: pad },
+      { x: 1280 - pad, y: pad },
+      { x: pad, y: 720 - pad },
+      { x: 1280 - pad, y: 720 - pad },
+    ];
+    let best = pos, dBest = Infinity;
+    for (const c of corners) {
+      const d = Math.hypot(pos.x - c.x, pos.y - c.y);
+      if (d < dBest) { dBest = d; best = c; }
+    }
+    return dBest < 60 ? best : pos;
   }
 
   function onPointerUp(e: React.PointerEvent) {
+    if (dragging.current === "overlay") setOvPos((p) => snap(p));
     dragging.current = null;
     dragStart.current = null;
     saved.current = null;
@@ -176,7 +202,7 @@ export default function ThumbTool() {
     ovUrl && URL.revokeObjectURL(ovUrl);
     setVideoUrl(""); setImgUrl(""); setOvUrl("");
     setScale(1); setMinScale(1); setOffset({ x: 0, y: 0 });
-    setOvScale(1); setOvPos({ x: 640, y: 360 });
+    setOvScale(1); setOvPos({ x: 640, y: 360 }); setOvAlpha(1);
     setEditMode("base");
     setStage("pick");
   }
@@ -216,32 +242,28 @@ export default function ThumbTool() {
             />
           </div>
 
+          {/* controls */}
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
               <label className="text-sm">Zoom</label>
-              <input
-                type="range"
-                min={minScale}
-                max={minScale * 3}
-                step={0.01}
-                value={scale}
-                onChange={(e) => setScale(parseFloat(e.target.value))}
-                disabled={editMode !== "base"}
-              />
+              <input type="range" min={minScale} max={minScale * 3} step={0.01}
+                     value={scale} onChange={(e)=>setScale(parseFloat(e.target.value))}
+                     disabled={editMode !== "base"} />
             </div>
 
             <div className="flex items-center gap-2">
               <input type="file" accept="image/png,image/jpeg,image/webp" onChange={onPickOverlay} />
               <label className="text-sm">Overlay size</label>
-              <input
-                type="range"
-                min={0.3}
-                max={3}
-                step={0.01}
-                value={ovScale}
-                onChange={(e) => setOvScale(parseFloat(e.target.value))}
-                disabled={!ovUrl}
-              />
+              <input type="range" min={0.3} max={3} step={0.01}
+                     value={ovScale} onChange={(e)=>setOvScale(parseFloat(e.target.value))}
+                     disabled={!ovUrl} />
+            </div>
+
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <label className="text-sm">Overlay opacity</label>
+              <input className="flex-1 md:flex-none" type="range" min={0.2} max={1} step={0.01}
+                     value={ovAlpha} onChange={(e)=>setOvAlpha(parseFloat(e.target.value))}
+                     disabled={!ovUrl} />
             </div>
 
             <button className="btn" onClick={exportUnder2MB}>Export ≤2 MB</button>
