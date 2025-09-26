@@ -19,6 +19,7 @@ export default function ThumbTool() {
   const [ovScale, setOvScale] = useState(1);
   const [ovPos, setOvPos] = useState({ x: 640, y: 360 }); // canvas center
   const [ovAlpha, setOvAlpha] = useState(1);
+  const [ovAR, setOvAR] = useState<number | null>(null);   // overlay aspect ratio (h/w)
 
   const [editMode, setEditMode] = useState<"base" | "overlay">("base");
 
@@ -61,10 +62,15 @@ export default function ThumbTool() {
     if (!f) return;
     if (!/image\/(png|jpeg|webp)/.test(f.type)) return alert("Overlay must be PNG/JPEG/WEBP");
     ovUrl && URL.revokeObjectURL(ovUrl);
-    setOvUrl(URL.createObjectURL(f));
+    const url = URL.createObjectURL(f);
+    setOvUrl(url);
     setOvPos({ x: 640, y: 360 });
     setOvScale(1);
     setOvAlpha(1);
+    // read aspect ratio once
+    const probe = new Image();
+    probe.onload = () => setOvAR(probe.height / probe.width);
+    probe.src = url;
   }
 
   async function captureFrame() {
@@ -84,7 +90,7 @@ export default function ThumbTool() {
     if (x > 0) x = 0;
     if (y > 0) y = 0;
     if (x + w < 1280) x = 1280 - w;
-    if (y + h < 720) y = 720 - h;
+    if (y + h < 720)  y = 720 - h;
     return { x, y };
   }
 
@@ -104,7 +110,7 @@ export default function ThumbTool() {
         o.onload = () => {
           const base = Math.min(c.width, c.height) / 3;
           const ow = base * ovScale;
-          const oh = (o.height / o.width) * ow;
+          const oh = ow * (ovAR ?? o.height / o.width);
           ctx.save();
           ctx.globalAlpha = ovAlpha;
           ctx.drawImage(o, ovPos.x - ow / 2, ovPos.y - oh / 2, ow, oh);
@@ -146,24 +152,28 @@ export default function ThumbTool() {
     }
   }
 
-  function snap(pos: { x: number; y: number }) {
+  // snap overlay so one of ITS corners sits near a canvas corner (with padding)
+  function snapOverlay(center: { x: number; y: number }) {
     const pad = 40;
-    const corners = [
-      { x: pad, y: pad },
-      { x: 1280 - pad, y: pad },
-      { x: pad, y: 720 - pad },
-      { x: 1280 - pad, y: 720 - pad },
+    const base = Math.min(1280, 720) / 3;
+    const ow = base * ovScale;
+    const oh = ow * (ovAR ?? 1);
+    const targets = [
+      { x: pad + ow / 2,           y: pad + oh / 2 },            // TL
+      { x: 1280 - pad - ow / 2,    y: pad + oh / 2 },            // TR
+      { x: pad + ow / 2,           y: 720 - pad - oh / 2 },      // BL
+      { x: 1280 - pad - ow / 2,    y: 720 - pad - oh / 2 },      // BR
     ];
-    let best = pos, dBest = Infinity;
-    for (const c of corners) {
-      const d = Math.hypot(pos.x - c.x, pos.y - c.y);
-      if (d < dBest) { dBest = d; best = c; }
+    let best = center, dBest = Infinity;
+    for (const t of targets) {
+      const d = Math.hypot(center.x - t.x, center.y - t.y);
+      if (d < dBest) { dBest = d; best = t; }
     }
-    return dBest < 60 ? best : pos;
+    return dBest < 120 ? best : center; // generous radius
   }
 
   function onPointerUp(e: React.PointerEvent) {
-    if (dragging.current === "overlay") setOvPos((p) => snap(p));
+    if (dragging.current === "overlay") setOvPos((p) => snapOverlay(p));
     dragging.current = null;
     dragStart.current = null;
     saved.current = null;
@@ -202,7 +212,7 @@ export default function ThumbTool() {
     ovUrl && URL.revokeObjectURL(ovUrl);
     setVideoUrl(""); setImgUrl(""); setOvUrl("");
     setScale(1); setMinScale(1); setOffset({ x: 0, y: 0 });
-    setOvScale(1); setOvPos({ x: 640, y: 360 }); setOvAlpha(1);
+    setOvScale(1); setOvPos({ x: 640, y: 360 }); setOvAlpha(1); setOvAR(null);
     setEditMode("base");
     setStage("pick");
   }
@@ -242,7 +252,6 @@ export default function ThumbTool() {
             />
           </div>
 
-          {/* controls */}
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
               <label className="text-sm">Zoom</label>
@@ -261,7 +270,7 @@ export default function ThumbTool() {
 
             <div className="flex items-center gap-2 w-full md:w-auto">
               <label className="text-sm">Overlay opacity</label>
-              <input className="flex-1 md:flex-none" type="range" min={0.2} max={1} step={0.01}
+              <input className="block w-[240px]" type="range" min={0.2} max={1} step={0.01}
                      value={ovAlpha} onChange={(e)=>setOvAlpha(parseFloat(e.target.value))}
                      disabled={!ovUrl} />
             </div>
