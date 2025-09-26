@@ -1,13 +1,35 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["DOM", "ES2020"],
-    "jsx": "react-jsx",
+    "target": "ES2021",
+    "lib": [
+      "ES2021",
+      "DOM"
+    ],
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
     "strict": true,
+    "noImplicitAny": false,
     "skipLibCheck": true,
-    "types": ["vite/client"]
+    "baseUrl": "src",
+    "paths": {
+      "@/*": [
+        "*"
+      ]
+    },
+    "types": [
+      "vite/client",
+      "node"
+    ]
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "vite.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.test.*",
+    "src/**/__tests__/**"
+  ]
 }
