@@ -152,25 +152,25 @@ export default function ThumbTool() {
     }
   }
 
-  // snap overlay so one of ITS corners sits near a canvas corner (with padding)
   function snapOverlay(center: { x: number; y: number }) {
-    const pad = 40;
-    const base = Math.min(1280, 720) / 3;
-    const ow = base * ovScale;
-    const oh = ow * (ovAR ?? 1);
-    const targets = [
-      { x: pad + ow / 2,           y: pad + oh / 2 },            // TL
-      { x: 1280 - pad - ow / 2,    y: pad + oh / 2 },            // TR
-      { x: pad + ow / 2,           y: 720 - pad - oh / 2 },      // BL
-      { x: 1280 - pad - ow / 2,    y: 720 - pad - oh / 2 },      // BR
-    ];
-    let best = center, dBest = Infinity;
-    for (const t of targets) {
-      const d = Math.hypot(center.x - t.x, center.y - t.y);
-      if (d < dBest) { dBest = d; best = t; }
-    }
-    return dBest < 120 ? best : center; // generous radius
-  }
+  const CW = 1280, CH = 720;          // canvas size
+  const base = Math.min(CW, CH) / 3;  // same base used in draw()
+  const ow = base * ovScale;
+  const oh = ow * (ovAR ?? 1);
+
+  let { x, y } = center;
+  const tol = 24; // snap distance in canvas px
+
+  // snap X to left/right edges (overlay box flush with canvas)
+  if (Math.abs(x - ow / 2) < tol) x = ow / 2;                // left edge
+  if (Math.abs(CW - (x + ow / 2)) < tol) x = CW - ow / 2;    // right edge
+
+  // snap Y to top/bottom edges
+  if (Math.abs(y - oh / 2) < tol) y = oh / 2;                // top edge
+  if (Math.abs(CH - (y + oh / 2)) < tol) y = CH - oh / 2;    // bottom edge
+
+  return { x, y };
+}
 
   function onPointerUp(e: React.PointerEvent) {
     if (dragging.current === "overlay") setOvPos((p) => snapOverlay(p));
