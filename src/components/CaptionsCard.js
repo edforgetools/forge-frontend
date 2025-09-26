@@ -1,0 +1,4 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+export default function CaptionsCard({ data, onGenerate, loading }) {
+    return (_jsxs("div", { className: "rounded-2xl border p-4 shadow-sm", children: [_jsxs("div", { className: "flex items-center justify-between", children: [_jsx("h3", { className: "text-lg font-semibold", children: "Social Captions" }), _jsx("button", { onClick: onGenerate, className: "px-3 py-1 rounded bg-black text-white", disabled: loading, children: loading ? 'Generating…' : 'Generate' })] }), data && (_jsxs("div", { className: "mt-3 space-y-3", children: [_jsxs("div", { children: [_jsx("div", { className: "text-sm font-medium", children: "Tweet" }), _jsx("p", { className: "text-sm", children: data.tweet })] }), _jsxs("div", { children: [_jsx("div", { className: "text-sm font-medium", children: "Instagram" }), _jsx("p", { className: "text-sm", children: data.instagram })] })] }))] }));
+}
