@@ -1,22 +1,25 @@
-import { useRef, useState } from 'react'
-import { captureFrame } from '@/features/frame/captureFrame'
-import { useEditorStore } from '@/lib/store'
+import { useRef, useState } from "react";
+import { captureFrame } from "@/features/frame/captureFrame";
+import { useEditorStore } from "@/lib/store";
 
 export function VideoImport() {
-  const [videoUrl, setVideoUrl] = useState<string | null>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const setCapturedFrame = useEditorStore((s) => s.setCapturedFrame)
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const setCapturedFrame = useEditorStore((s) => s.setCapturedFrame);
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm">Video</label>
+      <label htmlFor="video-import" className="block text-sm">
+        Video
+      </label>
       <input
+        id="video-import"
         type="file"
         accept="video/mp4,video/webm,video/quicktime"
         onChange={(e) => {
-          const file = e.target.files?.[0]
-          if (!file) return
-          setVideoUrl(URL.createObjectURL(file))
+          const file = e.target.files?.[0];
+          if (!file) return;
+          setVideoUrl(URL.createObjectURL(file));
         }}
       />
 
@@ -31,9 +34,9 @@ export function VideoImport() {
           <button
             className="px-3 py-1 rounded bg-neutral-800 hover:bg-neutral-700"
             onClick={async () => {
-              if (!videoRef.current) return
-              const dataUrl = await captureFrame(videoRef.current)
-              setCapturedFrame(dataUrl)
+              if (!videoRef.current) return;
+              const dataUrl = await captureFrame(videoRef.current);
+              setCapturedFrame(dataUrl);
             }}
           >
             Capture Frame
@@ -41,5 +44,5 @@ export function VideoImport() {
         </div>
       )}
     </div>
-  )
+  );
 }

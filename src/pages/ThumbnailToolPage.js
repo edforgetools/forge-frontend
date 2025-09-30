@@ -1,0 +1,36 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Helmet } from "react-helmet-async";
+import ThumbTool from "../tools/thumb/ThumbTool";
+export default function ThumbnailToolPage() {
+    return (_jsxs("div", { className: "min-h-screen bg-gray-900 text-white", children: [_jsxs(Helmet, { children: [_jsx("title", { children: "Free YouTube Thumbnail Maker - AI-Powered Thumbnail Generator 2024" }), _jsx("meta", { name: "description", content: "Create viral YouTube thumbnails in seconds with our free AI-powered thumbnail generator. Upload images, add text overlays, and design click-worthy thumbnails that boost CTR and views." }), _jsx("meta", { name: "keywords", content: "youtube thumbnail maker, free thumbnail generator, youtube thumbnail tool, thumbnail creator, youtube thumbnail design, AI thumbnail generator, youtube CTR, click-through rate" }), _jsx("meta", { property: "og:title", content: "Free YouTube Thumbnail Maker - AI-Powered Thumbnail Generator 2024" }), _jsx("meta", { property: "og:description", content: "Create viral YouTube thumbnails in seconds with our free AI-powered thumbnail generator. Upload images, add text overlays, and design click-worthy thumbnails that boost CTR and views." }), _jsx("meta", { property: "og:type", content: "website" }), _jsx("meta", { name: "twitter:card", content: "summary_large_image" }), _jsx("meta", { name: "twitter:title", content: "Free YouTube Thumbnail Maker - AI-Powered Thumbnail Generator 2024" }), _jsx("meta", { name: "twitter:description", content: "Create viral YouTube thumbnails in seconds with our free AI-powered thumbnail generator. Upload images, add text overlays, and design click-worthy thumbnails that boost CTR and views." }), _jsx("script", { type: "application/ld+json", children: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "SoftwareApplication",
+                            name: "Free YouTube Thumbnail Maker",
+                            description: "Create viral YouTube thumbnails in seconds with our free AI-powered thumbnail generator. Upload images, add text overlays, and design click-worthy thumbnails that boost CTR and views.",
+                            category: "MultimediaApplication",
+                            url: "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool",
+                            applicationCategory: "MultimediaApplication",
+                            operatingSystem: "Web Browser",
+                            offers: {
+                                "@type": "Offer",
+                                price: "0",
+                                priceCurrency: "USD",
+                            },
+                            creator: {
+                                "@type": "Organization",
+                                name: "Forge Tools",
+                            },
+                            featureList: [
+                                "AI-powered thumbnail generation",
+                                "Text overlay customization",
+                                "Multiple aspect ratios (16:9, 9:16, 1:1)",
+                                "High-quality export under 2MB",
+                                "Template suggestions",
+                                "Color contrast optimization",
+                            ],
+                            screenshot: "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool",
+                            softwareVersion: "1.0",
+                            datePublished: "2024-01-01",
+                            dateModified: "2024-01-01",
+                        }) })] }), _jsxs("div", { className: "container mx-auto px-4 py-8", children: [_jsxs("div", { className: "mb-8", children: [_jsx("h1", { className: "text-4xl font-bold mb-6 text-center", children: "Free YouTube Thumbnail Maker - AI-Powered Generator" }), _jsxs("div", { className: "max-w-4xl mx-auto space-y-4 text-lg leading-relaxed", children: [_jsx("p", { children: "Create viral YouTube thumbnails in seconds with our free AI-powered thumbnail generator. Upload your images or capture frames from videos, add custom text overlays, and design click-worthy thumbnails that boost CTR and views. Our advanced AI technology analyzes your content to create thumbnails optimized for maximum engagement." }), _jsx("h2", { className: "text-2xl font-semibold mt-8 mb-4", children: "Why Our YouTube Thumbnail Tool Works" }), _jsx("p", { children: "Our free YouTube thumbnail maker supports multiple aspect ratios (16:9, 9:16, 1:1), text presets, overlay images, and smart positioning features. Export high-quality thumbnails under 2MB to meet YouTube's requirements and boost your channel's performance. Whether you're a beginner or an experienced YouTuber, our intuitive interface makes it easy to create thumbnails that stand out in the crowded YouTube landscape." }), _jsx("h2", { className: "text-2xl font-semibold mt-8 mb-4", children: "Advanced Features for Content Creators" }), _jsx("p", { children: "The tool includes advanced features like automatic text sizing, color contrast optimization, and template suggestions based on your content type. You can also save your designs as templates for future use, ensuring brand consistency across all your videos. Perfect for gaming channels, educational content, vlogs, and any other YouTube niche that needs compelling visual content." }), _jsx("h2", { className: "text-2xl font-semibold mt-8 mb-4", children: "More Free Content Creation Tools" }), _jsxs("div", { className: "grid md:grid-cols-3 gap-4 mt-4", children: [_jsxs("div", { className: "bg-gray-800 rounded-lg p-4", children: [_jsx("h3", { className: "text-lg font-semibold mb-2", children: _jsx("a", { href: "/free-podcast-caption-generator", className: "text-blue-400 hover:text-blue-300", children: "Podcast Caption Generator" }) }), _jsx("p", { className: "text-sm text-gray-300", children: "Generate engaging social media captions from your podcast episodes with AI." })] }), _jsxs("div", { className: "bg-gray-800 rounded-lg p-4", children: [_jsx("h3", { className: "text-lg font-semibold mb-2", children: _jsx("a", { href: "/free-ai-audiogram-generator", className: "text-blue-400 hover:text-blue-300", children: "AI Audiogram Creator" }) }), _jsx("p", { className: "text-sm text-gray-300", children: "Transform audio content into stunning visual audiograms for social media." })] }), _jsxs("div", { className: "bg-gray-800 rounded-lg p-4", children: [_jsx("h3", { className: "text-lg font-semibold mb-2", children: _jsx("a", { href: "/clip-short-video-automatically", className: "text-blue-400 hover:text-blue-300", children: "Video Clipper Tool" }) }), _jsx("p", { className: "text-sm text-gray-300", children: "Automatically generate short video clips from longer content with AI." })] })] })] })] }), _jsx("div", { className: "bg-gray-800 rounded-lg p-6", children: _jsx(ThumbTool, {}) })] })] }));
+}

@@ -1,32 +1,57 @@
 import { useEffect, useMemo, useState } from "react";
-import { api } from "./lib/api";
+import { apiHealth, apiCaptions, apiTranscribe, apiLog } from "./lib/api";
+import { logEvent } from "./lib/logEvent";
+import UndoRedoBar from "./components/UndoRedoBar";
+import { useUndoRedoWithState } from "./hooks/useUndoRedo";
 
 type Tone = "default" | "hype" | "educational";
 
 const LS_KEY = "forge_v1_state_v2";
-type Persist = { transcript: string; tweet: string; instagram: string; tone: Tone };
+type Persist = {
+  transcript: string;
+  tweet: string;
+  instagram: string;
+  tone: Tone;
+};
+
+type DashboardState = {
+  transcript: string;
+  tweet: string;
+  instagram: string;
+  tone: Tone;
+};
 
 export default function ForgePlusDashboard() {
   const [file, setFile] = useState<File | null>(null);
-  const [transcript, setTranscript] = useState("");
-  const [tweet, setTweet] = useState("");
-  const [instagram, setInstagram] = useState("");
-  const [tone, setTone] = useState<Tone>("default");
-  const [busy, setBusy] = useState<null | "transcribe" | "captions" | "zip">(null);
+  const [busy, setBusy] = useState<null | "transcribe" | "captions" | "zip">(
+    null
+  );
   const [err, setErr] = useState<string | null>(null);
+
+  // Use undo/redo hook for text state management
+  const [state, updateState, undoRedo] = useUndoRedoWithState<DashboardState>({
+    transcript: "",
+    tweet: "",
+    instagram: "",
+    tone: "default",
+  });
+
+  const { transcript, tweet, instagram, tone } = state;
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(LS_KEY);
       if (raw) {
         const s = JSON.parse(raw) as Persist;
-        setTranscript(s.transcript || "");
-        setTweet(s.tweet || "");
-        setInstagram(s.instagram || "");
-        setTone(s.tone || "default");
+        updateState({
+          transcript: s.transcript || "",
+          tweet: s.tweet || "",
+          instagram: s.instagram || "",
+          tone: s.tone || "default",
+        });
       }
     } catch {}
-  }, []);
+  }, [updateState]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -38,10 +63,14 @@ export default function ForgePlusDashboard() {
 
   const canTranscribe = useMemo(() => !!file, [file]);
   const canCaption = useMemo(() => transcript.trim().length > 0, [transcript]);
-  const canZip = useMemo(() => tweet.trim() && instagram.trim(), [tweet, instagram]);
+  const canZip = useMemo(
+    () => tweet.trim() && instagram.trim(),
+    [tweet, instagram]
+  );
 
   function validateFile(f: File) {
-    const okType = /^video\//.test(f.type) || /\.(mp4|mov|m4v|webm)$/i.test(f.name);
+    const okType =
+      /^video\//.test(f.type) || /\.(mp4|mov|m4v|webm)$/i.test(f.name);
     const okSize = f.size <= 1_000_000_000;
     if (!okType) return "Unsupported file type. Use MP4/MOV/WebM.";
     if (!okSize) return "File too large. Max 1 GB.";
@@ -53,62 +82,92 @@ export default function ForgePlusDashboard() {
     const f = e.target.files?.[0] || null;
     if (!f) return;
     const v = validateFile(f);
-    if (v) { setFile(null); setErr(v); return; }
+    if (v) {
+      setFile(null);
+      setErr(v);
+      return;
+    }
     setFile(f);
   }
 
   async function transcribe() {
     if (!file) return;
-    setBusy("transcribe"); setErr(null);
+    setBusy("transcribe");
+    setErr(null);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const r = await fetch(api("/api/transcribe"), { method: "POST", body: fd });
-      if (!r.ok) { const msg = await r.text(); throw new Error(`Transcribe failed: ${r.status} ${msg}`); }
-      const j = await r.json();
-      setTranscript(j.transcript || ""); setTweet(""); setInstagram("");
-    } catch (e: any) { setErr(e.message || "Transcription error"); }
-    finally { setBusy(null); }
+      const r = await apiTranscribe(file);
+      updateState({
+        ...state,
+        transcript: r.text || "",
+        tweet: "",
+        instagram: "",
+      });
+    } catch (e: any) {
+      setErr(e.message || "Transcription error");
+      logEvent("error_transcribe", {
+        message: e.message,
+        fileName: file.name,
+        fileSize: file.size,
+      });
+    } finally {
+      setBusy(null);
+    }
   }
 
   async function genCaptions() {
-    setBusy("captions"); setErr(null);
+    setBusy("captions");
+    setErr(null);
     try {
-      const r = await fetch(api("/api/captions"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript, tone }),
+      const j = await apiCaptions({ transcript, tone });
+      updateState({
+        ...state,
+        tweet: j.tweet || "",
+        instagram: j.instagram || "",
       });
-      if (!r.ok) { const msg = await r.text(); throw new Error(`Captions failed: ${r.status} ${msg}`); }
-      const j = await r.json();
-      setTweet(j.tweet || ""); setInstagram(j.instagram || "");
-    } catch (e: any) { setErr(e.message || "Captions error"); }
-    finally { setBusy(null); }
+      await apiLog("info", "captions_generated", { len: transcript.length });
+    } catch (e: any) {
+      setErr(e.message || "Captions error");
+      logEvent("error_captions", {
+        message: e.message,
+        transcriptLength: transcript.length,
+        tone,
+      });
+    } finally {
+      setBusy(null);
+    }
   }
 
   async function downloadZip() {
-    setBusy("zip"); setErr(null);
+    setBusy("zip");
+    setErr(null);
     try {
-      const r = await fetch(api("/api/exportZip"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcript, tweet, instagram }),
-      });
-      if (!r.ok) { const msg = await r.text(); throw new Error(`Export failed: ${r.status} ${msg}`); }
-      const blob = await r.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url; a.download = "forge_export.zip"; a.click();
-      URL.revokeObjectURL(url);
-    } catch (e: any) { setErr(e.message || "Export error"); }
-    finally { setBusy(null); }
+      // Not yet implemented on server. Stub for now:
+      alert("ExportZip endpoint not implemented in mock server");
+    } catch (e: any) {
+      setErr(e.message || "Export error");
+      logEvent("error_export", { message: e.message });
+    } finally {
+      setBusy(null);
+    }
   }
 
   useEffect(() => {
+    ``;
     function onKey(e: KeyboardEvent) {
       const meta = e.metaKey || e.ctrlKey;
-      if (meta && e.key.toLowerCase() === "enter" && transcript.trim()) { e.preventDefault(); genCaptions(); }
-      if (meta && e.key.toLowerCase() === "s" && tweet.trim() && instagram.trim()) { e.preventDefault(); downloadZip(); }
+      if (meta && e.key.toLowerCase() === "enter" && transcript.trim()) {
+        e.preventDefault();
+        genCaptions();
+      }
+      if (
+        meta &&
+        e.key.toLowerCase() === "s" &&
+        tweet.trim() &&
+        instagram.trim()
+      ) {
+        e.preventDefault();
+        downloadZip();
+      }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -117,15 +176,29 @@ export default function ForgePlusDashboard() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-4">
       <div className="space-y-2">
-        <input type="file" accept="video/*,.mp4,.mov,.m4v,.webm" onChange={onUpload} />
-        <button className="btn" disabled={!canTranscribe || !!busy} onClick={transcribe}>
+        <label htmlFor="video-upload" className="block text-sm">
+          Upload video file
+        </label>
+        <input
+          id="video-upload"
+          type="file"
+          accept="video/*,.mp4,.mov,.m4v,.webm"
+          onChange={onUpload}
+        />
+        <button
+          className="btn"
+          disabled={!canTranscribe || !!busy}
+          onClick={transcribe}
+        >
           {busy === "transcribe" ? "Transcribing…" : "Transcribe"}
         </button>
         <div className="flex items-center gap-2">
           <label className="text-sm">Tone</label>
           <select
             value={tone}
-            onChange={(e)=>setTone(e.target.value as Tone)}
+            onChange={(e) =>
+              updateState({ ...state, tone: e.target.value as Tone })
+            }
             className="border rounded px-2 py-1 text-sm"
             aria-label="Tone selector"
           >
@@ -134,20 +207,53 @@ export default function ForgePlusDashboard() {
             <option value="educational">educational</option>
           </select>
         </div>
+
+        {/* Undo/Redo Bar */}
+        <div className="flex items-center gap-4">
+          <UndoRedoBar
+            canUndo={undoRedo.canUndo}
+            canRedo={undoRedo.canRedo}
+            onUndo={undoRedo.undo}
+            onRedo={undoRedo.redo}
+            disabled={!!busy}
+          />
+          <div className="text-xs text-gray-400">
+            Press Cmd/Ctrl+Z to undo, Cmd/Ctrl+Shift+Z to redo
+          </div>
+        </div>
       </div>
 
-      {err && <pre role="alert" className="text-red-500 text-xs whitespace-pre-wrap">{err}</pre>}
+      {err && (
+        <pre role="alert" className="text-red-500 text-xs whitespace-pre-wrap">
+          {err}
+        </pre>
+      )}
 
       <div className="space-y-2">
         <label className="block text-sm font-medium">Transcript</label>
-        <textarea className="w-full border rounded p-2 h-32" value={transcript} onChange={(e)=>setTranscript(e.target.value)} placeholder="Transcript will appear here…" />
+        <textarea
+          className="w-full border rounded p-2 h-32"
+          value={transcript}
+          onChange={(e) =>
+            updateState({ ...state, transcript: e.target.value })
+          }
+          placeholder="Transcript will appear here…"
+        />
       </div>
 
       <div className="flex items-center gap-2">
-        <button className="btn" disabled={!canCaption || !!busy} onClick={genCaptions}>
+        <button
+          className="btn"
+          disabled={!canCaption || !!busy}
+          onClick={genCaptions}
+        >
           {busy === "captions" ? "Generating…" : "Generate 2 Captions"}
         </button>
-        <button className="btn" disabled={!canZip || !!busy} onClick={downloadZip}>
+        <button
+          className="btn"
+          disabled={!canZip || !!busy}
+          onClick={downloadZip}
+        >
           {busy === "zip" ? "Packaging…" : "Download Zip"}
         </button>
       </div>
@@ -155,11 +261,21 @@ export default function ForgePlusDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium">Tweet</label>
-          <textarea className="w-full border rounded p-2 h-32" value={tweet} onChange={(e)=>setTweet(e.target.value)} />
+          <textarea
+            className="w-full border rounded p-2 h-32"
+            value={tweet}
+            onChange={(e) => updateState({ ...state, tweet: e.target.value })}
+          />
         </div>
         <div>
           <label className="block text-sm font-medium">Instagram</label>
-          <textarea className="w-full border rounded p-2 h-32" value={instagram} onChange={(e)=>setInstagram(e.target.value)} />
+          <textarea
+            className="w-full border rounded p-2 h-32"
+            value={instagram}
+            onChange={(e) =>
+              updateState({ ...state, instagram: e.target.value })
+            }
+          />
         </div>
       </div>
     </div>

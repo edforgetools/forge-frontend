@@ -2,8 +2,15 @@
   "name": "forge-frontend",
   "private": true,
   "dependencies": {
+    "@mdx-js/react": "^3.1.1",
+    "@mdx-js/rollup": "^3.1.1",
+    "@types/mdx": "^2.0.13",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-helmet-async": "^2.0.5",
     "zustand": "^4.5.0"
   },
   "devDependencies": {
@@ -18,9 +25,12 @@
     "vitest": "^1.6.0"
   },
   "scripts": {
-    "dev": "vite",
+    "dev": "node -e \"const apiBase = process.env.VITE_API_BASE || 'http://localhost:8787'; console.log('\\n🚀 Starting Forge Frontend...'); console.log('📡 API Base URL:', apiBase); console.log('\\n');\" && vite",
     "build": "tsc -b && vite build",
+    "build:prod": "tsc -b && vite build --mode production",
+    "build:vercel": "tsc -b && vite build --mode production",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "type-check": "tsc --noEmit"
   }
 }
