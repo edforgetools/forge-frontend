@@ -1,0 +1,18 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { logEvent } from "../lib/logEvent";
+const PLATFORM_URLS = {
+    tiktok: "https://www.tiktok.com/upload",
+    youtube: "https://www.youtube.com/shorts/upload",
+    instagram: "https://www.instagram.com/create/reel/",
+};
+export default function ExportModal({ isOpen, onClose, onDownload, }) {
+    if (!isOpen)
+        return null;
+    const handleShareClick = (platform) => {
+        // Log the share click event
+        logEvent("share_clicked", { platform });
+        // Open platform URL in new tab
+        window.open(PLATFORM_URLS[platform], "_blank", "noopener,noreferrer");
+    };
+    return (_jsx("div", { className: "fixed inset-0 bg-black/50 flex items-center justify-center z-50", children: _jsxs("div", { className: "bg-neutral-800 rounded-lg p-6 max-w-md w-full mx-4", children: [_jsxs("div", { className: "flex items-center justify-between mb-4", children: [_jsx("h2", { className: "text-xl font-semibold text-white", children: "Export Complete!" }), _jsx("button", { onClick: onClose, className: "text-neutral-400 hover:text-white transition-colors", "aria-label": "Close modal", children: "\u2715" })] }), _jsx("p", { className: "text-neutral-300 mb-6", children: "Your thumbnail has been exported successfully. Share it on your favorite platform!" }), _jsxs("div", { className: "space-y-3", children: [_jsx("h3", { className: "text-sm font-medium text-neutral-300 mb-3", children: "Share to:" }), _jsxs("div", { className: "grid grid-cols-1 gap-2", children: [_jsxs("button", { onClick: () => handleShareClick("tiktok"), className: "flex items-center gap-3 px-4 py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg transition-colors text-left", children: [_jsx("div", { className: "w-8 h-8 bg-black rounded flex items-center justify-center", children: _jsx("span", { className: "text-white font-bold text-sm", children: "T" }) }), _jsxs("div", { children: [_jsx("div", { className: "text-white font-medium", children: "TikTok" }), _jsx("div", { className: "text-xs text-neutral-400", children: "Upload your thumbnail" })] })] }), _jsxs("button", { onClick: () => handleShareClick("youtube"), className: "flex items-center gap-3 px-4 py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg transition-colors text-left", children: [_jsx("div", { className: "w-8 h-8 bg-red-600 rounded flex items-center justify-center", children: _jsx("span", { className: "text-white font-bold text-sm", children: "YT" }) }), _jsxs("div", { children: [_jsx("div", { className: "text-white font-medium", children: "YouTube Shorts" }), _jsx("div", { className: "text-xs text-neutral-400", children: "Upload your thumbnail" })] })] }), _jsxs("button", { onClick: () => handleShareClick("instagram"), className: "flex items-center gap-3 px-4 py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg transition-colors text-left", children: [_jsx("div", { className: "w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center", children: _jsx("span", { className: "text-white font-bold text-sm", children: "IG" }) }), _jsxs("div", { children: [_jsx("div", { className: "text-white font-medium", children: "Instagram Reels" }), _jsx("div", { className: "text-xs text-neutral-400", children: "Upload your thumbnail" })] })] })] })] }), _jsxs("div", { className: "flex gap-3 mt-6", children: [_jsx("button", { onClick: onDownload, className: "flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors", children: "Download Again" }), _jsx("button", { onClick: onClose, className: "flex-1 px-4 py-2 bg-neutral-600 hover:bg-neutral-500 text-white rounded-lg transition-colors", children: "Close" })] })] }) }));
+}

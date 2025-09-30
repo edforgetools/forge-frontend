@@ -1,0 +1,36 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Helmet } from "react-helmet-async";
+import ComingSoon from "../components/ComingSoon";
+export default function ClipperToolPage() {
+    return (_jsxs("div", { className: "min-h-screen bg-gray-900 text-white", children: [_jsxs(Helmet, { children: [_jsx("title", { children: "Free AI Video Clipper - Automatic Short Video Generator 2024" }), _jsx("meta", { name: "description", content: "Automatically generate viral short video clips from longer content with our free AI video clipper. Upload videos and let our smart algorithm identify the most engaging moments for TikTok, Instagram Reels, and YouTube Shorts." }), _jsx("meta", { name: "keywords", content: "video clipper, AI video clipper, automatic video clipping, short video generator, TikTok clips, Instagram Reels, YouTube Shorts, viral video maker, content repurposing" }), _jsx("meta", { property: "og:title", content: "Free AI Video Clipper - Automatic Short Video Generator 2024" }), _jsx("meta", { property: "og:description", content: "Automatically generate viral short video clips from longer content with our free AI video clipper. Upload videos and let our smart algorithm identify the most engaging moments for TikTok, Instagram Reels, and YouTube Shorts." }), _jsx("meta", { property: "og:type", content: "website" }), _jsx("meta", { name: "twitter:card", content: "summary_large_image" }), _jsx("meta", { name: "twitter:title", content: "Free AI Video Clipper - Automatic Short Video Generator 2024" }), _jsx("meta", { name: "twitter:description", content: "Automatically generate viral short video clips from longer content with our free AI video clipper. Upload videos and let our smart algorithm identify the most engaging moments for TikTok, Instagram Reels, and YouTube Shorts." }), _jsx("script", { type: "application/ld+json", children: JSON.stringify({
+                            "@context": "https://schema.org",
+                            "@type": "SoftwareApplication",
+                            name: "Free AI Video Clipper",
+                            description: "Automatically generate viral short video clips from longer content with our free AI video clipper. Upload videos and let our smart algorithm identify the most engaging moments for TikTok, Instagram Reels, and YouTube Shorts.",
+                            category: "MultimediaApplication",
+                            url: "https://forge-frontend.vercel.app/clip-short-video-automatically",
+                            applicationCategory: "MultimediaApplication",
+                            operatingSystem: "Web Browser",
+                            offers: {
+                                "@type": "Offer",
+                                price: "0",
+                                priceCurrency: "USD",
+                            },
+                            creator: {
+                                "@type": "Organization",
+                                name: "Forge Tools",
+                            },
+                            featureList: [
+                                "AI-powered video analysis",
+                                "Automatic clip generation",
+                                "Multi-platform optimization",
+                                "Engagement moment detection",
+                                "Smart timing optimization",
+                                "Viral content identification",
+                            ],
+                            screenshot: "https://forge-frontend.vercel.app/clip-short-video-automatically",
+                            softwareVersion: "1.0",
+                            datePublished: "2024-01-01",
+                            dateModified: "2024-01-01",
+                        }) })] }), _jsxs("div", { className: "container mx-auto px-4 py-8", children: [_jsxs("div", { className: "mb-8", children: [_jsx("h1", { className: "text-4xl font-bold mb-6 text-center", children: "Free AI Video Clipper - Automatic Short Video Generator" }), _jsxs("div", { className: "max-w-4xl mx-auto space-y-4 text-lg leading-relaxed", children: [_jsx("p", { children: "Automatically generate viral short video clips from your longer content with our free AI-powered video clipper. Upload your videos and let our smart algorithm identify the most engaging moments to create viral-ready short-form content. Our advanced AI technology analyzes your video content to detect emotional peaks, key moments, and trending elements that are most likely to capture audience attention and drive engagement." }), _jsx("h2", { className: "text-2xl font-semibold mt-8 mb-4", children: "How Our AI Video Clipper Works" }), _jsx("p", { children: "Our free video clipping tool uses advanced AI to analyze your content, detect key moments, and automatically generate multiple short clips optimized for TikTok, Instagram Reels, and YouTube Shorts. Perfect for content creators and marketers looking to maximize their reach. The tool understands platform-specific requirements and creates clips that are perfectly sized and formatted for each social media platform." }), _jsx("h2", { className: "text-2xl font-semibold mt-8 mb-4", children: "Perfect for Content Repurposing" }), _jsx("p", { children: "Whether you're repurposing long-form content, creating teaser videos, or building a library of short-form content, our video clipper helps you maximize the value of your existing content. The AI automatically identifies the most shareable moments, applies optimal timing, and ensures your clips meet platform requirements for maximum visibility and engagement across all social media channels." }), _jsx("h2", { className: "text-2xl font-semibold mt-8 mb-4", children: "More Free Content Creation Tools" }), _jsxs("div", { className: "grid md:grid-cols-3 gap-4 mt-4", children: [_jsxs("div", { className: "bg-gray-800 rounded-lg p-4", children: [_jsx("h3", { className: "text-lg font-semibold mb-2", children: _jsx("a", { href: "/free-youtube-thumbnail-tool", className: "text-blue-400 hover:text-blue-300", children: "YouTube Thumbnail Maker" }) }), _jsx("p", { className: "text-sm text-gray-300", children: "Create eye-catching YouTube thumbnails that boost CTR and views with AI." })] }), _jsxs("div", { className: "bg-gray-800 rounded-lg p-4", children: [_jsx("h3", { className: "text-lg font-semibold mb-2", children: _jsx("a", { href: "/free-podcast-caption-generator", className: "text-blue-400 hover:text-blue-300", children: "Podcast Caption Generator" }) }), _jsx("p", { className: "text-sm text-gray-300", children: "Generate engaging social media captions from your podcast episodes with AI." })] }), _jsxs("div", { className: "bg-gray-800 rounded-lg p-4", children: [_jsx("h3", { className: "text-lg font-semibold mb-2", children: _jsx("a", { href: "/free-ai-audiogram-generator", className: "text-blue-400 hover:text-blue-300", children: "AI Audiogram Creator" }) }), _jsx("p", { className: "text-sm text-gray-300", children: "Transform audio content into stunning visual audiograms for social media." })] })] })] })] }), _jsx("div", { className: "bg-gray-800 rounded-lg p-6", children: _jsx(ComingSoon, {}) })] })] }));
+}

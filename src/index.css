@@ -15,3 +15,32 @@ select,
 input[type="file"] {
   @apply bg-transparent border-gray-600;
 }
+
+/* Accessibility improvements for better contrast */
+.link-primary {
+  @apply text-blue-300 hover:text-blue-200 focus:text-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+}
+
+.link-secondary {
+  @apply text-cyan-300 hover:text-cyan-200 focus:text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+}
+
+/* Ensure proper focus states for all interactive elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2 ring-offset-gray-900;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .link-primary {
+    @apply text-white hover:text-gray-200;
+  }
+
+  .link-secondary {
+    @apply text-white hover:text-gray-200;
+  }
+}

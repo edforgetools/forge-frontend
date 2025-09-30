@@ -1,6 +1,6 @@
-import { VideoImport } from '@/features/upload/VideoImport'
-import { useEditorStore } from '@/lib/store'
-import { fToDataUrl } from '@/lib/dom'
+import { VideoImport } from "@/features/upload/VideoImport";
+import { useEditorStore } from "@/lib/store";
+import { fToDataUrl } from "@/lib/dom";
 
 export function LeftSidebar() {
   return (
@@ -8,16 +8,19 @@ export function LeftSidebar() {
       <h2 className="text-sm font-semibold">Assets</h2>
       <VideoImport />
       <div className="space-y-2">
-        <label className="block text-sm">Logo</label>
+        <label htmlFor="logo-upload" className="block text-sm">
+          Logo
+        </label>
         <input
+          id="logo-upload"
           type="file"
           accept="image/png,image/svg+xml"
           onChange={async (e) => {
-            const f = e.target.files?.[0]
-            if (!f) return
-            const dataUrl = await fToDataUrl(f)
-            const id = crypto.randomUUID()
-            const s = useEditorStore.getState()
+            const f = e.target.files?.[0];
+            if (!f) return;
+            const dataUrl = await fToDataUrl(f);
+            const id = crypto.randomUUID();
+            const s = useEditorStore.getState();
             s.addOverlay({
               id,
               name: f.name,
@@ -27,8 +30,8 @@ export function LeftSidebar() {
               h: 64,
               opacity: 0.85,
               dataUrl,
-            })
-            s.setSelection(id)
+            });
+            s.setSelection(id);
           }}
         />
       </div>
@@ -40,5 +43,5 @@ export function LeftSidebar() {
         </ul>
       </div>
     </aside>
-  )
+  );
 }
