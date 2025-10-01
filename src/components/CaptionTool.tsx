@@ -174,13 +174,20 @@ export default function CaptionTool() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Transcript Input */}
       <div className="space-y-2">
-        <label className="block text-sm font-medium">Transcript</label>
+        <label htmlFor="transcript-textarea" className="block text-sm font-medium text-text-primary">
+          Transcript
+        </label>
         <textarea
-          className="w-full border rounded p-3 h-32 bg-transparent border-gray-600"
+          id="transcript-textarea"
+          className="w-full border rounded p-3 h-32 bg-bg-secondary border-gray-600 text-text-primary"
           value={transcript}
           onChange={(e) => setTranscript(e.target.value)}
           placeholder="Paste your transcript here or upload a .txt file..."
+          aria-describedby="transcript-help"
         />
+        <div id="transcript-help" className="text-sm text-text-muted">
+          Enter your podcast transcript or upload a .txt file to generate social media captions
+        </div>
 
         {/* File Upload */}
         <div className="flex items-center gap-2">
@@ -210,9 +217,9 @@ export default function CaptionTool() {
       </div>
 
       {/* Platform Selection */}
-      <div className="space-y-2">
-        <label className="block text-sm font-medium">Select Platforms</label>
-        <div className="flex gap-4">
+      <fieldset className="space-y-2">
+        <legend className="block text-sm font-medium text-text-primary">Select Platforms</legend>
+        <div className="flex gap-4" role="group" aria-labelledby="platform-legend">
           {(["youtube", "tiktok", "instagram"] as Platform[]).map(
             (platform) => (
               <label key={platform} className="flex items-center gap-2">
@@ -222,13 +229,17 @@ export default function CaptionTool() {
                   onChange={() => handlePlatformChange(platform)}
                   disabled={loading}
                   className="rounded"
+                  aria-describedby={`${platform}-help`}
                 />
-                <span className="text-sm capitalize">{platform}</span>
+                <span className="text-sm capitalize text-text-primary">{platform}</span>
+                <span id={`${platform}-help`} className="sr-only">
+                  Generate captions for {platform}
+                </span>
               </label>
             )
           )}
         </div>
-      </div>
+      </fieldset>
 
       {/* Error Display */}
       {error && (

@@ -231,7 +231,13 @@ export default function App() {
           })}
         </script>
       </Helmet>
-      <main className="p-4 max-w-5xl mx-auto">
+      
+      {/* Skip link for keyboard navigation */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+      
+      <main id="main-content" className="p-4 max-w-5xl mx-auto">
         {/* SEO Content */}
         <section className="mb-8" aria-labelledby="main-heading">
           <h1
