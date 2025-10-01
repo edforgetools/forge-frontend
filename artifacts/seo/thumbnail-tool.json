@@ -1,0 +1,28 @@
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Snapthumb - YouTube Thumbnail Maker",
+  "description": "Snapthumb - Create viral YouTube thumbnails in seconds with our free AI-powered thumbnail generator. Upload images, add text overlays, and design click-worthy thumbnails that boost CTR and views.",
+  "category": "MultimediaApplication",
+  "url": "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "creator": {
+    "@type": "Organization",
+    "name": "Forge Tools"
+  },
+  "featureList": [
+    "AI-powered thumbnail generation",
+    "Text overlay customization",
+    "Multiple aspect ratios (16:9, 9:16, 1:1)",
+    "High-quality export under 2MB",
+    "Template suggestions",
+    "Color contrast optimization"
+  ],
+  "screenshot": "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool"
+}
