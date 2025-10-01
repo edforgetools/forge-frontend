@@ -231,7 +231,13 @@ export default function App() {
           })}
         </script>
       </Helmet>
-      <main className="p-4 max-w-5xl mx-auto">
+
+      {/* Skip link for keyboard navigation */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
+      <main id="main-content" className="p-4 max-w-5xl mx-auto">
         {/* SEO Content */}
         <section className="mb-8" aria-labelledby="main-heading">
           <h1
@@ -247,7 +253,11 @@ export default function App() {
               tools. Generate eye-catching YouTube thumbnails, engaging podcast
               captions, stunning audiograms, and viral-ready video clips.
               Perfect for content creators, podcasters, and marketers looking to
-              maximize their social media impact.
+              maximize their social media impact. Learn more in our
+              <a href="/blog" className="link-primary">
+                comprehensive blog
+              </a>
+              with expert tips and tutorials.
             </p>
 
             <h2 className="text-2xl font-semibold mt-8 mb-4">

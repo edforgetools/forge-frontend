@@ -1,12 +1,12 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useRef, useState } from 'react';
-import { captureFrame } from '@/features/frame/captureFrame';
-import { useEditorStore } from '@/lib/store';
+import { useRef, useState } from "react";
+import { captureFrame } from "@/features/frame/captureFrame";
+import { useEditorStore } from "@/lib/store";
 export function VideoImport() {
     const [videoUrl, setVideoUrl] = useState(null);
     const videoRef = useRef(null);
     const setCapturedFrame = useEditorStore((s) => s.setCapturedFrame);
-    return (_jsxs("div", { className: "space-y-2", children: [_jsx("label", { className: "block text-sm", children: "Video" }), _jsx("input", { type: "file", accept: "video/mp4,video/webm,video/quicktime", onChange: (e) => {
+    return (_jsxs("div", { className: "space-y-2", children: [_jsx("label", { htmlFor: "video-import", className: "block text-sm", children: "Video" }), _jsx("input", { id: "video-import", type: "file", accept: "video/mp4,video/webm,video/quicktime", onChange: (e) => {
                     const file = e.target.files?.[0];
                     if (!file)
                         return;

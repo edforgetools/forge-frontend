@@ -71,6 +71,49 @@ export default function AudiogramToolPage() {
           })}
         </script>
       </Helmet>
+
+      {/* Header */}
+      <header className="border-b border-gray-700 bg-gray-800">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">
+                <a href="/" className="link-primary">
+                  Forge Tools
+                </a>
+              </h1>
+              <p className="text-text-muted text-sm mt-1">
+                Free AI-Powered Content Creation
+              </p>
+            </div>
+            <nav
+              className="flex gap-6"
+              role="navigation"
+              aria-label="Main navigation"
+            >
+              <a
+                href="/"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Home
+              </a>
+              <a
+                href="/blog"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Blog
+              </a>
+              <a
+                href="/free-youtube-thumbnail-tool"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Tools
+              </a>
+            </nav>
+          </div>
+        </div>
+      </header>
+
       <main className="container mx-auto px-4 py-8">
         {/* SEO Content */}
         <div className="mb-8">
@@ -86,7 +129,14 @@ export default function AudiogramToolPage() {
               marketing and audience growth. Our advanced AI technology
               automatically identifies the most compelling moments from your
               audio and creates visually appealing video content that drives
-              engagement across all social platforms.
+              engagement across all social platforms. Works perfectly with our
+              <a
+                href="/free-podcast-caption-generator"
+                className="link-primary"
+              >
+                podcast caption generator
+              </a>
+              for complete content marketing workflows.
             </p>
 
             <h2 className="text-2xl font-semibold mt-8 mb-4">
@@ -172,6 +222,18 @@ export default function AudiogramToolPage() {
           <ComingSoon />
         </div>
       </main>
+
+      {/* Footer */}
+      <footer
+        className="bg-gray-800 border-t border-gray-700 mt-16"
+        role="contentinfo"
+      >
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center text-text-muted text-sm">
+            <p>&copy; 2024 Forge Tools. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

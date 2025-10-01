@@ -176,7 +176,7 @@ export default function ForgePlusDashboard() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-4">
       <div className="space-y-2">
-        <label htmlFor="video-upload" className="block text-sm">
+        <label htmlFor="video-upload" className="block text-sm text-text-primary">
           Upload video file
         </label>
         <input
@@ -184,28 +184,40 @@ export default function ForgePlusDashboard() {
           type="file"
           accept="video/*,.mp4,.mov,.m4v,.webm"
           onChange={onUpload}
+          aria-describedby="video-upload-help"
         />
+        <div id="video-upload-help" className="text-sm text-text-muted">
+          Upload a video file (MP4, MOV, M4V, or WebM) up to 1GB to transcribe
+        </div>
         <button
           className="btn"
           disabled={!canTranscribe || !!busy}
           onClick={transcribe}
+          aria-describedby="transcribe-help"
         >
           {busy === "transcribe" ? "Transcribing…" : "Transcribe"}
         </button>
+        <span id="transcribe-help" className="sr-only">
+          Transcribe the uploaded video to generate text
+        </span>
         <div className="flex items-center gap-2">
-          <label className="text-sm">Tone</label>
+          <label htmlFor="tone-select" className="text-sm text-text-primary">Tone</label>
           <select
+            id="tone-select"
             value={tone}
             onChange={(e) =>
               updateState({ ...state, tone: e.target.value as Tone })
             }
-            className="border rounded px-2 py-1 text-sm"
-            aria-label="Tone selector"
+            className="border rounded px-2 py-1 text-sm bg-bg-secondary text-text-primary"
+            aria-describedby="tone-help"
           >
             <option value="default">default</option>
             <option value="hype">hype</option>
             <option value="educational">educational</option>
           </select>
+          <span id="tone-help" className="sr-only">
+            Select the tone for generated captions
+          </span>
         </div>
 
         {/* Undo/Redo Bar */}
@@ -230,15 +242,20 @@ export default function ForgePlusDashboard() {
       )}
 
       <div className="space-y-2">
-        <label className="block text-sm font-medium">Transcript</label>
+        <label htmlFor="transcript-textarea" className="block text-sm font-medium text-text-primary">Transcript</label>
         <textarea
-          className="w-full border rounded p-2 h-32"
+          id="transcript-textarea"
+          className="w-full border rounded p-2 h-32 bg-bg-secondary text-text-primary"
           value={transcript}
           onChange={(e) =>
             updateState({ ...state, transcript: e.target.value })
           }
           placeholder="Transcript will appear here…"
+          aria-describedby="transcript-help"
         />
+        <div id="transcript-help" className="text-sm text-text-muted">
+          Edit the transcript text or paste your own content
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
@@ -260,22 +277,32 @@ export default function ForgePlusDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium">Tweet</label>
+          <label htmlFor="tweet-textarea" className="block text-sm font-medium text-text-primary">Tweet</label>
           <textarea
-            className="w-full border rounded p-2 h-32"
+            id="tweet-textarea"
+            className="w-full border rounded p-2 h-32 bg-bg-secondary text-text-primary"
             value={tweet}
             onChange={(e) => updateState({ ...state, tweet: e.target.value })}
+            aria-describedby="tweet-help"
           />
+          <div id="tweet-help" className="text-sm text-text-muted">
+            Generated Twitter caption
+          </div>
         </div>
         <div>
-          <label className="block text-sm font-medium">Instagram</label>
+          <label htmlFor="instagram-textarea" className="block text-sm font-medium text-text-primary">Instagram</label>
           <textarea
-            className="w-full border rounded p-2 h-32"
+            id="instagram-textarea"
+            className="w-full border rounded p-2 h-32 bg-bg-secondary text-text-primary"
             value={instagram}
             onChange={(e) =>
               updateState({ ...state, instagram: e.target.value })
             }
+            aria-describedby="instagram-help"
           />
+          <div id="instagram-help" className="text-sm text-text-muted">
+            Generated Instagram caption
+          </div>
         </div>
       </div>
     </div>

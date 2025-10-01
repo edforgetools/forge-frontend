@@ -7,7 +7,7 @@ export default function BlogPostPage() {
     const slug = path.replace("/blog/", "");
     const blogPost = getBlogPost(slug);
     if (!blogPost) {
-        return (_jsx("div", { className: "min-h-screen bg-gray-900 text-white flex items-center justify-center", children: _jsxs("div", { className: "text-center", children: [_jsx("h1", { className: "text-4xl font-bold mb-4", children: "Post Not Found" }), _jsx("p", { className: "text-gray-400 mb-8", children: "The blog post you're looking for doesn't exist." }), _jsx("a", { href: "/blog", className: "bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors", children: "Back to Blog" })] }) }));
+        return (_jsx("div", { className: "min-h-screen bg-gray-900 text-white", children: _jsx("main", { className: "flex items-center justify-center min-h-screen", children: _jsxs("div", { className: "text-center", children: [_jsx("h1", { className: "text-4xl font-bold mb-4 text-text-primary", children: "Post Not Found" }), _jsx("p", { className: "text-text-muted mb-8", children: "The blog post you're looking for doesn't exist." }), _jsx("a", { href: "/blog", className: "bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-medium transition-colors", children: "Back to Blog" })] }) }) }));
     }
     const { component: Component } = blogPost;
     const frontmatter = {

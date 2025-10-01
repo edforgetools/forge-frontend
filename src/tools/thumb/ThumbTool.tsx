@@ -968,16 +968,23 @@ export default function ThumbTool() {
   return (
     <div className="p-4 space-y-4 text-white">
       <div className="flex items-center gap-3 flex-wrap">
-        <label className="text-sm">Aspect</label>
+        <label htmlFor="aspect-select" className="text-sm text-text-primary">
+          Aspect
+        </label>
         <select
-          className="border rounded px-2 py-1 bg-black/40"
+          id="aspect-select"
+          className="border rounded px-2 py-1 bg-bg-secondary text-text-primary"
           value={aspect}
           onChange={(e) => setAspect(e.target.value as Aspect)}
+          aria-describedby="aspect-help"
         >
-          <option value="16:9">16:9</option>
-          <option value="9:16">9:16</option>
-          <option value="1:1">1:1</option>
+          <option value="16:9">16:9 (YouTube, Landscape)</option>
+          <option value="9:16">9:16 (TikTok, Instagram Stories)</option>
+          <option value="1:1">1:1 (Instagram Post, Square)</option>
         </select>
+        <span id="aspect-help" className="sr-only">
+          Choose the aspect ratio for your thumbnail
+        </span>
 
         {stage === "edit" && (
           <UndoRedoBar
@@ -988,13 +995,21 @@ export default function ThumbTool() {
           />
         )}
 
-        <label className="ml-4 inline-flex items-center gap-2 text-sm">
+        <label
+          htmlFor="flush-snap"
+          className="ml-4 inline-flex items-center gap-2 text-sm text-text-primary"
+        >
           <input
+            id="flush-snap"
             type="checkbox"
             checked={flushSnap}
             onChange={(e) => setFlushSnap(e.target.checked)}
+            aria-describedby="flush-snap-help"
           />
           Flush snap
+          <span id="flush-snap-help" className="sr-only">
+            Enable flush snap to align elements to canvas edges
+          </span>
         </label>
 
         <div className="text-xs text-neutral-400 ml-4">
@@ -1007,7 +1022,7 @@ export default function ThumbTool() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor="base-file" className="block text-sm">
+        <label htmlFor="base-file" className="block text-sm text-text-primary">
           Upload base image or video
         </label>
         <input
@@ -1015,13 +1030,22 @@ export default function ThumbTool() {
           type="file"
           accept="image/*,video/*"
           onChange={onBaseFile}
+          aria-describedby="base-file-help"
         />
+        <div id="base-file-help" className="text-sm text-text-muted">
+          Upload an image file or video to create your thumbnail. For videos,
+          you can capture a frame.
+        </div>
         {stage === "pick" && videoRef.current?.src && (
           <button
-            className="px-3 py-1 rounded bg-neutral-700"
+            className="px-3 py-1 rounded bg-neutral-700 text-text-primary hover:bg-neutral-600"
             onClick={captureFrameFromVideo}
+            aria-describedby="capture-help"
           >
             Capture frame
+            <span id="capture-help" className="sr-only">
+              Capture current video frame as thumbnail base
+            </span>
           </button>
         )}
       </div>
@@ -1030,21 +1054,32 @@ export default function ThumbTool() {
         <>
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2">
-              <span>Zoom</span>
+              <label
+                htmlFor="zoom-slider"
+                className="text-sm text-text-primary"
+              >
+                Zoom
+              </label>
               <input
+                id="zoom-slider"
                 type="range"
                 min={minScale}
                 max={minScale * 6}
                 step={0.01}
                 value={scale}
                 onChange={(e) => setScale(parseFloat(e.target.value))}
+                aria-describedby="zoom-help"
               />
+              <span id="zoom-help" className="sr-only">
+                Adjust zoom level from {minScale.toFixed(2)}x to{" "}
+                {(minScale * 6).toFixed(2)}x
+              </span>
             </div>
 
             <div className="flex items-center gap-2">
               <label
                 htmlFor="overlay-file"
-                className="px-2 py-1 rounded bg-neutral-700 cursor-pointer"
+                className="px-2 py-1 rounded bg-neutral-700 cursor-pointer text-text-primary hover:bg-neutral-600"
               >
                 Choose overlay
                 <input
@@ -1053,12 +1088,19 @@ export default function ThumbTool() {
                   accept="image/*"
                   onChange={onOverlayFile}
                   className="hidden"
+                  aria-describedby="overlay-file-help"
                 />
               </label>
-              <span className="opacity-70 text-sm">
+              <span id="overlay-file-help" className="sr-only">
+                Upload an overlay image to add to your thumbnail
+              </span>
+              <span className="opacity-70 text-sm text-text-muted">
                 {ovUrl ? "Overlay loaded" : "No overlay"}
               </span>
-              <label htmlFor="overlay-size" className="text-sm">
+              <label
+                htmlFor="overlay-size"
+                className="text-sm text-text-primary"
+              >
                 Overlay size
               </label>
               <input
@@ -1069,8 +1111,15 @@ export default function ThumbTool() {
                 step={0.01}
                 value={ovScale}
                 onChange={(e) => setOvScale(parseFloat(e.target.value))}
+                aria-describedby="overlay-size-help"
               />
-              <label htmlFor="overlay-opacity" className="text-sm">
+              <span id="overlay-size-help" className="sr-only">
+                Adjust overlay size from 0.2x to 3x
+              </span>
+              <label
+                htmlFor="overlay-opacity"
+                className="text-sm text-text-primary"
+              >
                 Overlay opacity
               </label>
               <input
@@ -1081,7 +1130,11 @@ export default function ThumbTool() {
                 step={0.01}
                 value={ovAlpha}
                 onChange={(e) => setOvAlpha(parseFloat(e.target.value))}
+                aria-describedby="overlay-opacity-help"
               />
+              <span id="overlay-opacity-help" className="sr-only">
+                Adjust overlay opacity from 5% to 100%
+              </span>
             </div>
           </div>
 
@@ -1171,7 +1224,7 @@ export default function ThumbTool() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <label htmlFor="text-size" className="text-sm">
+              <label htmlFor="text-size" className="text-sm text-text-primary">
                 Size
               </label>
               <input
@@ -1182,8 +1235,15 @@ export default function ThumbTool() {
                 step={1}
                 value={txtSize}
                 onChange={(e) => setTxtSize(parseInt(e.target.value))}
+                aria-describedby="text-size-help"
               />
-              <label htmlFor="text-opacity" className="text-sm">
+              <span id="text-size-help" className="sr-only">
+                Adjust text size from 16px to 200px
+              </span>
+              <label
+                htmlFor="text-opacity"
+                className="text-sm text-text-primary"
+              >
                 Opacity
               </label>
               <input
@@ -1194,10 +1254,17 @@ export default function ThumbTool() {
                 step={0.01}
                 value={txtAlpha}
                 onChange={(e) => setTxtAlpha(parseFloat(e.target.value))}
+                aria-describedby="text-opacity-help"
               />
+              <span id="text-opacity-help" className="sr-only">
+                Adjust text opacity from 5% to 100%
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <label htmlFor="text-stroke" className="text-sm">
+              <label
+                htmlFor="text-stroke"
+                className="text-sm text-text-primary"
+              >
                 Stroke
               </label>
               <input
@@ -1208,7 +1275,11 @@ export default function ThumbTool() {
                 step={1}
                 value={txtStrokeW}
                 onChange={(e) => setTxtStrokeW(parseInt(e.target.value))}
+                aria-describedby="text-stroke-help"
               />
+              <span id="text-stroke-help" className="sr-only">
+                Adjust text stroke width from 0px to 24px
+              </span>
               <label htmlFor="text-stroke-color" className="sr-only">
                 Stroke color
               </label>
@@ -1217,8 +1288,9 @@ export default function ThumbTool() {
                 type="color"
                 value={txtStroke}
                 onChange={(e) => setTxtStroke(e.target.value)}
+                aria-label="Text stroke color"
               />
-              <label htmlFor="text-fill" className="text-sm">
+              <label htmlFor="text-fill" className="text-sm text-text-primary">
                 Fill
               </label>
               <label htmlFor="text-fill-color" className="sr-only">
@@ -1229,6 +1301,7 @@ export default function ThumbTool() {
                 type="color"
                 value={txtFill}
                 onChange={(e) => setTxtFill(e.target.value)}
+                aria-label="Text fill color"
               />
             </div>
 
@@ -1270,10 +1343,11 @@ export default function ThumbTool() {
                 Start Over
               </button>
               <label
+                htmlFor="watermark-toggle"
                 className={`inline-flex items-center gap-2 text-sm px-3 py-1 rounded transition-colors ${
                   canRemoveWatermark()
-                    ? "bg-neutral-700 cursor-pointer hover:bg-neutral-600"
-                    : "bg-neutral-800 cursor-not-allowed opacity-60"
+                    ? "bg-neutral-700 cursor-pointer hover:bg-neutral-600 text-text-primary"
+                    : "bg-neutral-800 cursor-not-allowed opacity-60 text-text-muted"
                 }`}
                 title={
                   !canRemoveWatermark()
@@ -1282,6 +1356,7 @@ export default function ThumbTool() {
                 }
               >
                 <input
+                  id="watermark-toggle"
                   type="checkbox"
                   checked={wmOn}
                   disabled={!canRemoveWatermark()}
@@ -1298,8 +1373,14 @@ export default function ThumbTool() {
                     }
                   }}
                   className="rounded"
+                  aria-describedby="watermark-help"
                 />
                 Remove watermark {!canRemoveWatermark() && "(Upgrade to Pro)"}
+                <span id="watermark-help" className="sr-only">
+                  {canRemoveWatermark()
+                    ? "Toggle watermark visibility on exported thumbnails"
+                    : "Watermark removal requires Pro or Plus plan"}
+                </span>
               </label>
             </div>
           </div>
