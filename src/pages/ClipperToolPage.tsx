@@ -39,33 +39,35 @@ export default function ClipperToolPage() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "Free AI Video Clipper",
-            "description": "Automatically generate viral short video clips from longer content with our free AI video clipper. Upload videos and let our smart algorithm identify the most engaging moments for TikTok, Instagram Reels, and YouTube Shorts.",
-            "category": "MultimediaApplication",
-            "url": "https://forge-frontend.vercel.app/clip-short-video-automatically",
-            "applicationCategory": "MultimediaApplication",
-            "operatingSystem": "Web Browser",
-            "offers": {
+            name: "Free AI Video Clipper",
+            description:
+              "Automatically generate viral short video clips from longer content with our free AI video clipper. Upload videos and let our smart algorithm identify the most engaging moments for TikTok, Instagram Reels, and YouTube Shorts.",
+            category: "MultimediaApplication",
+            url: "https://forge-frontend.vercel.app/clip-short-video-automatically",
+            applicationCategory: "MultimediaApplication",
+            operatingSystem: "Web Browser",
+            offers: {
               "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD"
+              price: "0",
+              priceCurrency: "USD",
             },
-            "creator": {
+            creator: {
               "@type": "Organization",
-              "name": "Forge Tools"
+              name: "Forge Tools",
             },
-            "featureList": [
+            featureList: [
               "AI-powered video analysis",
               "Automatic clip generation",
               "Multi-platform optimization",
               "Engagement moment detection",
               "Smart timing optimization",
-              "Viral content identification"
+              "Viral content identification",
             ],
-            "screenshot": "https://forge-frontend.vercel.app/clip-short-video-automatically",
-            "softwareVersion": "1.0",
-            "datePublished": "2024-01-01",
-            "dateModified": "2024-01-01"
+            screenshot:
+              "https://forge-frontend.vercel.app/clip-short-video-automatically",
+            softwareVersion: "1.0",
+            datePublished: "2024-01-01",
+            dateModified: "2024-01-01",
           })}
         </script>
       </Helmet>
@@ -128,8 +130,15 @@ export default function ClipperToolPage() {
               analyzes your video content to detect emotional peaks, key
               moments, and trending elements that are most likely to capture
               audience attention and drive engagement. Perfect for repurposing
-              content across <a href="/free-youtube-thumbnail-tool" className="link-primary">YouTube</a>, 
-              <a href="/free-ai-audiogram-generator" className="link-primary">Instagram</a>, and other platforms.
+              content across{" "}
+              <a href="/free-youtube-thumbnail-tool" className="link-primary">
+                YouTube
+              </a>
+              ,
+              <a href="/free-ai-audiogram-generator" className="link-primary">
+                Instagram
+              </a>
+              , and other platforms.
             </p>
 
             <h2 className="text-2xl font-semibold mt-8 mb-4">

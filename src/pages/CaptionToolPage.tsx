@@ -39,33 +39,35 @@ export default function CaptionToolPage() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "Free AI Podcast Caption Generator",
-            "description": "Generate viral social media captions from podcast episodes with our free AI caption generator. Upload audio files for instant transcription and engagement-optimized captions for all platforms.",
-            "category": "MultimediaApplication",
-            "url": "https://forge-frontend.vercel.app/free-podcast-caption-generator",
-            "applicationCategory": "MultimediaApplication",
-            "operatingSystem": "Web Browser",
-            "offers": {
+            name: "Free AI Podcast Caption Generator",
+            description:
+              "Generate viral social media captions from podcast episodes with our free AI caption generator. Upload audio files for instant transcription and engagement-optimized captions for all platforms.",
+            category: "MultimediaApplication",
+            url: "https://forge-frontend.vercel.app/free-podcast-caption-generator",
+            applicationCategory: "MultimediaApplication",
+            operatingSystem: "Web Browser",
+            offers: {
               "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD"
+              price: "0",
+              priceCurrency: "USD",
             },
-            "creator": {
+            creator: {
               "@type": "Organization",
-              "name": "Forge Tools"
+              name: "Forge Tools",
             },
-            "featureList": [
+            featureList: [
               "AI-powered caption generation",
               "Automatic audio transcription",
               "Multi-platform optimization",
               "Engagement-focused formatting",
               "Key quote extraction",
-              "Brand voice matching"
+              "Brand voice matching",
             ],
-            "screenshot": "https://forge-frontend.vercel.app/free-podcast-caption-generator",
-            "softwareVersion": "1.0",
-            "datePublished": "2024-01-01",
-            "dateModified": "2024-01-01"
+            screenshot:
+              "https://forge-frontend.vercel.app/free-podcast-caption-generator",
+            softwareVersion: "1.0",
+            datePublished: "2024-01-01",
+            dateModified: "2024-01-01",
           })}
         </script>
       </Helmet>
@@ -141,8 +143,10 @@ export default function CaptionToolPage() {
               marketers looking to maximize their reach across all platforms.
               The tool automatically identifies the most quotable moments,
               extracts key insights, and formats them for maximum social media
-              impact. For more content creation tips, check out our 
-              <a href="/blog" className="link-primary">content creation blog</a> 
+              impact. For more content creation tips, check out our
+              <a href="/blog" className="link-primary">
+                content creation blog
+              </a>
               with expert guides and tutorials.
             </p>
 

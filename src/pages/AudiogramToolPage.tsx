@@ -39,33 +39,35 @@ export default function AudiogramToolPage() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "Free AI Audiogram Generator",
-            "description": "Create viral audiograms from podcast episodes with our free AI audiogram generator. Transform audio into stunning visual content that drives engagement on Instagram, TikTok, and all social platforms.",
-            "category": "MultimediaApplication",
-            "url": "https://forge-frontend.vercel.app/free-ai-audiogram-generator",
-            "applicationCategory": "MultimediaApplication",
-            "operatingSystem": "Web Browser",
-            "offers": {
+            name: "Free AI Audiogram Generator",
+            description:
+              "Create viral audiograms from podcast episodes with our free AI audiogram generator. Transform audio into stunning visual content that drives engagement on Instagram, TikTok, and all social platforms.",
+            category: "MultimediaApplication",
+            url: "https://forge-frontend.vercel.app/free-ai-audiogram-generator",
+            applicationCategory: "MultimediaApplication",
+            operatingSystem: "Web Browser",
+            offers: {
               "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD"
+              price: "0",
+              priceCurrency: "USD",
             },
-            "creator": {
+            creator: {
               "@type": "Organization",
-              "name": "Forge Tools"
+              name: "Forge Tools",
             },
-            "featureList": [
+            featureList: [
               "AI-powered audiogram generation",
               "Automatic audio transcription",
               "Visual waveform analysis",
               "Multi-platform optimization",
               "Professional typography",
-              "Brand customization"
+              "Brand customization",
             ],
-            "screenshot": "https://forge-frontend.vercel.app/free-ai-audiogram-generator",
-            "softwareVersion": "1.0",
-            "datePublished": "2024-01-01",
-            "dateModified": "2024-01-01"
+            screenshot:
+              "https://forge-frontend.vercel.app/free-ai-audiogram-generator",
+            softwareVersion: "1.0",
+            datePublished: "2024-01-01",
+            dateModified: "2024-01-01",
           })}
         </script>
       </Helmet>
@@ -127,8 +129,13 @@ export default function AudiogramToolPage() {
               marketing and audience growth. Our advanced AI technology
               automatically identifies the most compelling moments from your
               audio and creates visually appealing video content that drives
-              engagement across all social platforms. Works perfectly with our 
-              <a href="/free-podcast-caption-generator" className="link-primary">podcast caption generator</a> 
+              engagement across all social platforms. Works perfectly with our
+              <a
+                href="/free-podcast-caption-generator"
+                className="link-primary"
+              >
+                podcast caption generator
+              </a>
               for complete content marketing workflows.
             </p>
 

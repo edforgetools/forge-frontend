@@ -39,33 +39,35 @@ export default function ThumbnailToolPage() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            "name": "Free YouTube Thumbnail Maker",
-            "description": "Create viral YouTube thumbnails in seconds with our free AI-powered thumbnail generator. Upload images, add text overlays, and design click-worthy thumbnails that boost CTR and views.",
-            "category": "MultimediaApplication",
-            "url": "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool",
-            "applicationCategory": "MultimediaApplication",
-            "operatingSystem": "Web Browser",
-            "offers": {
+            name: "Free YouTube Thumbnail Maker",
+            description:
+              "Create viral YouTube thumbnails in seconds with our free AI-powered thumbnail generator. Upload images, add text overlays, and design click-worthy thumbnails that boost CTR and views.",
+            category: "MultimediaApplication",
+            url: "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool",
+            applicationCategory: "MultimediaApplication",
+            operatingSystem: "Web Browser",
+            offers: {
               "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD"
+              price: "0",
+              priceCurrency: "USD",
             },
-            "creator": {
+            creator: {
               "@type": "Organization",
-              "name": "Forge Tools"
+              name: "Forge Tools",
             },
-            "featureList": [
+            featureList: [
               "AI-powered thumbnail generation",
               "Text overlay customization",
               "Multiple aspect ratios (16:9, 9:16, 1:1)",
               "High-quality export under 2MB",
               "Template suggestions",
-              "Color contrast optimization"
+              "Color contrast optimization",
             ],
-            "screenshot": "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool",
-            "softwareVersion": "1.0",
-            "datePublished": "2024-01-01",
-            "dateModified": "2024-01-01"
+            screenshot:
+              "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool",
+            softwareVersion: "1.0",
+            datePublished: "2024-01-01",
+            dateModified: "2024-01-01",
           })}
         </script>
       </Helmet>
@@ -126,8 +128,10 @@ export default function ThumbnailToolPage() {
               frames from videos, add custom text overlays, and design
               click-worthy thumbnails that boost CTR and views. Our advanced AI
               technology analyzes your content to create thumbnails optimized
-              for maximum engagement. Learn more about 
-              <a href="/blog" className="link-primary">YouTube thumbnail best practices</a> 
+              for maximum engagement. Learn more about
+              <a href="/blog" className="link-primary">
+                YouTube thumbnail best practices
+              </a>
               in our comprehensive guides.
             </p>
 
