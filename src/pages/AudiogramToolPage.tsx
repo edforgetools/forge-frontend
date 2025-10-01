@@ -1,10 +1,42 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
+import { motion } from "framer-motion";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ShareButton } from "@/components/ShareButton";
+import { UpgradeCTA } from "@/components/UpgradeCTA";
+import { trackPageViewTool } from "@/lib/metrics";
+import {
+  Image,
+  Type,
+  Music,
+  Scissors,
+  BookOpen,
+  ArrowRight,
+  ExternalLink,
+  Home,
+  Menu,
+  Mic,
+  Zap,
+  Sparkles,
+} from "lucide-react";
 import ComingSoon from "../components/ComingSoon";
 
 export default function AudiogramToolPage() {
+  // Track page view
+  React.useEffect(() => {
+    trackPageViewTool("audiogram");
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Helmet>
         <title>
           Free AI Audiogram Generator - Viral Visual Content Creator 2024
@@ -70,56 +102,119 @@ export default function AudiogramToolPage() {
             dateModified: "2024-01-01",
           })}
         </script>
+        <link
+          rel="canonical"
+          href="https://forge-frontend.vercel.app/free-ai-audiogram-generator"
+        />
       </Helmet>
 
+      {/* Skip link for keyboard navigation */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
       {/* Header */}
-      <header className="border-b border-gray-700 bg-gray-800">
+      <motion.header
+        className="border-b border-border bg-card"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold">
-                <a href="/" className="link-primary">
+                <a href="/" className="hover:text-primary transition-colors">
                   Forge Tools
                 </a>
               </h1>
-              <p className="text-text-muted text-sm mt-1">
+              <p className="text-muted-foreground text-sm mt-1">
                 Free AI-Powered Content Creation
               </p>
             </div>
             <nav
-              className="flex gap-6"
+              className="hidden md:flex gap-6"
               role="navigation"
               aria-label="Main navigation"
             >
-              <a
-                href="/"
-                className="text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Home
-              </a>
-              <a
-                href="/blog"
-                className="text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Blog
-              </a>
-              <a
-                href="/free-youtube-thumbnail-tool"
-                className="text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Tools
-              </a>
+              <Button variant="ghost" asChild>
+                <a href="/">
+                  <Home className="h-4 w-4 mr-2" />
+                  Home
+                </a>
+              </Button>
+              <Button variant="ghost" asChild>
+                <a href="/blog">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Blog
+                </a>
+              </Button>
+              <Button variant="ghost" asChild>
+                <a href="/free-youtube-thumbnail-tool">
+                  <Image className="h-4 w-4 mr-2" />
+                  Tools
+                </a>
+              </Button>
             </nav>
+            <div className="flex items-center gap-2">
+              <ShareButton size="sm" variant="ghost" />
+              <UpgradeCTA
+                variant="inline"
+                size="sm"
+                feature="AI Audiogram Generator"
+              />
+              <Button variant="ghost" size="sm" className="md:hidden">
+                <Menu className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
-      </header>
+      </motion.header>
 
-      <main className="container mx-auto px-4 py-8">
-        {/* SEO Content */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-6 text-center">
-            Free AI Audiogram Generator - Viral Visual Content Creator
+      <main
+        id="main-content"
+        className="container mx-auto px-4 py-8"
+        role="main"
+        aria-label="Free AI Audiogram Generator"
+      >
+        {/* Upgrade Banner */}
+        <UpgradeCTA
+          variant="banner"
+          plan="plus"
+          feature="advanced audiogram templates and unlimited exports"
+          className="mb-8"
+        />
+
+        {/* Hero Section */}
+        <motion.section
+          className="mb-12 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary-300 bg-clip-text text-transparent">
+            Free AI Audiogram Generator
           </h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+            Create viral audiograms from podcast episodes with our free AI
+            audiogram generator. Transform audio into stunning visual content
+            that drives engagement on Instagram, TikTok, and all social
+            platforms.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Badge variant="secondary" className="text-sm px-3 py-1">
+              <Music className="h-3 w-3 mr-1" />
+              AI-Powered
+            </Badge>
+            <Badge variant="secondary" className="text-sm px-3 py-1">
+              <Sparkles className="h-3 w-3 mr-1" />
+              Viral Content
+            </Badge>
+            <Badge variant="secondary" className="text-sm px-3 py-1">
+              <ExternalLink className="h-3 w-3 mr-1" />
+              Multi-Platform
+            </Badge>
+          </div>
 
           <div className="max-w-4xl mx-auto space-y-4 text-lg leading-relaxed">
             <p>
@@ -175,7 +270,7 @@ export default function AudiogramToolPage() {
                     href="/free-youtube-thumbnail-tool"
                     className="link-primary"
                   >
-                    YouTube Thumbnail Maker
+                    Snapthumb - YouTube Thumbnail Maker
                   </a>
                 </h3>
                 <p className="text-sm text-gray-300">
@@ -190,7 +285,7 @@ export default function AudiogramToolPage() {
                     href="/free-podcast-caption-generator"
                     className="link-primary"
                   >
-                    Podcast Caption Generator
+                    Captiq - Podcast Caption Generator
                   </a>
                 </h3>
                 <p className="text-sm text-gray-300">
@@ -215,7 +310,7 @@ export default function AudiogramToolPage() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.section>
 
         {/* Coming Soon Component */}
         <div className="bg-gray-800 rounded-lg p-6">

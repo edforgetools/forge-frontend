@@ -1,4 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Crown, Zap, Star } from "lucide-react";
 import {
   getCurrentPlan,
   setCurrentPlan,
@@ -10,6 +19,18 @@ import { trackRevenue, trackActivity } from "../lib/metrics";
 interface PlanSelectorProps {
   className?: string;
 }
+
+const planIcons = {
+  free: null,
+  pro: <Zap className="h-3 w-3" />,
+  plus: <Crown className="h-3 w-3" />,
+};
+
+const planVariants = {
+  free: "secondary" as const,
+  pro: "default" as const,
+  plus: "outline" as const,
+};
 
 export default function PlanSelector({ className = "" }: PlanSelectorProps) {
   const [currentPlan, setCurrentPlanState] = useState<Plan>(getCurrentPlan());
@@ -49,37 +70,58 @@ export default function PlanSelector({ className = "" }: PlanSelectorProps) {
   const plans: Plan[] = ["free", "pro", "plus"];
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <span className="text-sm text-gray-300">Dev Plan:</span>
-      <div className="flex gap-1">
+    <div className={`flex items-center gap-3 ${className}`}>
+      <span className="text-sm text-muted-foreground">Dev Plan:</span>
+      <div className="flex gap-2">
         {plans.map((planId) => {
           const plan = getPlan(planId);
           const isActive = currentPlan === planId;
+          const icon = planIcons[planId];
+          const variant = planVariants[planId];
+
           return (
-            <button
-              key={planId}
-              onClick={() => handlePlanChange(planId)}
-              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                isActive
-                  ? planId === "free"
-                    ? "bg-gray-600 text-white"
-                    : planId === "pro"
-                    ? "bg-blue-600 text-white"
-                    : "bg-purple-600 text-white"
-                  : "bg-gray-700 hover:bg-gray-600 text-gray-300"
-              }`}
-              title={`${plan.name}: ${
-                plan.watermarkEnforced
-                  ? "Watermark enforced"
-                  : "Watermark toggle"
-              }, ${
-                plan.unlimitedExports ? "Unlimited exports" : "Usage caps"
-              }, ${
-                plan.premiumPresets ? "Premium presets" : "Basic presets"
-              }, ${plan.scheduler ? "Scheduler included" : "No scheduler"}`}
-            >
-              {plan.name}
-            </button>
+            <TooltipProvider key={planId}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant={isActive ? variant : "ghost"}
+                    size="sm"
+                    onClick={() => handlePlanChange(planId)}
+                    className={`flex items-center gap-2 ${
+                      isActive ? "ring-2 ring-ring" : ""
+                    }`}
+                  >
+                    {icon}
+                    {plan.name}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="space-y-1">
+                    <p className="font-medium">{plan.name}</p>
+                    <div className="text-xs space-y-1">
+                      <p>
+                        {plan.watermarkEnforced
+                          ? "Watermark enforced"
+                          : "Watermark toggle"}
+                      </p>
+                      <p>
+                        {plan.unlimitedExports
+                          ? "Unlimited exports"
+                          : "Usage caps"}
+                      </p>
+                      <p>
+                        {plan.premiumPresets
+                          ? "Premium presets"
+                          : "Basic presets"}
+                      </p>
+                      <p>
+                        {plan.scheduler ? "Scheduler included" : "No scheduler"}
+                      </p>
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           );
         })}
       </div>

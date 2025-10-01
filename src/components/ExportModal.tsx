@@ -1,4 +1,16 @@
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Share2, Download, X } from "lucide-react";
 import { logEvent } from "../lib/logEvent";
 
 interface ExportModalProps {
@@ -13,13 +25,35 @@ const PLATFORM_URLS = {
   instagram: "https://www.instagram.com/create/reel/",
 };
 
+const platformData = [
+  {
+    id: "tiktok" as const,
+    name: "TikTok",
+    description: "Upload your thumbnail",
+    icon: "T",
+    bgColor: "bg-black",
+  },
+  {
+    id: "youtube" as const,
+    name: "YouTube Shorts",
+    description: "Upload your thumbnail",
+    icon: "YT",
+    bgColor: "bg-red-600",
+  },
+  {
+    id: "instagram" as const,
+    name: "Instagram Reels",
+    description: "Upload your thumbnail",
+    icon: "IG",
+    bgColor: "bg-gradient-to-r from-purple-500 to-pink-500",
+  },
+];
+
 export default function ExportModal({
   isOpen,
   onClose,
   onDownload,
 }: ExportModalProps) {
-  if (!isOpen) return null;
-
   const handleShareClick = (platform: keyof typeof PLATFORM_URLS) => {
     // Log the share click event
     logEvent("share_clicked", { platform });
@@ -29,92 +63,68 @@ export default function ExportModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-neutral-800 rounded-lg p-6 max-w-md w-full mx-4">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-white">Export Complete!</h2>
-          <button
-            onClick={onClose}
-            className="text-neutral-400 hover:text-white transition-colors"
-            aria-label="Close modal"
-          >
-            ✕
-          </button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Share2 className="h-5 w-5" />
+            Export Complete!
+          </DialogTitle>
+          <DialogDescription>
+            Your thumbnail has been exported successfully. Share it on your
+            favorite platform!
+          </DialogDescription>
+        </DialogHeader>
 
-        <p className="text-neutral-300 mb-6">
-          Your thumbnail has been exported successfully. Share it on your
-          favorite platform!
-        </p>
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-foreground">Share to:</h3>
 
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium text-neutral-300 mb-3">
-            Share to:
-          </h3>
-
-          <div className="grid grid-cols-1 gap-2">
-            <button
-              onClick={() => handleShareClick("tiktok")}
-              className="flex items-center gap-3 px-4 py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg transition-colors text-left"
-            >
-              <div className="w-8 h-8 bg-black rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">T</span>
-              </div>
-              <div>
-                <div className="text-white font-medium">TikTok</div>
-                <div className="text-xs text-neutral-400">
-                  Upload your thumbnail
-                </div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleShareClick("youtube")}
-              className="flex items-center gap-3 px-4 py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg transition-colors text-left"
-            >
-              <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">YT</span>
-              </div>
-              <div>
-                <div className="text-white font-medium">YouTube Shorts</div>
-                <div className="text-xs text-neutral-400">
-                  Upload your thumbnail
-                </div>
-              </div>
-            </button>
-
-            <button
-              onClick={() => handleShareClick("instagram")}
-              className="flex items-center gap-3 px-4 py-3 bg-neutral-700 hover:bg-neutral-600 rounded-lg transition-colors text-left"
-            >
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">IG</span>
-              </div>
-              <div>
-                <div className="text-white font-medium">Instagram Reels</div>
-                <div className="text-xs text-neutral-400">
-                  Upload your thumbnail
-                </div>
-              </div>
-            </button>
+          <div className="grid grid-cols-1 gap-3">
+            {platformData.map((platform, index) => (
+              <motion.div
+                key={platform.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card
+                  className="cursor-pointer hover:bg-accent transition-colors"
+                  onClick={() => handleShareClick(platform.id)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-8 h-8 ${platform.bgColor} rounded flex items-center justify-center`}
+                      >
+                        <span className="text-white font-bold text-sm">
+                          {platform.icon}
+                        </span>
+                      </div>
+                      <div>
+                        <div className="font-medium">{platform.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {platform.description}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </div>
         </div>
 
-        <div className="flex gap-3 mt-6">
-          <button
-            onClick={onDownload}
-            className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-          >
+        <DialogFooter className="flex gap-3">
+          <Button variant="outline" onClick={onDownload} className="flex-1">
+            <Download className="h-4 w-4 mr-2" />
             Download Again
-          </button>
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 bg-neutral-600 hover:bg-neutral-500 text-white rounded-lg transition-colors"
-          >
+          </Button>
+          <Button variant="secondary" onClick={onClose} className="flex-1">
+            <X className="h-4 w-4 mr-2" />
             Close
-          </button>
-        </div>
-      </div>
-    </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

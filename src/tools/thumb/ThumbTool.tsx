@@ -8,6 +8,9 @@ import React, {
 import UndoRedoBar from "../../components/UndoRedoBar";
 import PlanSelector from "../../components/PlanSelector";
 import ExportModal from "../../components/ExportModal";
+import ErrorBoundary from "../../components/ErrorBoundary";
+import SessionRestoreDialog from "../../components/SessionRestoreDialog";
+import ErrorTestButton from "../../components/ErrorTestButton";
 import {
   TEXT_PRESETS,
   TextPreset,
@@ -15,6 +18,7 @@ import {
   isPresetPremium,
 } from "../../presets/textPresets";
 import { logEvent } from "../../lib/logEvent";
+import { exportUnder2MB } from "../../features/export/sizeBudget";
 import {
   getCurrentPlan,
   canRemoveWatermark,
@@ -32,6 +36,7 @@ import {
   trackContentShare,
   trackActivation,
 } from "../../lib/metrics";
+import { useAutosave, useSessionRestore } from "../../hooks/useAutosave";
 
 /** ===== Types ===== */
 type Stage = "pick" | "edit";
@@ -203,6 +208,10 @@ function applyTextPreset(
 
 /** ===== Component ===== */
 export default function ThumbTool() {
+  /** Session restore state */
+  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+  const [hasRestored, setHasRestored] = useState(false);
+
   /** Canvas size by aspect */
   const [aspect, setAspect] = useState<Aspect>(DEFAULT_ASPECT);
   const { w: CW, h: CH } = useMemo(() => dimsForAspect(aspect), [aspect]);
@@ -255,9 +264,90 @@ export default function ThumbTool() {
   // For Free plan, always enforce watermark regardless of wmOn setting
   const shouldShowWatermark = wmOn || plan === "free";
 
+  // For Free plan, always show watermark as "on" in the UI
+  const displayWatermarkOn = plan === "free" ? true : wmOn;
+
   /** Export modal */
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportedBlob, setExportedBlob] = useState<Blob | null>(null);
+
+  // Session restore hook
+  const { getLastSaveTime, hasRecentSave } = useSessionRestore(
+    "forge_thumbnail_state"
+  );
+
+  // Autosave hook
+  const {
+    loadData,
+    clearSavedData,
+    getLastSaveTime: getAutosaveTime,
+  } = useAutosave({
+    key: "forge_thumbnail_state",
+    data: {
+      aspect,
+      imgUrl,
+      scale,
+      minScale,
+      offset,
+      ovUrl,
+      ovPos,
+      ovScale,
+      ovAlpha,
+      ovAR,
+      txt,
+      txtPos,
+      txtSize,
+      txtAlpha,
+      txtFill,
+      txtStroke,
+      txtStrokeW,
+      txtFontFamily,
+      txtFontWeight,
+      flushSnap,
+      wmOn,
+      stage,
+    },
+    enabled: true,
+    onSave: (data) => {
+      // Only save if we have meaningful content
+      if (data.imgUrl || data.txt) {
+        return data;
+      }
+      return null;
+    },
+    onLoad: (data) => {
+      // Validate and restore data
+      if (data && typeof data === "object") {
+        return {
+          aspect: data.aspect || DEFAULT_ASPECT,
+          imgUrl: data.imgUrl || "",
+          scale: data.scale || 1,
+          minScale: data.minScale || 1,
+          offset: data.offset || { x: 0, y: 0 },
+          ovUrl: data.ovUrl || "",
+          ovPos: data.ovPos || { x: 200, y: 200 },
+          ovScale: data.ovScale || 1,
+          ovAlpha: data.ovAlpha || 0.85,
+          ovAR: data.ovAR || null,
+          txt: data.txt || "YOUR TITLE",
+          txtPos: data.txtPos || { x: CW / 2, y: Math.round(CH * 0.16) },
+          txtSize: data.txtSize || 72,
+          txtAlpha: data.txtAlpha || 1,
+          txtFill: data.txtFill || "#ffffff",
+          txtStroke: data.txtStroke || "#000000",
+          txtStrokeW: data.txtStrokeW || 8,
+          txtFontFamily:
+            data.txtFontFamily ||
+            "system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif",
+          txtFontWeight: data.txtFontWeight || "bold",
+          flushSnap: data.flushSnap || false,
+          wmOn: data.wmOn !== undefined ? data.wmOn : true,
+          stage: data.stage || "pick",
+        };
+      }
+      return null;
+    },
+  });
 
   useEffect(
     () => localStorage.setItem("forge_wm_on", wmOn ? "1" : "0"),
@@ -284,6 +374,60 @@ export default function ThumbTool() {
       );
     };
   }, []);
+
+  // Session restore logic
+  useEffect(() => {
+    if (hasRestored) return;
+
+    const savedData = loadData();
+    if (savedData && hasRecentSave()) {
+      setShowRestoreDialog(true);
+    } else {
+      setHasRestored(true);
+    }
+  }, [loadData, hasRecentSave, hasRestored]);
+
+  const handleRestoreSession = () => {
+    const savedData = loadData();
+    if (savedData) {
+      setAspect(savedData.aspect);
+      setImgUrl(savedData.imgUrl);
+      setScale(savedData.scale);
+      setMinScale(savedData.minScale);
+      setOffset(savedData.offset);
+      setOvUrl(savedData.ovUrl);
+      setOvPos(savedData.ovPos);
+      setOvScale(savedData.ovScale);
+      setOvAlpha(savedData.ovAlpha);
+      setOvAR(savedData.ovAR);
+      setTxt(savedData.txt);
+      setTxtPos(savedData.txtPos);
+      setTxtSize(savedData.txtSize);
+      setTxtAlpha(savedData.txtAlpha);
+      setTxtFill(savedData.txtFill);
+      setTxtStroke(savedData.txtStroke);
+      setTxtStrokeW(savedData.txtStrokeW);
+      setTxtFontFamily(savedData.txtFontFamily);
+      setTxtFontWeight(savedData.txtFontWeight);
+      setFlushSnap(savedData.flushSnap);
+      setWmOn(savedData.wmOn);
+      setStage(savedData.stage);
+
+      // Push to undo history
+      pushSnap();
+
+      logEvent("session_restored", { tool: "thumbnail" });
+    }
+    setShowRestoreDialog(false);
+    setHasRestored(true);
+  };
+
+  const handleDismissRestore = () => {
+    clearSavedData();
+    setShowRestoreDialog(false);
+    setHasRestored(true);
+    logEvent("session_restore_dismissed", { tool: "thumbnail" });
+  };
 
   /** Stage */
   const [stage, setStage] = useState<Stage>("pick");
@@ -897,27 +1041,21 @@ export default function ThumbTool() {
       drawWatermark(octx, CW, CH);
     }
 
-    // JPEG quality ramp-down for ≤ 2 MB
-    let q = 0.95;
-    let blob: Blob | null = null;
-    for (let i = 0; i < 10; i++) {
-      const b = await new Promise<Blob | null>((res) =>
-        out.toBlob((bb) => res(bb), "image/jpeg", q)
-      );
-      if (!b) break;
-      if (b.size <= 2_000_000) {
-        blob = b;
-        break;
-      }
-      q *= 0.8;
-    }
+    // Use enhanced export function with PNG fallback and byte logging
+    const blob = await exportUnder2MB(out, 2 * 1024 * 1024, {
+      enableLogging: true,
+      minQuality: 0.3,
+      maxQuality: 0.95,
+      minWidth: 480,
+      minHeight: 270,
+    });
+
     if (!blob) {
-      // final attempt PNG (may exceed)
-      blob = (await new Promise<Blob | null>((res) =>
-        out.toBlob((bb) => res(bb), "image/png")
-      )) as Blob;
+      console.error(
+        "Export failed: Unable to generate image within size constraints"
+      );
+      return;
     }
-    if (!blob) return;
 
     // Store the blob and show the export modal
     setExportedBlob(blob);
@@ -966,436 +1104,479 @@ export default function ThumbTool() {
 
   /** ===== UI ===== */
   return (
-    <div className="p-4 space-y-4 text-white">
-      <div className="flex items-center gap-3 flex-wrap">
-        <label htmlFor="aspect-select" className="text-sm text-text-primary">
-          Aspect
-        </label>
-        <select
-          id="aspect-select"
-          className="border rounded px-2 py-1 bg-bg-secondary text-text-primary"
-          value={aspect}
-          onChange={(e) => setAspect(e.target.value as Aspect)}
-          aria-describedby="aspect-help"
-        >
-          <option value="16:9">16:9 (YouTube, Landscape)</option>
-          <option value="9:16">9:16 (TikTok, Instagram Stories)</option>
-          <option value="1:1">1:1 (Instagram Post, Square)</option>
-        </select>
-        <span id="aspect-help" className="sr-only">
-          Choose the aspect ratio for your thumbnail
-        </span>
+    <ErrorBoundary>
+      <div className="p-4 space-y-4 text-white">
+        <div className="flex items-center gap-3 flex-wrap">
+          <label htmlFor="aspect-select" className="text-sm text-text-primary">
+            Aspect
+          </label>
+          <select
+            id="aspect-select"
+            className="border rounded px-2 py-1 bg-bg-secondary text-text-primary"
+            value={aspect}
+            onChange={(e) => setAspect(e.target.value as Aspect)}
+            aria-describedby="aspect-help"
+          >
+            <option value="16:9">16:9 (YouTube, Landscape)</option>
+            <option value="9:16">9:16 (TikTok, Instagram Stories)</option>
+            <option value="1:1">1:1 (Instagram Post, Square)</option>
+          </select>
+          <span id="aspect-help" className="sr-only">
+            Choose the aspect ratio for your thumbnail
+          </span>
+
+          {stage === "edit" && (
+            <UndoRedoBar
+              canUndo={canUndo}
+              canRedo={canRedo}
+              onUndo={undo}
+              onRedo={redo}
+            />
+          )}
+
+          <label
+            htmlFor="flush-snap"
+            className="ml-4 inline-flex items-center gap-2 text-sm text-text-primary"
+          >
+            <input
+              id="flush-snap"
+              type="checkbox"
+              checked={flushSnap}
+              onChange={(e) => setFlushSnap(e.target.checked)}
+              aria-describedby="flush-snap-help"
+            />
+            Flush snap
+            <span id="flush-snap-help" className="sr-only">
+              Enable flush snap to align elements to canvas edges
+            </span>
+          </label>
+
+          <div className="text-xs text-neutral-400 ml-4">
+            Nudge: Arrow keys (1px) | Shift+Arrow (10px)
+          </div>
+
+          <div className="ml-auto flex items-center gap-2">
+            <PlanSelector />
+            {process.env.NODE_ENV === "development" && <ErrorTestButton />}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label
+            htmlFor="base-file"
+            className="block text-sm text-text-primary"
+          >
+            Upload base image or video
+          </label>
+          <input
+            id="base-file"
+            type="file"
+            accept="image/*,video/*"
+            onChange={onBaseFile}
+            aria-describedby="base-file-help"
+          />
+          <div id="base-file-help" className="text-sm text-text-muted">
+            Upload an image file or video to create your thumbnail. For videos,
+            you can capture a frame.
+          </div>
+          {stage === "pick" && videoRef.current?.src && (
+            <button
+              className="px-3 py-1 rounded bg-neutral-700 text-text-primary hover:bg-neutral-600"
+              onClick={captureFrameFromVideo}
+              aria-describedby="capture-help"
+            >
+              Capture frame
+              <span id="capture-help" className="sr-only">
+                Capture current video frame as thumbnail base
+              </span>
+            </button>
+          )}
+        </div>
 
         {stage === "edit" && (
-          <UndoRedoBar
-            canUndo={canUndo}
-            canRedo={canRedo}
-            onUndo={undo}
-            onRedo={redo}
-          />
-        )}
-
-        <label
-          htmlFor="flush-snap"
-          className="ml-4 inline-flex items-center gap-2 text-sm text-text-primary"
-        >
-          <input
-            id="flush-snap"
-            type="checkbox"
-            checked={flushSnap}
-            onChange={(e) => setFlushSnap(e.target.checked)}
-            aria-describedby="flush-snap-help"
-          />
-          Flush snap
-          <span id="flush-snap-help" className="sr-only">
-            Enable flush snap to align elements to canvas edges
-          </span>
-        </label>
-
-        <div className="text-xs text-neutral-400 ml-4">
-          Nudge: Arrow keys (1px) | Shift+Arrow (10px)
-        </div>
-
-        <div className="ml-auto">
-          <PlanSelector />
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="base-file" className="block text-sm text-text-primary">
-          Upload base image or video
-        </label>
-        <input
-          id="base-file"
-          type="file"
-          accept="image/*,video/*"
-          onChange={onBaseFile}
-          aria-describedby="base-file-help"
-        />
-        <div id="base-file-help" className="text-sm text-text-muted">
-          Upload an image file or video to create your thumbnail. For videos,
-          you can capture a frame.
-        </div>
-        {stage === "pick" && videoRef.current?.src && (
-          <button
-            className="px-3 py-1 rounded bg-neutral-700 text-text-primary hover:bg-neutral-600"
-            onClick={captureFrameFromVideo}
-            aria-describedby="capture-help"
-          >
-            Capture frame
-            <span id="capture-help" className="sr-only">
-              Capture current video frame as thumbnail base
-            </span>
-          </button>
-        )}
-      </div>
-
-      {stage === "edit" && (
-        <>
-          <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2">
-              <label
-                htmlFor="zoom-slider"
-                className="text-sm text-text-primary"
-              >
-                Zoom
-              </label>
-              <input
-                id="zoom-slider"
-                type="range"
-                min={minScale}
-                max={minScale * 6}
-                step={0.01}
-                value={scale}
-                onChange={(e) => setScale(parseFloat(e.target.value))}
-                aria-describedby="zoom-help"
-              />
-              <span id="zoom-help" className="sr-only">
-                Adjust zoom level from {minScale.toFixed(2)}x to{" "}
-                {(minScale * 6).toFixed(2)}x
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <label
-                htmlFor="overlay-file"
-                className="px-2 py-1 rounded bg-neutral-700 cursor-pointer text-text-primary hover:bg-neutral-600"
-              >
-                Choose overlay
+          <>
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="zoom-slider"
+                  className="text-sm text-text-primary"
+                >
+                  Zoom
+                </label>
                 <input
-                  id="overlay-file"
-                  type="file"
-                  accept="image/*"
-                  onChange={onOverlayFile}
-                  className="hidden"
-                  aria-describedby="overlay-file-help"
+                  id="zoom-slider"
+                  type="range"
+                  min={minScale}
+                  max={minScale * 6}
+                  step={0.01}
+                  value={scale}
+                  onChange={(e) => setScale(parseFloat(e.target.value))}
+                  aria-describedby="zoom-help"
                 />
-              </label>
-              <span id="overlay-file-help" className="sr-only">
-                Upload an overlay image to add to your thumbnail
-              </span>
-              <span className="opacity-70 text-sm text-text-muted">
-                {ovUrl ? "Overlay loaded" : "No overlay"}
-              </span>
-              <label
-                htmlFor="overlay-size"
-                className="text-sm text-text-primary"
-              >
-                Overlay size
-              </label>
-              <input
-                id="overlay-size"
-                type="range"
-                min={0.2}
-                max={3}
-                step={0.01}
-                value={ovScale}
-                onChange={(e) => setOvScale(parseFloat(e.target.value))}
-                aria-describedby="overlay-size-help"
-              />
-              <span id="overlay-size-help" className="sr-only">
-                Adjust overlay size from 0.2x to 3x
-              </span>
-              <label
-                htmlFor="overlay-opacity"
-                className="text-sm text-text-primary"
-              >
-                Overlay opacity
-              </label>
-              <input
-                id="overlay-opacity"
-                type="range"
-                min={0.05}
-                max={1}
-                step={0.01}
-                value={ovAlpha}
-                onChange={(e) => setOvAlpha(parseFloat(e.target.value))}
-                aria-describedby="overlay-opacity-help"
-              />
-              <span id="overlay-opacity-help" className="sr-only">
-                Adjust overlay opacity from 5% to 100%
-              </span>
-            </div>
-          </div>
+                <span id="zoom-help" className="sr-only">
+                  Adjust zoom level from {minScale.toFixed(2)}x to{" "}
+                  {(minScale * 6).toFixed(2)}x
+                </span>
+              </div>
 
-          <div
-            onWheel={onWheel}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={onPointerUp}
-            style={{ width: CW, maxWidth: "100%" }}
-          >
-            <canvas
-              ref={canvasRef}
-              width={CW}
-              height={CH}
-              style={{
-                width: "100%",
-                touchAction: "none",
-                border: "1px solid #555",
-                background: "#000",
-              }}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <label htmlFor="text-input" className="sr-only">
-                Text content
-              </label>
-              <input
-                id="text-input"
-                className="px-2 py-1 rounded bg-neutral-800"
-                value={txt}
-                onChange={(e) => setTxt(e.target.value)}
-                placeholder="YOUR TITLE"
-              />
-            </div>
-
-            {/* Text Presets */}
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Text Presets</label>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
-                {getAvailablePresets(hasPremiumPresets()).map((preset) => {
-                  const isPremium = preset.isPremium;
-                  const isLocked = isPremium && !hasPremiumPresets();
-
-                  return (
-                    <button
-                      key={preset.id}
-                      onClick={() => {
-                        if (isLocked) {
-                          trackPremiumFeatureAttempt("premium_preset", plan);
-                          alert(
-                            "This preset requires Pro or Plus plan. Upgrade to access premium presets."
-                          );
-                          return;
-                        }
-                        handlePresetSelect(preset);
-                        trackActivity("preset_selection");
-                        trackToolUse("thumbnail-tool", "preset_apply", {
-                          presetId: preset.id,
-                        });
-                      }}
-                      className={`px-3 py-2 rounded transition-colors text-left ${
-                        isLocked
-                          ? "bg-neutral-800 cursor-not-allowed opacity-60"
-                          : "bg-neutral-700 hover:bg-neutral-600"
-                      }`}
-                      title={
-                        isLocked
-                          ? `${preset.description} (Pro/Plus only)`
-                          : preset.description
-                      }
-                      disabled={isLocked}
-                    >
-                      <div className="text-xs font-medium truncate flex items-center gap-1">
-                        {preset.name}
-                        {isLocked && (
-                          <span className="text-yellow-400">🔒</span>
-                        )}
-                      </div>
-                      <div className="text-xs opacity-70 truncate">
-                        {preset.description}
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="overlay-file"
+                  className="px-2 py-1 rounded bg-neutral-700 cursor-pointer text-text-primary hover:bg-neutral-600"
+                >
+                  Choose overlay
+                  <input
+                    id="overlay-file"
+                    type="file"
+                    accept="image/*"
+                    onChange={onOverlayFile}
+                    className="hidden"
+                    aria-describedby="overlay-file-help"
+                  />
+                </label>
+                <span id="overlay-file-help" className="sr-only">
+                  Upload an overlay image to add to your thumbnail
+                </span>
+                <span className="opacity-70 text-sm text-text-muted">
+                  {ovUrl ? "Overlay loaded" : "No overlay"}
+                </span>
+                <label
+                  htmlFor="overlay-size"
+                  className="text-sm text-text-primary"
+                >
+                  Overlay size
+                </label>
+                <input
+                  id="overlay-size"
+                  type="range"
+                  min={0.2}
+                  max={3}
+                  step={0.01}
+                  value={ovScale}
+                  onChange={(e) => setOvScale(parseFloat(e.target.value))}
+                  aria-describedby="overlay-size-help"
+                />
+                <span id="overlay-size-help" className="sr-only">
+                  Adjust overlay size from 0.2x to 3x
+                </span>
+                <label
+                  htmlFor="overlay-opacity"
+                  className="text-sm text-text-primary"
+                >
+                  Overlay opacity
+                </label>
+                <input
+                  id="overlay-opacity"
+                  type="range"
+                  min={0.05}
+                  max={1}
+                  step={0.01}
+                  value={ovAlpha}
+                  onChange={(e) => setOvAlpha(parseFloat(e.target.value))}
+                  aria-describedby="overlay-opacity-help"
+                />
+                <span id="overlay-opacity-help" className="sr-only">
+                  Adjust overlay opacity from 5% to 100%
+                </span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <label htmlFor="text-size" className="text-sm text-text-primary">
-                Size
-              </label>
-              <input
-                id="text-size"
-                type="range"
-                min={16}
-                max={200}
-                step={1}
-                value={txtSize}
-                onChange={(e) => setTxtSize(parseInt(e.target.value))}
-                aria-describedby="text-size-help"
-              />
-              <span id="text-size-help" className="sr-only">
-                Adjust text size from 16px to 200px
-              </span>
-              <label
-                htmlFor="text-opacity"
-                className="text-sm text-text-primary"
-              >
-                Opacity
-              </label>
-              <input
-                id="text-opacity"
-                type="range"
-                min={0.05}
-                max={1}
-                step={0.01}
-                value={txtAlpha}
-                onChange={(e) => setTxtAlpha(parseFloat(e.target.value))}
-                aria-describedby="text-opacity-help"
-              />
-              <span id="text-opacity-help" className="sr-only">
-                Adjust text opacity from 5% to 100%
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <label
-                htmlFor="text-stroke"
-                className="text-sm text-text-primary"
-              >
-                Stroke
-              </label>
-              <input
-                id="text-stroke"
-                type="range"
-                min={0}
-                max={24}
-                step={1}
-                value={txtStrokeW}
-                onChange={(e) => setTxtStrokeW(parseInt(e.target.value))}
-                aria-describedby="text-stroke-help"
-              />
-              <span id="text-stroke-help" className="sr-only">
-                Adjust text stroke width from 0px to 24px
-              </span>
-              <label htmlFor="text-stroke-color" className="sr-only">
-                Stroke color
-              </label>
-              <input
-                id="text-stroke-color"
-                type="color"
-                value={txtStroke}
-                onChange={(e) => setTxtStroke(e.target.value)}
-                aria-label="Text stroke color"
-              />
-              <label htmlFor="text-fill" className="text-sm text-text-primary">
-                Fill
-              </label>
-              <label htmlFor="text-fill-color" className="sr-only">
-                Fill color
-              </label>
-              <input
-                id="text-fill-color"
-                type="color"
-                value={txtFill}
-                onChange={(e) => setTxtFill(e.target.value)}
-                aria-label="Text fill color"
+
+            <div
+              onWheel={onWheel}
+              onPointerDown={onPointerDown}
+              onPointerMove={onPointerMove}
+              onPointerUp={onPointerUp}
+              style={{ width: CW, maxWidth: "100%" }}
+              role="img"
+              aria-label="Thumbnail preview canvas. Use mouse or touch to drag elements, or arrow keys to nudge selected elements."
+              tabIndex={0}
+              className="focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-bg-primary"
+            >
+              <canvas
+                ref={canvasRef}
+                width={CW}
+                height={CH}
+                style={{
+                  width: "100%",
+                  touchAction: "none",
+                  border: "1px solid #555",
+                  background: "#000",
+                }}
+                aria-hidden="true"
               />
             </div>
 
-            <div className="flex items-center gap-3">
-              <button
-                className="px-3 py-1 rounded bg-neutral-700"
-                onClick={exportUnder2MB}
-                title={
-                  !hasUnlimitedExports()
-                    ? `Exports remaining: ${Math.max(
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <label htmlFor="text-input" className="sr-only">
+                  Text content
+                </label>
+                <input
+                  id="text-input"
+                  className="px-2 py-1 rounded bg-neutral-800"
+                  value={txt}
+                  onChange={(e) => setTxt(e.target.value)}
+                  placeholder="YOUR TITLE"
+                />
+              </div>
+
+              {/* Text Presets */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Text Presets</label>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                  {getAvailablePresets(hasPremiumPresets()).map((preset) => {
+                    const isPremium = preset.isPremium;
+                    const isLocked = isPremium && !hasPremiumPresets();
+
+                    return (
+                      <button
+                        key={preset.id}
+                        onClick={() => {
+                          if (isLocked) {
+                            trackPremiumFeatureAttempt("premium_preset", plan);
+                            alert(
+                              "This preset requires Pro or Plus plan. Upgrade to access premium presets."
+                            );
+                            return;
+                          }
+                          handlePresetSelect(preset);
+                          trackActivity("preset_selection");
+                          trackToolUse("thumbnail-tool", "preset_apply", {
+                            presetId: preset.id,
+                          });
+                        }}
+                        className={`px-3 py-2 rounded transition-colors text-left ${
+                          isLocked
+                            ? "bg-neutral-800 cursor-not-allowed opacity-60"
+                            : "bg-neutral-700 hover:bg-neutral-600"
+                        }`}
+                        title={
+                          isLocked
+                            ? `${preset.description} (Pro/Plus only)`
+                            : preset.description
+                        }
+                        disabled={isLocked}
+                      >
+                        <div className="text-xs font-medium truncate flex items-center gap-1">
+                          {preset.name}
+                          {isLocked && (
+                            <span className="text-yellow-400">🔒</span>
+                          )}
+                        </div>
+                        <div className="text-xs opacity-70 truncate">
+                          {preset.description}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="text-size"
+                  className="text-sm text-text-primary"
+                >
+                  Size
+                </label>
+                <input
+                  id="text-size"
+                  type="range"
+                  min={16}
+                  max={200}
+                  step={1}
+                  value={txtSize}
+                  onChange={(e) => setTxtSize(parseInt(e.target.value))}
+                  aria-describedby="text-size-help"
+                />
+                <span id="text-size-help" className="sr-only">
+                  Adjust text size from 16px to 200px
+                </span>
+                <label
+                  htmlFor="text-opacity"
+                  className="text-sm text-text-primary"
+                >
+                  Opacity
+                </label>
+                <input
+                  id="text-opacity"
+                  type="range"
+                  min={0.05}
+                  max={1}
+                  step={0.01}
+                  value={txtAlpha}
+                  onChange={(e) => setTxtAlpha(parseFloat(e.target.value))}
+                  aria-describedby="text-opacity-help"
+                />
+                <span id="text-opacity-help" className="sr-only">
+                  Adjust text opacity from 5% to 100%
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="text-stroke"
+                  className="text-sm text-text-primary"
+                >
+                  Stroke
+                </label>
+                <input
+                  id="text-stroke"
+                  type="range"
+                  min={0}
+                  max={24}
+                  step={1}
+                  value={txtStrokeW}
+                  onChange={(e) => setTxtStrokeW(parseInt(e.target.value))}
+                  aria-describedby="text-stroke-help"
+                />
+                <span id="text-stroke-help" className="sr-only">
+                  Adjust text stroke width from 0px to 24px
+                </span>
+                <label htmlFor="text-stroke-color" className="sr-only">
+                  Stroke color
+                </label>
+                <input
+                  id="text-stroke-color"
+                  type="color"
+                  value={txtStroke}
+                  onChange={(e) => setTxtStroke(e.target.value)}
+                  aria-label="Text stroke color"
+                />
+                <label
+                  htmlFor="text-fill"
+                  className="text-sm text-text-primary"
+                >
+                  Fill
+                </label>
+                <label htmlFor="text-fill-color" className="sr-only">
+                  Fill color
+                </label>
+                <input
+                  id="text-fill-color"
+                  type="color"
+                  value={txtFill}
+                  onChange={(e) => setTxtFill(e.target.value)}
+                  aria-label="Text fill color"
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  className="px-3 py-1 rounded bg-neutral-700 text-text-primary hover:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-bg-primary"
+                  onClick={exportUnder2MB}
+                  title={
+                    !hasUnlimitedExports()
+                      ? `Exports remaining: ${Math.max(
+                          0,
+                          5 -
+                            parseInt(
+                              localStorage.getItem("forge_export_count") || "0"
+                            )
+                        )}`
+                      : "Unlimited exports"
+                  }
+                  aria-describedby="export-help"
+                >
+                  Export ≤ 2 MB
+                  {!hasUnlimitedExports() && (
+                    <span className="ml-1 text-xs opacity-70">
+                      (
+                      {Math.max(
                         0,
                         5 -
                           parseInt(
                             localStorage.getItem("forge_export_count") || "0"
                           )
-                      )}`
-                    : "Unlimited exports"
-                }
-              >
-                Export ≤ 2 MB
-                {!hasUnlimitedExports() && (
-                  <span className="ml-1 text-xs opacity-70">
-                    (
-                    {Math.max(
-                      0,
-                      5 -
-                        parseInt(
-                          localStorage.getItem("forge_export_count") || "0"
-                        )
-                    )}{" "}
-                    left)
-                  </span>
-                )}
-              </button>
-              <button
-                className="px-3 py-1 rounded bg-neutral-700"
-                onClick={startOver}
-              >
-                Start Over
-              </button>
-              <label
-                htmlFor="watermark-toggle"
-                className={`inline-flex items-center gap-2 text-sm px-3 py-1 rounded transition-colors ${
-                  canRemoveWatermark()
-                    ? "bg-neutral-700 cursor-pointer hover:bg-neutral-600 text-text-primary"
-                    : "bg-neutral-800 cursor-not-allowed opacity-60 text-text-muted"
-                }`}
-                title={
-                  !canRemoveWatermark()
-                    ? "Upgrade to Pro to remove watermark"
-                    : "Toggle watermark visibility"
-                }
-              >
-                <input
-                  id="watermark-toggle"
-                  type="checkbox"
-                  checked={wmOn}
-                  disabled={!canRemoveWatermark()}
-                  onChange={(e) => {
-                    if (canRemoveWatermark()) {
-                      setWmOn(e.target.checked);
-                      logEvent("watermark_toggle", {
-                        enabled: e.target.checked,
-                        plan,
-                      });
-                    } else {
-                      // For Free plan, show upgrade message if they try to toggle
-                      trackPremiumFeatureAttempt("watermark_removal", plan);
-                    }
-                  }}
-                  className="rounded"
-                  aria-describedby="watermark-help"
-                />
-                Remove watermark {!canRemoveWatermark() && "(Upgrade to Pro)"}
-                <span id="watermark-help" className="sr-only">
-                  {canRemoveWatermark()
-                    ? "Toggle watermark visibility on exported thumbnails"
-                    : "Watermark removal requires Pro or Plus plan"}
+                      )}{" "}
+                      left)
+                    </span>
+                  )}
+                </button>
+                <span id="export-help" className="sr-only">
+                  Export your thumbnail as a JPEG file under 2MB.{" "}
+                  {!hasUnlimitedExports()
+                    ? `You have ${Math.max(
+                        0,
+                        5 -
+                          parseInt(
+                            localStorage.getItem("forge_export_count") || "0"
+                          )
+                      )} exports remaining.`
+                    : "Unlimited exports available."}
                 </span>
-              </label>
+                <button
+                  className="px-3 py-1 rounded bg-neutral-700 text-text-primary hover:bg-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-bg-primary"
+                  onClick={startOver}
+                  aria-describedby="start-over-help"
+                >
+                  Start Over
+                </button>
+                <span id="start-over-help" className="sr-only">
+                  Reset the thumbnail editor and start with a new design
+                </span>
+                <label
+                  htmlFor="watermark-toggle"
+                  className={`inline-flex items-center gap-2 text-sm px-3 py-1 rounded transition-colors ${
+                    canRemoveWatermark()
+                      ? "bg-neutral-700 cursor-pointer hover:bg-neutral-600 text-text-primary"
+                      : "bg-neutral-800 cursor-not-allowed opacity-60 text-text-muted"
+                  }`}
+                  title={
+                    !canRemoveWatermark()
+                      ? "Upgrade to Pro to remove watermark"
+                      : "Toggle watermark visibility"
+                  }
+                >
+                  <input
+                    id="watermark-toggle"
+                    type="checkbox"
+                    checked={displayWatermarkOn}
+                    disabled={!canRemoveWatermark()}
+                    onChange={(e) => {
+                      if (canRemoveWatermark()) {
+                        setWmOn(e.target.checked);
+                        logEvent("watermark_toggle", {
+                          enabled: e.target.checked,
+                          plan,
+                        });
+                      } else {
+                        // For Free plan, show upgrade message if they try to toggle
+                        trackPremiumFeatureAttempt("watermark_removal", plan);
+                      }
+                    }}
+                    className="rounded"
+                    aria-describedby="watermark-help"
+                  />
+                  Remove watermark {!canRemoveWatermark() && "(Upgrade to Pro)"}
+                  <span id="watermark-help" className="sr-only">
+                    {canRemoveWatermark()
+                      ? "Toggle watermark visibility on exported thumbnails"
+                      : "Watermark removal requires Pro or Plus plan"}
+                  </span>
+                </label>
+              </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
 
-      {/* Hidden video element for frame capture if needed */}
-      <video ref={videoRef} className="hidden" playsInline muted />
+        {/* Hidden video element for frame capture if needed */}
+        <video ref={videoRef} className="hidden" playsInline muted />
 
-      {/* Export Modal */}
-      <ExportModal
-        isOpen={showExportModal}
-        onClose={() => setShowExportModal(false)}
-        onDownload={handleDownloadAgain}
-      />
-    </div>
+        {/* Export Modal */}
+        <ExportModal
+          isOpen={showExportModal}
+          onClose={() => setShowExportModal(false)}
+          onDownload={handleDownloadAgain}
+        />
+
+        {/* Session Restore Dialog */}
+        <SessionRestoreDialog
+          isOpen={showRestoreDialog}
+          onRestore={handleRestoreSession}
+          onDismiss={handleDismissRestore}
+          lastSaveTime={getLastSaveTime()}
+          toolName="Thumbnail Tool"
+        />
+      </div>
+    </ErrorBoundary>
   );
 }

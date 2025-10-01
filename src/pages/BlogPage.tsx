@@ -38,6 +38,7 @@ export default function BlogPage() {
           name="twitter:description"
           content="Learn how to create professional content with our free AI tools. Get tips on YouTube thumbnails, podcast captions, audiograms, and more."
         />
+        <link rel="canonical" href="https://forge-frontend.vercel.app/blog" />
       </Helmet>
 
       <div className="mb-8">

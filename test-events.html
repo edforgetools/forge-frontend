@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Growth Hooks Events</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #ccc;
+      }
+      button {
+        margin: 10px;
+        padding: 10px 20px;
+      }
+      .log {
+        background: #f5f5f5;
+        padding: 10px;
+        margin: 10px 0;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Growth Hooks Event Testing</h1>
+
+    <div class="test-section">
+      <h2>Page View Events</h2>
+      <button onclick="testPageView('thumbnail')">
+        Test page_view_thumbnail_tool
+      </button>
+      <button onclick="testPageView('caption')">
+        Test page_view_caption_tool
+      </button>
+      <button onclick="testPageView('audiogram')">
+        Test page_view_audiogram_tool
+      </button>
+      <button onclick="testPageView('clipper')">
+        Test page_view_clipper_tool
+      </button>
+    </div>
+
+    <div class="test-section">
+      <h2>Activation Events</h2>
+      <button onclick="testActivation('thumbnail_export')">
+        Test thumbnail_export
+      </button>
+      <button onclick="testActivation('caption_generate')">
+        Test caption_generate
+      </button>
+    </div>
+
+    <div class="test-section">
+      <h2>Revenue Events</h2>
+      <button onclick="testRevenue('upgrade_click')">Test upgrade_click</button>
+    </div>
+
+    <div class="test-section">
+      <h2>Referral Events</h2>
+      <button onclick="testShare('copy')">Test share_clicked_copy</button>
+      <button onclick="testShare('native')">Test share_clicked_native</button>
+      <button onclick="testShare('twitter')">Test share_clicked_twitter</button>
+    </div>
+
+    <div class="test-section">
+      <h2>Retention Events</h2>
+      <button onclick="testRetention('return_visit')">Test return_visit</button>
+    </div>
+
+    <div class="log" id="log">
+      <h3>Event Log:</h3>
+      <div id="logContent"></div>
+    </div>
+
+    <script>
+      function log(message) {
+        const logContent = document.getElementById("logContent");
+        const timestamp = new Date().toLocaleTimeString();
+        logContent.innerHTML += `[${timestamp}] ${message}<br>`;
+      }
+
+      function testPageView(tool) {
+        const event = `page_view_${tool}_tool`;
+        const payload = {
+          name: event,
+          meta: {
+            category: "acquisition",
+            tool: tool,
+            timestamp: Date.now(),
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+          },
+        };
+
+        fetch("/api/log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+          .then(() => {
+            log(`✅ Sent ${event} event`);
+          })
+          .catch((err) => {
+            log(`❌ Failed to send ${event}: ${err.message}`);
+          });
+      }
+
+      function testActivation(event) {
+        const payload = {
+          name: event,
+          meta: {
+            category: "activation",
+            timestamp: Date.now(),
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+          },
+        };
+
+        fetch("/api/log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+          .then(() => {
+            log(`✅ Sent ${event} event`);
+          })
+          .catch((err) => {
+            log(`❌ Failed to send ${event}: ${err.message}`);
+          });
+      }
+
+      function testRevenue(event) {
+        const payload = {
+          name: event,
+          meta: {
+            category: "revenue",
+            plan: "pro",
+            feature: "test feature",
+            timestamp: Date.now(),
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+          },
+        };
+
+        fetch("/api/log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+          .then(() => {
+            log(`✅ Sent ${event} event`);
+          })
+          .catch((err) => {
+            log(`❌ Failed to send ${event}: ${err.message}`);
+          });
+      }
+
+      function testShare(platform) {
+        const event = `share_clicked_${platform}`;
+        const payload = {
+          name: event,
+          meta: {
+            category: "referral",
+            platform: platform,
+            url: window.location.href,
+            timestamp: Date.now(),
+            userAgent: navigator.userAgent,
+          },
+        };
+
+        fetch("/api/log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+          .then(() => {
+            log(`✅ Sent ${event} event`);
+          })
+          .catch((err) => {
+            log(`❌ Failed to send ${event}: ${err.message}`);
+          });
+      }
+
+      function testRetention(event) {
+        const payload = {
+          name: event,
+          meta: {
+            category: "retention",
+            timestamp: Date.now(),
+            url: window.location.href,
+            referrer: document.referrer,
+            userAgent: navigator.userAgent,
+          },
+        };
+
+        fetch("/api/log", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        })
+          .then(() => {
+            log(`✅ Sent ${event} event`);
+          })
+          .catch((err) => {
+            log(`❌ Failed to send ${event}: ${err.message}`);
+          });
+      }
+
+      // Test all events on page load
+      window.addEventListener("load", () => {
+        log("🚀 Growth hooks test page loaded");
+        log("Click buttons above to test individual events");
+        log("Check Network tab in DevTools to see POST requests to /api/log");
+      });
+    </script>
+  </body>
+</html>

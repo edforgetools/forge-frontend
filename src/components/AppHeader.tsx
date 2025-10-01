@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 export function AppHeader() {
   const [mode, setMode] = useState<"MOCK" | "REAL" | "—">("—");
@@ -24,22 +32,26 @@ export function AppHeader() {
 
   return (
     <header
-      className="flex items-center justify-between px-6 py-3 border-b"
+      className="flex items-center justify-between px-6 py-4 border-b border-border bg-card"
       role="banner"
     >
-      <h1 className="text-lg font-semibold">Forge</h1>
-      <div className="relative group">
-        <span
-          className={`px-2 py-1 text-xs rounded border ${
-            mode === "MOCK" ? "bg-yellow-50" : "bg-green-50"
-          }`}
-        >
-          {mode}
-        </span>
-        <div className="absolute right-0 mt-2 w-64 p-2 text-xs border rounded bg-white shadow opacity-0 group-hover:opacity-100 transition">
-          {tip}
-        </div>
-      </div>
+      <h1 className="text-xl font-bold text-foreground">Forge</h1>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Badge
+              variant={mode === "MOCK" ? "secondary" : "default"}
+              className="flex items-center gap-2"
+            >
+              <Info className="h-3 w-3" />
+              {mode}
+            </Badge>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="max-w-xs">{tip}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </header>
   );
 }

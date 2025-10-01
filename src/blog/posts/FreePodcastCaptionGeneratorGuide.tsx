@@ -45,7 +45,7 @@ export default function FreePodcastCaptionGeneratorGuide() {
         <li>
           Visit our{" "}
           <a href="/free-podcast-caption-generator">
-            Free Podcast Caption Generator
+            Captiq - Free Podcast Caption Generator
           </a>
         </li>
         <li>

@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import mdx from "@mdx-js/rollup";
+import { visualizer } from "rollup-plugin-visualizer";
 import path from "path";
 
 export default defineConfig(({ mode }) => ({
@@ -12,7 +13,15 @@ export default defineConfig(({ mode }) => ({
       remarkPlugins: [],
       rehypePlugins: [],
     }),
-  ],
+    // Bundle analyzer for performance monitoring
+    mode === "production" &&
+      visualizer({
+        filename: "artifacts/bundle-analysis.html",
+        open: false,
+        gzipSize: true,
+        brotliSize: true,
+      }),
+  ].filter(Boolean),
   resolve: { alias: { "@": path.resolve(__dirname, "src") } },
   base: "/",
   build: {
