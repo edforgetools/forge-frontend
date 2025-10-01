@@ -968,7 +968,9 @@ export default function ThumbTool() {
   return (
     <div className="p-4 space-y-4 text-white">
       <div className="flex items-center gap-3 flex-wrap">
-        <label htmlFor="aspect-select" className="text-sm text-text-primary">Aspect</label>
+        <label htmlFor="aspect-select" className="text-sm text-text-primary">
+          Aspect
+        </label>
         <select
           id="aspect-select"
           className="border rounded px-2 py-1 bg-bg-secondary text-text-primary"
@@ -993,7 +995,10 @@ export default function ThumbTool() {
           />
         )}
 
-        <label htmlFor="flush-snap" className="ml-4 inline-flex items-center gap-2 text-sm text-text-primary">
+        <label
+          htmlFor="flush-snap"
+          className="ml-4 inline-flex items-center gap-2 text-sm text-text-primary"
+        >
           <input
             id="flush-snap"
             type="checkbox"
@@ -1028,7 +1033,8 @@ export default function ThumbTool() {
           aria-describedby="base-file-help"
         />
         <div id="base-file-help" className="text-sm text-text-muted">
-          Upload an image file or video to create your thumbnail. For videos, you can capture a frame.
+          Upload an image file or video to create your thumbnail. For videos,
+          you can capture a frame.
         </div>
         {stage === "pick" && videoRef.current?.src && (
           <button
@@ -1048,7 +1054,12 @@ export default function ThumbTool() {
         <>
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2">
-              <label htmlFor="zoom-slider" className="text-sm text-text-primary">Zoom</label>
+              <label
+                htmlFor="zoom-slider"
+                className="text-sm text-text-primary"
+              >
+                Zoom
+              </label>
               <input
                 id="zoom-slider"
                 type="range"
@@ -1060,7 +1071,8 @@ export default function ThumbTool() {
                 aria-describedby="zoom-help"
               />
               <span id="zoom-help" className="sr-only">
-                Adjust zoom level from {minScale.toFixed(2)}x to {(minScale * 6).toFixed(2)}x
+                Adjust zoom level from {minScale.toFixed(2)}x to{" "}
+                {(minScale * 6).toFixed(2)}x
               </span>
             </div>
 
@@ -1085,7 +1097,10 @@ export default function ThumbTool() {
               <span className="opacity-70 text-sm text-text-muted">
                 {ovUrl ? "Overlay loaded" : "No overlay"}
               </span>
-              <label htmlFor="overlay-size" className="text-sm text-text-primary">
+              <label
+                htmlFor="overlay-size"
+                className="text-sm text-text-primary"
+              >
                 Overlay size
               </label>
               <input
@@ -1101,7 +1116,10 @@ export default function ThumbTool() {
               <span id="overlay-size-help" className="sr-only">
                 Adjust overlay size from 0.2x to 3x
               </span>
-              <label htmlFor="overlay-opacity" className="text-sm text-text-primary">
+              <label
+                htmlFor="overlay-opacity"
+                className="text-sm text-text-primary"
+              >
                 Overlay opacity
               </label>
               <input
@@ -1222,7 +1240,10 @@ export default function ThumbTool() {
               <span id="text-size-help" className="sr-only">
                 Adjust text size from 16px to 200px
               </span>
-              <label htmlFor="text-opacity" className="text-sm text-text-primary">
+              <label
+                htmlFor="text-opacity"
+                className="text-sm text-text-primary"
+              >
                 Opacity
               </label>
               <input
@@ -1240,7 +1261,10 @@ export default function ThumbTool() {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <label htmlFor="text-stroke" className="text-sm text-text-primary">
+              <label
+                htmlFor="text-stroke"
+                className="text-sm text-text-primary"
+              >
                 Stroke
               </label>
               <input
@@ -1353,10 +1377,9 @@ export default function ThumbTool() {
                 />
                 Remove watermark {!canRemoveWatermark() && "(Upgrade to Pro)"}
                 <span id="watermark-help" className="sr-only">
-                  {canRemoveWatermark() 
+                  {canRemoveWatermark()
                     ? "Toggle watermark visibility on exported thumbnails"
-                    : "Watermark removal requires Pro or Plus plan"
-                  }
+                    : "Watermark removal requires Pro or Plus plan"}
                 </span>
               </label>
             </div>

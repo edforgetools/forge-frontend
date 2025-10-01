@@ -38,11 +38,11 @@ export default function BlogLayout({
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">
+              <div className="text-2xl font-bold">
                 <a href="/" className="link-primary">
                   Forge Tools
                 </a>
-              </h1>
+              </div>
               <p className="text-gray-400 text-sm mt-1">
                 Free AI-Powered Content Creation
               </p>
@@ -90,7 +90,9 @@ export default function BlogLayout({
       </div>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8">{children}</main>
+      <main className="max-w-4xl mx-auto px-4 py-8" role="main">
+        {children}
+      </main>
 
       {/* Footer */}
       <footer className="bg-gray-800 border-t border-gray-700 mt-16">

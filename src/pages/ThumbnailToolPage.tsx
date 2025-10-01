@@ -39,39 +39,37 @@ export default function ThumbnailToolPage() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            name: "Free YouTube Thumbnail Maker",
-            description:
-              "Create viral YouTube thumbnails in seconds with our free AI-powered thumbnail generator. Upload images, add text overlays, and design click-worthy thumbnails that boost CTR and views.",
-            category: "MultimediaApplication",
-            url: "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool",
-            applicationCategory: "MultimediaApplication",
-            operatingSystem: "Web Browser",
-            offers: {
+            "name": "Free YouTube Thumbnail Maker",
+            "description": "Create viral YouTube thumbnails in seconds with our free AI-powered thumbnail generator. Upload images, add text overlays, and design click-worthy thumbnails that boost CTR and views.",
+            "category": "MultimediaApplication",
+            "url": "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool",
+            "applicationCategory": "MultimediaApplication",
+            "operatingSystem": "Web Browser",
+            "offers": {
               "@type": "Offer",
-              price: "0",
-              priceCurrency: "USD",
+              "price": "0",
+              "priceCurrency": "USD"
             },
-            creator: {
+            "creator": {
               "@type": "Organization",
-              name: "Forge Tools",
+              "name": "Forge Tools"
             },
-            featureList: [
+            "featureList": [
               "AI-powered thumbnail generation",
               "Text overlay customization",
               "Multiple aspect ratios (16:9, 9:16, 1:1)",
               "High-quality export under 2MB",
               "Template suggestions",
-              "Color contrast optimization",
+              "Color contrast optimization"
             ],
-            screenshot:
-              "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool",
-            softwareVersion: "1.0",
-            datePublished: "2024-01-01",
-            dateModified: "2024-01-01",
+            "screenshot": "https://forge-frontend.vercel.app/free-youtube-thumbnail-tool",
+            "softwareVersion": "1.0",
+            "datePublished": "2024-01-01",
+            "dateModified": "2024-01-01"
           })}
         </script>
       </Helmet>
-      
+
       {/* Header */}
       <header className="border-b border-gray-700 bg-gray-800">
         <div className="container mx-auto px-4 py-6">
@@ -86,7 +84,11 @@ export default function ThumbnailToolPage() {
                 Free AI-Powered Content Creation
               </p>
             </div>
-            <nav className="flex gap-6" role="navigation" aria-label="Main navigation">
+            <nav
+              className="flex gap-6"
+              role="navigation"
+              aria-label="Main navigation"
+            >
               <a
                 href="/"
                 className="text-text-secondary hover:text-text-primary transition-colors"
@@ -109,7 +111,7 @@ export default function ThumbnailToolPage() {
           </div>
         </div>
       </header>
-      
+
       <main className="container mx-auto px-4 py-8">
         {/* SEO Content */}
         <div className="mb-8">
@@ -124,7 +126,9 @@ export default function ThumbnailToolPage() {
               frames from videos, add custom text overlays, and design
               click-worthy thumbnails that boost CTR and views. Our advanced AI
               technology analyzes your content to create thumbnails optimized
-              for maximum engagement.
+              for maximum engagement. Learn more about 
+              <a href="/blog" className="link-primary">YouTube thumbnail best practices</a> 
+              in our comprehensive guides.
             </p>
 
             <h2 className="text-2xl font-semibold mt-8 mb-4">
@@ -209,9 +213,12 @@ export default function ThumbnailToolPage() {
           <ThumbTool />
         </div>
       </main>
-      
+
       {/* Footer */}
-      <footer className="bg-gray-800 border-t border-gray-700 mt-16" role="contentinfo">
+      <footer
+        className="bg-gray-800 border-t border-gray-700 mt-16"
+        role="contentinfo"
+      >
         <div className="container mx-auto px-4 py-8">
           <div className="text-center text-text-muted text-sm">
             <p>&copy; 2024 Forge Tools. All rights reserved.</p>

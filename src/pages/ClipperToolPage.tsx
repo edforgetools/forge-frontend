@@ -39,38 +39,79 @@ export default function ClipperToolPage() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            name: "Free AI Video Clipper",
-            description:
-              "Automatically generate viral short video clips from longer content with our free AI video clipper. Upload videos and let our smart algorithm identify the most engaging moments for TikTok, Instagram Reels, and YouTube Shorts.",
-            category: "MultimediaApplication",
-            url: "https://forge-frontend.vercel.app/clip-short-video-automatically",
-            applicationCategory: "MultimediaApplication",
-            operatingSystem: "Web Browser",
-            offers: {
+            "name": "Free AI Video Clipper",
+            "description": "Automatically generate viral short video clips from longer content with our free AI video clipper. Upload videos and let our smart algorithm identify the most engaging moments for TikTok, Instagram Reels, and YouTube Shorts.",
+            "category": "MultimediaApplication",
+            "url": "https://forge-frontend.vercel.app/clip-short-video-automatically",
+            "applicationCategory": "MultimediaApplication",
+            "operatingSystem": "Web Browser",
+            "offers": {
               "@type": "Offer",
-              price: "0",
-              priceCurrency: "USD",
+              "price": "0",
+              "priceCurrency": "USD"
             },
-            creator: {
+            "creator": {
               "@type": "Organization",
-              name: "Forge Tools",
+              "name": "Forge Tools"
             },
-            featureList: [
+            "featureList": [
               "AI-powered video analysis",
               "Automatic clip generation",
               "Multi-platform optimization",
               "Engagement moment detection",
               "Smart timing optimization",
-              "Viral content identification",
+              "Viral content identification"
             ],
-            screenshot:
-              "https://forge-frontend.vercel.app/clip-short-video-automatically",
-            softwareVersion: "1.0",
-            datePublished: "2024-01-01",
-            dateModified: "2024-01-01",
+            "screenshot": "https://forge-frontend.vercel.app/clip-short-video-automatically",
+            "softwareVersion": "1.0",
+            "datePublished": "2024-01-01",
+            "dateModified": "2024-01-01"
           })}
         </script>
       </Helmet>
+
+      {/* Header */}
+      <header className="border-b border-gray-700 bg-gray-800">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">
+                <a href="/" className="link-primary">
+                  Forge Tools
+                </a>
+              </h1>
+              <p className="text-text-muted text-sm mt-1">
+                Free AI-Powered Content Creation
+              </p>
+            </div>
+            <nav
+              className="flex gap-6"
+              role="navigation"
+              aria-label="Main navigation"
+            >
+              <a
+                href="/"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Home
+              </a>
+              <a
+                href="/blog"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Blog
+              </a>
+              <a
+                href="/free-youtube-thumbnail-tool"
+                className="text-text-secondary hover:text-text-primary transition-colors"
+              >
+                Tools
+              </a>
+            </nav>
+          </div>
+        </div>
+      </header>
+
       <main className="container mx-auto px-4 py-8">
         {/* SEO Content */}
         <div className="mb-8">
@@ -86,7 +127,9 @@ export default function ClipperToolPage() {
               create viral-ready short-form content. Our advanced AI technology
               analyzes your video content to detect emotional peaks, key
               moments, and trending elements that are most likely to capture
-              audience attention and drive engagement.
+              audience attention and drive engagement. Perfect for repurposing
+              content across <a href="/free-youtube-thumbnail-tool" className="link-primary">YouTube</a>, 
+              <a href="/free-ai-audiogram-generator" className="link-primary">Instagram</a>, and other platforms.
             </p>
 
             <h2 className="text-2xl font-semibold mt-8 mb-4">
@@ -172,6 +215,18 @@ export default function ClipperToolPage() {
           <ComingSoon />
         </div>
       </main>
+
+      {/* Footer */}
+      <footer
+        className="bg-gray-800 border-t border-gray-700 mt-16"
+        role="contentinfo"
+      >
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center text-text-muted text-sm">
+            <p>&copy; 2024 Forge Tools. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

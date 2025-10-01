@@ -71,11 +71,11 @@ select:focus-visible {
   .link-secondary {
     @apply text-white hover:text-gray-200;
   }
-  
+
   .btn {
     @apply border-white text-white;
   }
-  
+
   textarea,
   select,
   input[type="file"],

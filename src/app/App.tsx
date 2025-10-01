@@ -207,36 +207,35 @@ export default function App() {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            name: "Forge Tools",
-            description:
-              "Create professional content with Forge's free AI tools: YouTube thumbnails, podcast captions, audiograms, and video clips. Boost your social media presence with our powerful content creation suite.",
-            url: "https://forge-frontend.vercel.app",
-            applicationCategory: "MultimediaApplication",
-            operatingSystem: "Web Browser",
-            offers: {
+            "name": "Forge Tools",
+            "description": "Create professional content with Forge's free AI tools: YouTube thumbnails, podcast captions, audiograms, and video clips. Boost your social media presence with our powerful content creation suite.",
+            "url": "https://forge-frontend.vercel.app",
+            "applicationCategory": "MultimediaApplication",
+            "operatingSystem": "Web Browser",
+            "offers": {
               "@type": "Offer",
-              price: "0",
-              priceCurrency: "USD",
+              "price": "0",
+              "priceCurrency": "USD"
             },
-            creator: {
+            "creator": {
               "@type": "Organization",
-              name: "Forge Tools",
+              "name": "Forge Tools"
             },
-            featureList: [
+            "featureList": [
               "YouTube Thumbnail Generator",
               "Podcast Caption Generator",
               "AI Audiogram Creator",
-              "Automatic Video Clipper",
-            ],
+              "Automatic Video Clipper"
+            ]
           })}
         </script>
       </Helmet>
-      
+
       {/* Skip link for keyboard navigation */}
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      
+
       <main id="main-content" className="p-4 max-w-5xl mx-auto">
         {/* SEO Content */}
         <section className="mb-8" aria-labelledby="main-heading">
@@ -253,7 +252,9 @@ export default function App() {
               tools. Generate eye-catching YouTube thumbnails, engaging podcast
               captions, stunning audiograms, and viral-ready video clips.
               Perfect for content creators, podcasters, and marketers looking to
-              maximize their social media impact.
+              maximize their social media impact. Learn more in our 
+              <a href="/blog" className="link-primary">comprehensive blog</a> 
+              with expert tips and tutorials.
             </p>
 
             <h2 className="text-2xl font-semibold mt-8 mb-4">
