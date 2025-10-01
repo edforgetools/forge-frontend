@@ -2,8 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: dark;
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+    --radius: 0.5rem;
+    color-scheme: dark;
+  }
 }
 
 /* Screen reader only class for accessibility */
@@ -58,8 +80,36 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
-select:focus-visible {
+select:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+[role="menuitem"]:focus-visible,
+[role="option"]:focus-visible,
+[tabindex]:focus-visible {
   @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-bg-primary;
+}
+
+/* Enhanced focus states for better visibility */
+button:focus-visible,
+[role="button"]:focus-visible {
+  @apply ring-2 ring-primary-400 ring-offset-2 ring-offset-bg-primary;
+}
+
+/* Focus states for form elements */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  @apply ring-2 ring-primary-400 ring-offset-2 ring-offset-bg-primary border-primary-400;
+}
+
+/* Focus states for links */
+a:focus-visible {
+  @apply ring-2 ring-primary-400 ring-offset-2 ring-offset-bg-primary;
+}
+
+/* Focus states for custom interactive elements */
+[tabindex="0"]:focus-visible {
+  @apply ring-2 ring-primary-400 ring-offset-2 ring-offset-bg-primary;
 }
 
 /* High contrast mode support */
@@ -92,4 +142,52 @@ select:focus-visible {
   @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4;
   @apply bg-primary-600 text-white px-4 py-2 rounded z-50;
   @apply focus:outline-none focus:ring-2 focus:ring-primary-500;
+}
+
+/* Focus trap for modals and dialogs */
+.focus-trap {
+  @apply focus:outline-none;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast focus indicators */
+@media (prefers-contrast: high) {
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply ring-4 ring-white ring-offset-4 ring-offset-black;
+  }
+}
+
+/* Keyboard navigation improvements */
+.keyboard-only:focus {
+  @apply outline-none ring-2 ring-primary-400 ring-offset-2 ring-offset-bg-primary;
+}
+
+/* Ensure interactive elements are keyboard accessible */
+[role="button"],
+[role="tab"],
+[role="menuitem"],
+[role="option"] {
+  @apply cursor-pointer;
+}
+
+[role="button"]:disabled,
+[role="tab"]:disabled,
+[role="menuitem"]:disabled,
+[role="option"]:disabled {
+  @apply cursor-not-allowed opacity-50;
 }

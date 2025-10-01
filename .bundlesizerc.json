@@ -1,0 +1,15 @@
+{
+  "files": [
+    {
+      "path": "./dist/assets/*.js",
+      "maxSize": "250kb",
+      "compression": "gzip"
+    }
+  ],
+  "ci": {
+    "trackBranches": ["main", "master", "develop"],
+    "bundleBudget": {
+      "maxBundleSize": "250kb"
+    }
+  }
+}

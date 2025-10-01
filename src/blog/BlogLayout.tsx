@@ -33,6 +33,11 @@ export default function BlogLayout({
         <meta name="twitter:description" content={description} />
       </Helmet>
 
+      {/* Skip link for keyboard navigation */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="border-b border-gray-700 bg-gray-800">
         <div className="max-w-4xl mx-auto px-4 py-6">
@@ -90,7 +95,12 @@ export default function BlogLayout({
       </div>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-8" role="main">
+      <main
+        id="main-content"
+        className="max-w-4xl mx-auto px-4 py-8"
+        role="main"
+        aria-label="Blog content"
+      >
         {children}
       </main>
 

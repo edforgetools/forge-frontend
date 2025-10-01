@@ -1,0 +1,28 @@
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Free AI Video Clipper",
+  "description": "Automatically generate viral short video clips from longer content with our free AI video clipper. Upload videos and let our smart algorithm identify the most engaging moments for TikTok, Instagram Reels, and YouTube Shorts.",
+  "category": "MultimediaApplication",
+  "url": "https://forge-frontend.vercel.app/clip-short-video-automatically",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "creator": {
+    "@type": "Organization",
+    "name": "Forge Tools"
+  },
+  "featureList": [
+    "AI-powered video analysis",
+    "Automatic clip generation",
+    "Multi-platform optimization",
+    "Engagement moment detection",
+    "Smart timing optimization",
+    "Viral content identification"
+  ],
+  "screenshot": "https://forge-frontend.vercel.app/clip-short-video-automatically"
+}

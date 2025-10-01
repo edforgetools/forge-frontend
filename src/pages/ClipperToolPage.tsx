@@ -1,8 +1,16 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
 import ComingSoon from "../components/ComingSoon";
+import { ShareButton } from "@/components/ShareButton";
+import { UpgradeCTA } from "@/components/UpgradeCTA";
+import { trackPageViewTool } from "@/lib/metrics";
 
 export default function ClipperToolPage() {
+  // Track page view
+  React.useEffect(() => {
+    trackPageViewTool("clipper");
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <Helmet>
@@ -70,7 +78,16 @@ export default function ClipperToolPage() {
             dateModified: "2024-01-01",
           })}
         </script>
+        <link
+          rel="canonical"
+          href="https://forge-frontend.vercel.app/clip-short-video-automatically"
+        />
       </Helmet>
+
+      {/* Skip link for keyboard navigation */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
 
       {/* Header */}
       <header className="border-b border-gray-700 bg-gray-800">
@@ -86,35 +103,58 @@ export default function ClipperToolPage() {
                 Free AI-Powered Content Creation
               </p>
             </div>
-            <nav
-              className="flex gap-6"
-              role="navigation"
-              aria-label="Main navigation"
-            >
-              <a
-                href="/"
-                className="text-text-secondary hover:text-text-primary transition-colors"
+            <div className="flex items-center gap-4">
+              <nav
+                className="flex gap-6"
+                role="navigation"
+                aria-label="Main navigation"
               >
-                Home
-              </a>
-              <a
-                href="/blog"
-                className="text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Blog
-              </a>
-              <a
-                href="/free-youtube-thumbnail-tool"
-                className="text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Tools
-              </a>
-            </nav>
+                <a
+                  href="/"
+                  className="text-text-secondary hover:text-text-primary transition-colors"
+                >
+                  Home
+                </a>
+                <a
+                  href="/blog"
+                  className="text-text-secondary hover:text-text-primary transition-colors"
+                >
+                  Blog
+                </a>
+                <a
+                  href="/free-youtube-thumbnail-tool"
+                  className="text-text-secondary hover:text-text-primary transition-colors"
+                >
+                  Tools
+                </a>
+              </nav>
+              <div className="flex items-center gap-2">
+                <ShareButton size="sm" variant="ghost" />
+                <UpgradeCTA
+                  variant="inline"
+                  size="sm"
+                  feature="AI Video Clipper"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main
+        id="main-content"
+        className="container mx-auto px-4 py-8"
+        role="main"
+        aria-label="Free AI Video Clipper"
+      >
+        {/* Upgrade Banner */}
+        <UpgradeCTA
+          variant="banner"
+          plan="plus"
+          feature="unlimited video processing and advanced AI analysis"
+          className="mb-8"
+        />
+
         {/* SEO Content */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-6 text-center">
@@ -177,7 +217,7 @@ export default function ClipperToolPage() {
                     href="/free-youtube-thumbnail-tool"
                     className="link-primary"
                   >
-                    YouTube Thumbnail Maker
+                    Snapthumb - YouTube Thumbnail Maker
                   </a>
                 </h3>
                 <p className="text-sm text-gray-300">
@@ -192,7 +232,7 @@ export default function ClipperToolPage() {
                     href="/free-podcast-caption-generator"
                     className="link-primary"
                   >
-                    Podcast Caption Generator
+                    Captiq - Podcast Caption Generator
                   </a>
                 </h3>
                 <p className="text-sm text-gray-300">

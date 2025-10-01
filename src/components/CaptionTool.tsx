@@ -1,6 +1,8 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { apiCaptions, apiExportZip } from "../lib/api";
 import { logEvent } from "../lib/logEvent";
+import ErrorBoundary from "./ErrorBoundary";
+import SessionRestoreDialog from "./SessionRestoreDialog";
 import {
   trackFirstFileUpload,
   trackFirstExport,
@@ -9,6 +11,7 @@ import {
   trackError,
   trackActivation,
 } from "../lib/metrics";
+import { useAutosave, useSessionRestore } from "../hooks/useAutosave";
 
 type Platform = "youtube" | "tiktok" | "instagram";
 
@@ -27,6 +30,76 @@ export default function CaptionTool() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Session restore state
+  const [showRestoreDialog, setShowRestoreDialog] = useState(false);
+  const [hasRestored, setHasRestored] = useState(false);
+
+  // Session restore hook
+  const { getLastSaveTime, hasRecentSave } = useSessionRestore(
+    "forge_caption_state"
+  );
+
+  // Autosave hook
+  const { loadData, clearSavedData } = useAutosave({
+    key: "forge_caption_state",
+    data: {
+      transcript,
+      selectedPlatforms,
+      results,
+    },
+    enabled: true,
+    onSave: (data) => {
+      // Only save if we have meaningful content
+      if (data.transcript && data.transcript.trim().length > 0) {
+        return data;
+      }
+      return null;
+    },
+    onLoad: (data) => {
+      // Validate and restore data
+      if (data && typeof data === "object") {
+        return {
+          transcript: data.transcript || "",
+          selectedPlatforms: data.selectedPlatforms || ["youtube"],
+          results: data.results || null,
+        };
+      }
+      return null;
+    },
+  });
+
+  // Session restore logic
+  useEffect(() => {
+    if (hasRestored) return;
+
+    const savedData = loadData();
+    if (savedData && hasRecentSave()) {
+      setShowRestoreDialog(true);
+    } else {
+      setHasRestored(true);
+    }
+  }, [loadData, hasRecentSave, hasRestored]);
+
+  const handleRestoreSession = () => {
+    const savedData = loadData();
+    if (savedData) {
+      setTranscript(savedData.transcript);
+      setSelectedPlatforms(savedData.selectedPlatforms);
+      setResults(savedData.results);
+
+      logEvent("session_restored", { tool: "caption" });
+    }
+    setShowRestoreDialog(false);
+    setHasRestored(true);
+  };
+
+  const handleDismissRestore = () => {
+    clearSavedData();
+    setShowRestoreDialog(false);
+    setHasRestored(true);
+    logEvent("session_restore_dismissed", { tool: "caption" });
+  };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -171,135 +244,169 @@ export default function CaptionTool() {
   const canExport = results && selectedPlatforms.length > 0 && !loading;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Transcript Input */}
-      <div className="space-y-2">
-        <label htmlFor="transcript-textarea" className="block text-sm font-medium text-text-primary">
-          Transcript
-        </label>
-        <textarea
-          id="transcript-textarea"
-          className="w-full border rounded p-3 h-32 bg-bg-secondary border-gray-600 text-text-primary"
-          value={transcript}
-          onChange={(e) => setTranscript(e.target.value)}
-          placeholder="Paste your transcript here or upload a .txt file..."
-          aria-describedby="transcript-help"
-        />
-        <div id="transcript-help" className="text-sm text-text-muted">
-          Enter your podcast transcript or upload a .txt file to generate social media captions
-        </div>
-
-        {/* File Upload */}
-        <div className="flex items-center gap-2">
-          <label htmlFor="transcript-file" className="sr-only">
-            Upload transcript file
+    <ErrorBoundary>
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Transcript Input */}
+        <div className="space-y-2">
+          <label
+            htmlFor="transcript-textarea"
+            className="block text-sm font-medium text-text-primary"
+          >
+            Transcript
           </label>
-          <input
-            id="transcript-file"
-            ref={fileInputRef}
-            type="file"
-            accept=".txt"
-            onChange={handleFileUpload}
-            className="hidden"
+          <textarea
+            id="transcript-textarea"
+            className="w-full border rounded p-3 h-32 bg-bg-secondary border-gray-600 text-text-primary"
+            value={transcript}
+            onChange={(e) => setTranscript(e.target.value)}
+            placeholder="Paste your transcript here or upload a .txt file..."
+            aria-describedby="transcript-help"
           />
-          <button
-            className="btn"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={loading}
-            aria-describedby="file-upload-help"
-          >
-            Upload .txt File
-          </button>
-          <span id="file-upload-help" className="text-sm text-gray-400">
-            Optional: Upload a .txt file with your transcript
-          </span>
-        </div>
-      </div>
+          <div id="transcript-help" className="text-sm text-text-muted">
+            Enter your podcast transcript or upload a .txt file to generate
+            social media captions
+          </div>
 
-      {/* Platform Selection */}
-      <fieldset className="space-y-2">
-        <legend className="block text-sm font-medium text-text-primary">Select Platforms</legend>
-        <div className="flex gap-4" role="group" aria-labelledby="platform-legend">
-          {(["youtube", "tiktok", "instagram"] as Platform[]).map(
-            (platform) => (
-              <label key={platform} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={selectedPlatforms.includes(platform)}
-                  onChange={() => handlePlatformChange(platform)}
-                  disabled={loading}
-                  className="rounded"
-                  aria-describedby={`${platform}-help`}
-                />
-                <span className="text-sm capitalize text-text-primary">{platform}</span>
-                <span id={`${platform}-help`} className="sr-only">
-                  Generate captions for {platform}
-                </span>
-              </label>
-            )
-          )}
-        </div>
-      </fieldset>
-
-      {/* Error Display */}
-      {error && (
-        <div className="text-red-500 text-sm bg-red-500/10 border border-red-500/20 rounded p-3">
-          {error}
-        </div>
-      )}
-
-      {/* Action Buttons */}
-      <div className="flex gap-3">
-        <button
-          className="btn"
-          onClick={handleGenerate}
-          disabled={!canGenerate}
-        >
-          {loading ? "Generating..." : "Generate Captions"}
-        </button>
-
-        {results && (
-          <button
-            className="btn"
-            onClick={handleExportZip}
-            disabled={!canExport}
-          >
-            {loading ? "Exporting..." : "Export ZIP"}
-          </button>
-        )}
-      </div>
-
-      {/* Results Panel */}
-      {results && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Generated Captions</h3>
-
-          <div className="grid gap-4">
-            {selectedPlatforms.includes("youtube") && results.youtube && (
-              <div className="border rounded p-4">
-                <h4 className="font-medium mb-2">YouTube</h4>
-                <p className="text-sm whitespace-pre-wrap">{results.youtube}</p>
-              </div>
-            )}
-
-            {selectedPlatforms.includes("tiktok") && results.tweet && (
-              <div className="border rounded p-4">
-                <h4 className="font-medium mb-2">TikTok</h4>
-                <p className="text-sm whitespace-pre-wrap">{results.tweet}</p>
-              </div>
-            )}
-
-            {selectedPlatforms.includes("instagram") && results.instagram && (
-              <div className="border rounded p-4">
-                <h4 className="font-medium mb-2">Instagram</h4>
-                <p className="text-sm whitespace-pre-wrap">
-                  {results.instagram}
-                </p>
-              </div>
-            )}
+          {/* File Upload */}
+          <div className="flex items-center gap-2">
+            <label htmlFor="transcript-file" className="sr-only">
+              Upload transcript file
+            </label>
+            <input
+              id="transcript-file"
+              ref={fileInputRef}
+              type="file"
+              accept=".txt"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <button
+              className="btn focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-bg-primary"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={loading}
+              aria-describedby="file-upload-help"
+            >
+              Upload .txt File
+            </button>
+            <span id="file-upload-help" className="text-sm text-gray-400">
+              Optional: Upload a .txt file with your transcript
+            </span>
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Platform Selection */}
+        <fieldset className="space-y-2">
+          <legend className="block text-sm font-medium text-text-primary">
+            Select Platforms
+          </legend>
+          <div
+            className="flex gap-4"
+            role="group"
+            aria-labelledby="platform-legend"
+          >
+            {(["youtube", "tiktok", "instagram"] as Platform[]).map(
+              (platform) => (
+                <label key={platform} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedPlatforms.includes(platform)}
+                    onChange={() => handlePlatformChange(platform)}
+                    disabled={loading}
+                    className="rounded"
+                    aria-describedby={`${platform}-help`}
+                  />
+                  <span className="text-sm capitalize text-text-primary">
+                    {platform}
+                  </span>
+                  <span id={`${platform}-help`} className="sr-only">
+                    Generate captions for {platform}
+                  </span>
+                </label>
+              )
+            )}
+          </div>
+        </fieldset>
+
+        {/* Error Display */}
+        {error && (
+          <div className="text-red-500 text-sm bg-red-500/10 border border-red-500/20 rounded p-3">
+            {error}
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex gap-3">
+          <button
+            className="btn focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-bg-primary"
+            onClick={handleGenerate}
+            disabled={!canGenerate}
+            aria-describedby="generate-help"
+          >
+            {loading ? "Generating..." : "Generate Captions"}
+          </button>
+          <span id="generate-help" className="sr-only">
+            Generate social media captions from your transcript for the selected
+            platforms
+          </span>
+
+          {results && (
+            <button
+              className="btn focus:outline-none focus:ring-2 focus:ring-primary-400 focus:ring-offset-2 focus:ring-offset-bg-primary"
+              onClick={handleExportZip}
+              disabled={!canExport}
+              aria-describedby="export-help"
+            >
+              {loading ? "Exporting..." : "Export ZIP"}
+            </button>
+          )}
+          <span id="export-help" className="sr-only">
+            Download all generated captions as a ZIP file
+          </span>
+        </div>
+
+        {/* Results Panel */}
+        {results && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Generated Captions</h3>
+
+            <div className="grid gap-4">
+              {selectedPlatforms.includes("youtube") && results.youtube && (
+                <div className="border rounded p-4">
+                  <h4 className="font-medium mb-2">YouTube</h4>
+                  <p className="text-sm whitespace-pre-wrap">
+                    {results.youtube}
+                  </p>
+                </div>
+              )}
+
+              {selectedPlatforms.includes("tiktok") && results.tweet && (
+                <div className="border rounded p-4">
+                  <h4 className="font-medium mb-2">TikTok</h4>
+                  <p className="text-sm whitespace-pre-wrap">{results.tweet}</p>
+                </div>
+              )}
+
+              {selectedPlatforms.includes("instagram") && results.instagram && (
+                <div className="border rounded p-4">
+                  <h4 className="font-medium mb-2">Instagram</h4>
+                  <p className="text-sm whitespace-pre-wrap">
+                    {results.instagram}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Session Restore Dialog */}
+        <SessionRestoreDialog
+          isOpen={showRestoreDialog}
+          onRestore={handleRestoreSession}
+          onDismiss={handleDismissRestore}
+          lastSaveTime={getLastSaveTime()}
+          toolName="Caption Tool"
+        />
+      </div>
+    </ErrorBoundary>
   );
 }

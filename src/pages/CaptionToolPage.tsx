@@ -1,17 +1,49 @@
 import React from "react";
 import { Helmet } from "react-helmet-async";
+import { motion } from "framer-motion";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ShareButton } from "@/components/ShareButton";
+import { UpgradeCTA } from "@/components/UpgradeCTA";
+import { trackPageViewTool, trackActivation } from "@/lib/metrics";
+import {
+  Image,
+  Type,
+  Music,
+  Scissors,
+  BookOpen,
+  ArrowRight,
+  ExternalLink,
+  Home,
+  Menu,
+  Mic,
+  Zap,
+} from "lucide-react";
 import CaptionTool from "../components/CaptionTool";
 
 export default function CaptionToolPage() {
+  // Track page view
+  React.useEffect(() => {
+    trackPageViewTool("caption");
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <Helmet>
         <title>
-          Free AI Podcast Caption Generator - Viral Social Media Captions 2024
+          Captiq - Free AI Podcast Caption Generator - Viral Social Media
+          Captions 2024
         </title>
         <meta
           name="description"
-          content="Generate viral social media captions from podcast episodes with our free AI caption generator. Upload audio files for instant transcription and engagement-optimized captions for all platforms."
+          content="Captiq - Generate viral social media captions from podcast episodes with our free AI caption generator. Upload audio files for instant transcription and engagement-optimized captions for all platforms."
         />
         <meta
           name="keywords"
@@ -19,29 +51,29 @@ export default function CaptionToolPage() {
         />
         <meta
           property="og:title"
-          content="Free AI Podcast Caption Generator - Viral Social Media Captions 2024"
+          content="Captiq - Free AI Podcast Caption Generator - Viral Social Media Captions 2024"
         />
         <meta
           property="og:description"
-          content="Generate viral social media captions from podcast episodes with our free AI caption generator. Upload audio files for instant transcription and engagement-optimized captions for all platforms."
+          content="Captiq - Generate viral social media captions from podcast episodes with our free AI caption generator. Upload audio files for instant transcription and engagement-optimized captions for all platforms."
         />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta
           name="twitter:title"
-          content="Free AI Podcast Caption Generator - Viral Social Media Captions 2024"
+          content="Captiq - Free AI Podcast Caption Generator - Viral Social Media Captions 2024"
         />
         <meta
           name="twitter:description"
-          content="Generate viral social media captions from podcast episodes with our free AI caption generator. Upload audio files for instant transcription and engagement-optimized captions for all platforms."
+          content="Captiq - Generate viral social media captions from podcast episodes with our free AI caption generator. Upload audio files for instant transcription and engagement-optimized captions for all platforms."
         />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
-            name: "Free AI Podcast Caption Generator",
+            name: "Captiq - AI Podcast Caption Generator",
             description:
-              "Generate viral social media captions from podcast episodes with our free AI caption generator. Upload audio files for instant transcription and engagement-optimized captions for all platforms.",
+              "Captiq - Generate viral social media captions from podcast episodes with our free AI caption generator. Upload audio files for instant transcription and engagement-optimized captions for all platforms.",
             category: "MultimediaApplication",
             url: "https://forge-frontend.vercel.app/free-podcast-caption-generator",
             applicationCategory: "MultimediaApplication",
@@ -70,168 +102,287 @@ export default function CaptionToolPage() {
             dateModified: "2024-01-01",
           })}
         </script>
+        <link
+          rel="canonical"
+          href="https://forge-frontend.vercel.app/free-podcast-caption-generator"
+        />
       </Helmet>
 
+      {/* Skip link for keyboard navigation */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
+
       {/* Header */}
-      <header className="border-b border-gray-700 bg-gray-800">
+      <motion.header
+        className="border-b border-border bg-card"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold">
-                <a href="/" className="link-primary">
+                <a href="/" className="hover:text-primary transition-colors">
                   Forge Tools
                 </a>
               </h1>
-              <p className="text-text-muted text-sm mt-1">
+              <p className="text-muted-foreground text-sm mt-1">
                 Free AI-Powered Content Creation
               </p>
             </div>
             <nav
-              className="flex gap-6"
+              className="hidden md:flex gap-6"
               role="navigation"
               aria-label="Main navigation"
             >
-              <a
-                href="/"
-                className="text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Home
-              </a>
-              <a
-                href="/blog"
-                className="text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Blog
-              </a>
-              <a
-                href="/free-youtube-thumbnail-tool"
-                className="text-text-secondary hover:text-text-primary transition-colors"
-              >
-                Tools
-              </a>
+              <Button variant="ghost" asChild>
+                <a href="/">
+                  <Home className="h-4 w-4 mr-2" />
+                  Home
+                </a>
+              </Button>
+              <Button variant="ghost" asChild>
+                <a href="/blog">
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  Blog
+                </a>
+              </Button>
+              <Button variant="ghost" asChild>
+                <a href="/free-youtube-thumbnail-tool">
+                  <Image className="h-4 w-4 mr-2" />
+                  Tools
+                </a>
+              </Button>
             </nav>
-          </div>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        {/* SEO Content */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-6 text-center">
-            Free AI Podcast Caption Generator - Viral Social Media Captions
-          </h1>
-
-          <div className="max-w-4xl mx-auto space-y-4 text-lg leading-relaxed">
-            <p>
-              Generate viral social media captions from your podcast episodes
-              with our free AI-powered caption generator. Upload your audio or
-              video files to get automatic transcription, then create
-              engagement-optimized captions for Twitter, Instagram, TikTok, and
-              other social platforms. Our advanced AI technology understands
-              context, tone, and trending topics to create captions that drive
-              maximum engagement. Perfect for content creators who want to
-              maximize their reach across all social media platforms.
-            </p>
-
-            <h2 className="text-2xl font-semibold mt-8 mb-4">
-              How Our AI Caption Generator Works
-            </h2>
-            <p>
-              Our free podcast caption generator uses advanced AI to analyze
-              your content and create compelling social media posts that drive
-              engagement. Perfect for podcasters, content creators, and
-              marketers looking to maximize their reach across all platforms.
-              The tool automatically identifies the most quotable moments,
-              extracts key insights, and formats them for maximum social media
-              impact. For more content creation tips, check out our
-              <a href="/blog" className="link-primary">
-                content creation blog
-              </a>
-              with expert guides and tutorials.
-            </p>
-
-            <h2 className="text-2xl font-semibold mt-8 mb-4">
-              Perfect for Content Creators & Marketers
-            </h2>
-            <p>
-              Whether you're promoting a new episode, sharing key takeaways, or
-              creating teaser content, our caption generator helps you maintain
-              a consistent social media presence without the time-consuming
-              manual work. The AI understands your podcast's unique voice and
-              creates captions that match your brand's tone and style, helping
-              you build a stronger connection with your audience across all
-              social platforms.
-            </p>
-
-            <h2 className="text-2xl font-semibold mt-8 mb-4">
-              More Free Content Creation Tools
-            </h2>
-            <div className="grid md:grid-cols-3 gap-4 mt-4">
-              <div className="bg-gray-800 rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-2">
-                  <a
-                    href="/free-youtube-thumbnail-tool"
-                    className="link-primary"
-                  >
-                    YouTube Thumbnail Maker
-                  </a>
-                </h3>
-                <p className="text-sm text-gray-300">
-                  Create eye-catching YouTube thumbnails that boost CTR and
-                  views with AI.
-                </p>
-              </div>
-
-              <div className="bg-gray-800 rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-2">
-                  <a
-                    href="/free-ai-audiogram-generator"
-                    className="link-primary"
-                  >
-                    AI Audiogram Creator
-                  </a>
-                </h3>
-                <p className="text-sm text-gray-300">
-                  Transform audio content into stunning visual audiograms for
-                  social media.
-                </p>
-              </div>
-
-              <div className="bg-gray-800 rounded-lg p-4">
-                <h3 className="text-lg font-semibold mb-2">
-                  <a
-                    href="/clip-short-video-automatically"
-                    className="link-primary"
-                  >
-                    Video Clipper Tool
-                  </a>
-                </h3>
-                <p className="text-sm text-gray-300">
-                  Automatically generate short video clips from longer content
-                  with AI.
-                </p>
-              </div>
+            <div className="flex items-center gap-2">
+              <ShareButton size="sm" variant="ghost" />
+              <UpgradeCTA
+                variant="inline"
+                size="sm"
+                feature="Podcast Caption Generator"
+              />
+              <Button variant="ghost" size="sm" className="md:hidden">
+                <Menu className="h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
+      </motion.header>
 
-        {/* Embedded Tool */}
-        <div className="bg-gray-800 rounded-lg p-6">
-          <CaptionTool />
-        </div>
+      <main
+        id="main-content"
+        className="container mx-auto px-4 py-8"
+        role="main"
+        aria-label="Captiq - Podcast Caption Generator"
+      >
+        {/* Upgrade Banner */}
+        <UpgradeCTA
+          variant="banner"
+          plan="pro"
+          feature="unlimited caption generation and premium templates"
+          className="mb-8"
+        />
+
+        {/* Hero Section */}
+        <motion.section
+          className="mb-12 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary-300 bg-clip-text text-transparent">
+            Captiq - Free AI Podcast Caption Generator
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+            Generate viral social media captions from your podcast episodes with
+            our free AI-powered caption generator. Upload your audio or video
+            files to get automatic transcription, then create
+            engagement-optimized captions for all platforms.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Badge variant="secondary" className="text-sm px-3 py-1">
+              <Mic className="h-3 w-3 mr-1" />
+              AI Transcription
+            </Badge>
+            <Badge variant="secondary" className="text-sm px-3 py-1">
+              <Zap className="h-3 w-3 mr-1" />
+              Multi-Platform
+            </Badge>
+            <Badge variant="secondary" className="text-sm px-3 py-1">
+              <ExternalLink className="h-3 w-3 mr-1" />
+              Viral Captions
+            </Badge>
+          </div>
+        </motion.section>
+
+        {/* Features Grid */}
+        <motion.section
+          className="mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white mb-4">
+                  <Mic className="h-6 w-6" />
+                </div>
+                <CardTitle>Automatic Transcription</CardTitle>
+                <CardDescription>
+                  Upload your audio or video files and get instant, accurate
+                  transcription powered by advanced AI technology.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center text-white mb-4">
+                  <Type className="h-6 w-6" />
+                </div>
+                <CardTitle>Smart Caption Generation</CardTitle>
+                <CardDescription>
+                  Our AI analyzes your content to create compelling social media
+                  posts that drive maximum engagement across all platforms.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white mb-4">
+                  <Zap className="h-6 w-6" />
+                </div>
+                <CardTitle>Multi-Platform Optimization</CardTitle>
+                <CardDescription>
+                  Generate captions optimized for Twitter, Instagram, TikTok,
+                  and other social platforms with platform-specific formatting.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </motion.section>
+
+        {/* Tool Interface */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <Card className="p-6">
+            <CaptionTool />
+          </Card>
+        </motion.section>
+
+        {/* Related Tools */}
+        <motion.section
+          className="mt-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <h2 className="text-3xl font-bold text-center mb-12">
+            More Free Content Creation Tools
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <CardHeader>
+                <div className="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center text-white mb-4">
+                  <Image className="h-6 w-6" />
+                </div>
+                <CardTitle>
+                  <a
+                    href="/free-youtube-thumbnail-tool"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Snapthumb - YouTube Thumbnail Maker
+                  </a>
+                </CardTitle>
+                <CardDescription>
+                  Create eye-catching YouTube thumbnails that boost CTR and
+                  views with AI.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" className="w-full">
+                  Try Now
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <CardHeader>
+                <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center text-white mb-4">
+                  <Music className="h-6 w-6" />
+                </div>
+                <CardTitle>
+                  <a
+                    href="/free-ai-audiogram-generator"
+                    className="hover:text-primary transition-colors"
+                  >
+                    AI Audiogram Creator
+                  </a>
+                </CardTitle>
+                <CardDescription>
+                  Transform audio content into stunning visual audiograms for
+                  social media.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" className="w-full">
+                  Try Now
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <CardHeader>
+                <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center text-white mb-4">
+                  <Scissors className="h-6 w-6" />
+                </div>
+                <CardTitle>
+                  <a
+                    href="/clip-short-video-automatically"
+                    className="hover:text-primary transition-colors"
+                  >
+                    Video Clipper Tool
+                  </a>
+                </CardTitle>
+                <CardDescription>
+                  Automatically generate short video clips from longer content
+                  with AI.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="outline" className="w-full">
+                  Try Now
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </motion.section>
       </main>
 
       {/* Footer */}
-      <footer
-        className="bg-gray-800 border-t border-gray-700 mt-16"
+      <motion.footer
+        className="bg-card border-t border-border mt-16"
         role="contentinfo"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.8 }}
       >
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center text-text-muted text-sm">
+          <div className="text-center text-muted-foreground text-sm">
             <p>&copy; 2024 Forge Tools. All rights reserved.</p>
           </div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 }

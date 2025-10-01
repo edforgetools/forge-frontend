@@ -1,0 +1,47 @@
+JSON-LD Validation Report
+Generated: 2025-10-01T22:14:11.069002
+========================================
+
+Summary:
+- Files processed: 5
+- Total errors: 0
+- Total warnings: 0
+- Valid files: 5/5
+
+
+File: audiogram-tool.json
+Status: ✅ VALID
+Errors: 0
+Warnings: 0
+
+---
+
+File: caption-tool.json
+Status: ✅ VALID
+Errors: 0
+Warnings: 0
+
+---
+
+File: clipper-tool.json
+Status: ✅ VALID
+Errors: 0
+Warnings: 0
+
+---
+
+File: homepage.json
+Status: ✅ VALID
+Errors: 0
+Warnings: 0
+
+---
+
+File: thumbnail-tool.json
+Status: ✅ VALID
+Errors: 0
+Warnings: 0
+
+---
+
+🎉 All JSON-LD files passed validation! No schema errors found.

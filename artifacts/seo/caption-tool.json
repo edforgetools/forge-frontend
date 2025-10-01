@@ -1,0 +1,28 @@
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Captiq - AI Podcast Caption Generator",
+  "description": "Captiq - Generate viral social media captions from podcast episodes with our free AI caption generator. Upload audio files for instant transcription and engagement-optimized captions for all platforms.",
+  "category": "MultimediaApplication",
+  "url": "https://forge-frontend.vercel.app/free-podcast-caption-generator",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "creator": {
+    "@type": "Organization",
+    "name": "Forge Tools"
+  },
+  "featureList": [
+    "AI-powered caption generation",
+    "Automatic audio transcription",
+    "Multi-platform optimization",
+    "Engagement-focused formatting",
+    "Key quote extraction",
+    "Brand voice matching"
+  ],
+  "screenshot": "https://forge-frontend.vercel.app/free-podcast-caption-generator"
+}

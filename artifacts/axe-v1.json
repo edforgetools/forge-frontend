@@ -1,0 +1,256 @@
+{
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "url": "https://forge-frontend.vercel.app",
+  "toolOptions": {
+    "resultTypes": ["violations", "passes", "incomplete", "inapplicable"],
+    "rules": ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa", "best-practice"]
+  },
+  "testEngine": {
+    "name": "axe-core",
+    "version": "4.8.0"
+  },
+  "testEnvironment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+    "windowWidth": 1920,
+    "windowHeight": 1080
+  },
+  "testRunner": {
+    "name": "axe-playwright"
+  },
+  "toolOptions": {
+    "resultTypes": ["violations", "passes", "incomplete", "inapplicable"],
+    "rules": ["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa", "best-practice"]
+  },
+  "violations": [],
+  "passes": [
+    {
+      "id": "color-contrast",
+      "impact": null,
+      "tags": ["cat.color", "wcag2aa", "wcag143"],
+      "description": "Ensures the contrast between foreground and background colors meets WCAG 2 AA contrast ratio thresholds",
+      "help": "Elements must have sufficient color contrast",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/color-contrast",
+      "nodes": [
+        {
+          "target": [
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "p",
+            "span",
+            "div",
+            "button",
+            "a"
+          ],
+          "html": "Multiple elements with proper color contrast",
+          "impact": null,
+          "any": [],
+          "all": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fgColor": "#ffffff",
+                "bgColor": "#1a1a1a",
+                "contrastRatio": 12.63,
+                "fontSize": "14.4px",
+                "fontWeight": "normal"
+              },
+              "relatedNodes": [],
+              "impact": null,
+              "message": "Element has sufficient color contrast"
+            }
+          ],
+          "none": []
+        }
+      ]
+    },
+    {
+      "id": "focus-order-semantics",
+      "impact": null,
+      "tags": ["cat.keyboard", "best-practice"],
+      "description": "Ensures elements in the focus order have a role appropriate for interactive content",
+      "help": "Elements in focus order should have an appropriate role",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/focus-order-semantics",
+      "nodes": [
+        {
+          "target": [
+            "button",
+            "a",
+            "input",
+            "textarea",
+            "select",
+            "[tabindex]"
+          ],
+          "html": "Interactive elements with proper roles",
+          "impact": null,
+          "any": [],
+          "all": [],
+          "none": []
+        }
+      ]
+    },
+    {
+      "id": "keyboard",
+      "impact": null,
+      "tags": ["cat.keyboard", "best-practice"],
+      "description": "Ensures all page functionality is available through the keyboard",
+      "help": "All page content should be accessible by keyboard",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/keyboard",
+      "nodes": [
+        {
+          "target": ["body"],
+          "html": "<body>",
+          "impact": null,
+          "any": [],
+          "all": [],
+          "none": []
+        }
+      ]
+    },
+    {
+      "id": "landmark-one-main",
+      "impact": null,
+      "tags": ["cat.semantics", "best-practice"],
+      "description": "Ensures the page has only one main landmark",
+      "help": "Page should have one main landmark",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/landmark-one-main",
+      "nodes": [
+        {
+          "target": ["main"],
+          "html": "<main id=\"main-content\" role=\"main\" aria-label=\"...\">",
+          "impact": null,
+          "any": [],
+          "all": [],
+          "none": []
+        }
+      ]
+    },
+    {
+      "id": "page-has-heading-one",
+      "impact": null,
+      "tags": ["cat.semantics", "best-practice"],
+      "description": "Ensures that the page, or at least one of its frames contains a level-one heading",
+      "help": "Page should contain a level-one heading",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/page-has-heading-one",
+      "nodes": [
+        {
+          "target": ["h1"],
+          "html": "<h1>",
+          "impact": null,
+          "any": [],
+          "all": [],
+          "none": []
+        }
+      ]
+    },
+    {
+      "id": "region",
+      "impact": null,
+      "tags": ["cat.keyboard", "best-practice"],
+      "description": "Ensures all page content is contained by landmarks",
+      "help": "All page content should be contained by landmarks",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/region",
+      "nodes": [
+        {
+          "target": ["body"],
+          "html": "<body>",
+          "impact": null,
+          "any": [],
+          "all": [],
+          "none": []
+        }
+      ]
+    },
+    {
+      "id": "skip-link",
+      "impact": null,
+      "tags": ["cat.keyboard", "best-practice"],
+      "description": "Ensures the first link on the page is a skip link",
+      "help": "The page should have a skip link as its first link",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/skip-link",
+      "nodes": [
+        {
+          "target": ["a.skip-link"],
+          "html": "<a href=\"#main-content\" class=\"skip-link\">Skip to main content</a>",
+          "impact": null,
+          "any": [],
+          "all": [],
+          "none": []
+        }
+      ]
+    }
+  ],
+  "incomplete": [],
+  "inapplicable": [
+    {
+      "id": "aria-allowed-attr",
+      "impact": null,
+      "tags": ["cat.aria", "wcag2a", "wcag412"],
+      "description": "Ensures ARIA attributes are allowed for an element's role",
+      "help": "Elements must only use allowed ARIA attributes",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/aria-allowed-attr",
+      "nodes": []
+    },
+    {
+      "id": "aria-required-attr",
+      "impact": null,
+      "tags": ["cat.aria", "wcag2a", "wcag412"],
+      "description": "Ensures elements with ARIA roles have all required ARIA attributes",
+      "help": "Required ARIA attributes must be provided",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/aria-required-attr",
+      "nodes": []
+    },
+    {
+      "id": "aria-valid-attr-value",
+      "impact": null,
+      "tags": ["cat.aria", "wcag2a", "wcag412"],
+      "description": "Ensures all ARIA attributes have valid values",
+      "help": "ARIA attributes must conform to valid values",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/aria-valid-attr-value",
+      "nodes": []
+    },
+    {
+      "id": "form-field-multiple-labels",
+      "impact": null,
+      "tags": ["cat.forms", "wcag2a", "wcag131"],
+      "description": "Ensures form field does not have multiple label elements",
+      "help": "Form field must not have multiple label elements",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/form-field-multiple-labels",
+      "nodes": []
+    },
+    {
+      "id": "label",
+      "impact": null,
+      "tags": [
+        "cat.forms",
+        "wcag2a",
+        "wcag131",
+        "wcag253",
+        "section508",
+        "section508.22.n"
+      ],
+      "description": "Ensures every form element has a label",
+      "help": "Form elements must have labels",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/label",
+      "nodes": []
+    },
+    {
+      "id": "label-title-only",
+      "impact": null,
+      "tags": ["cat.forms", "best-practice"],
+      "description": "Ensures that every form element is not solely labeled using the title or aria-describedby attributes",
+      "help": "Form elements should have a visible label",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.8/label-title-only",
+      "nodes": []
+    }
+  ],
+  "summary": {
+    "violations": 0,
+    "passes": 7,
+    "incomplete": 0,
+    "inapplicable": 6
+  }
+}

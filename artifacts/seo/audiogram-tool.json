@@ -1,0 +1,28 @@
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Free AI Audiogram Generator",
+  "description": "Create viral audiograms from podcast episodes with our free AI audiogram generator. Transform audio into stunning visual content that drives engagement on Instagram, TikTok, and all social platforms.",
+  "category": "MultimediaApplication",
+  "url": "https://forge-frontend.vercel.app/free-ai-audiogram-generator",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "creator": {
+    "@type": "Organization",
+    "name": "Forge Tools"
+  },
+  "featureList": [
+    "AI-powered audiogram generation",
+    "Automatic audio transcription",
+    "Visual waveform analysis",
+    "Multi-platform optimization",
+    "Professional typography",
+    "Brand customization"
+  ],
+  "screenshot": "https://forge-frontend.vercel.app/free-ai-audiogram-generator"
+}

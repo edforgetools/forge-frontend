@@ -1,5 +1,26 @@
 import { useState, useEffect } from "react";
 import { HelmetProvider, Helmet } from "react-helmet-async";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Image,
+  Type,
+  Music,
+  Scissors,
+  BookOpen,
+  Sparkles,
+  ArrowRight,
+  ExternalLink,
+} from "lucide-react";
 import ForgePlusDashboard from "../ForgePlusDashboard";
 import ThumbTool from "../tools/thumb/ThumbTool";
 import ThumbnailToolPage from "../pages/ThumbnailToolPage";
@@ -15,7 +36,13 @@ import {
   initSession,
   trackActivity,
   trackToolDiscovery,
+  trackPageViewTool,
+  trackReturnVisit,
 } from "../lib/metrics";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/hooks/useToast";
+import { ShareButton } from "@/components/ShareButton";
+import { UpgradeCTA } from "@/components/UpgradeCTA";
 
 type Route =
   | "home"
@@ -30,6 +57,7 @@ type Route =
 export default function App() {
   const [tab, setTab] = useState<"captions" | "thumb">("captions");
   const [route, setRoute] = useState<Route>("home");
+  const { toasts, removeToast } = useToast();
 
   // Initialize session tracking
   useEffect(() => {
@@ -75,6 +103,24 @@ export default function App() {
       path,
       referrer: document.referrer,
     });
+
+    // Track specific tool page views
+    if (newRoute === "free-youtube-thumbnail-tool") {
+      trackPageViewTool("thumbnail");
+    } else if (newRoute === "free-podcast-caption-generator") {
+      trackPageViewTool("caption");
+    } else if (newRoute === "free-ai-audiogram-generator") {
+      trackPageViewTool("audiogram");
+    } else if (newRoute === "clip-short-video-automatically") {
+      trackPageViewTool("clipper");
+    }
+
+    // Track return visits
+    if (localStorage.getItem("forge_visited")) {
+      trackReturnVisit();
+    } else {
+      localStorage.setItem("forge_visited", "true");
+    }
   }, []);
 
   // Handle browser back/forward
@@ -223,8 +269,8 @@ export default function App() {
               name: "Forge Tools",
             },
             featureList: [
-              "YouTube Thumbnail Generator",
-              "Podcast Caption Generator",
+              "Snapthumb - YouTube Thumbnail Generator",
+              "Captiq - Podcast Caption Generator",
               "AI Audiogram Creator",
               "Automatic Video Clipper",
             ],
@@ -237,191 +283,241 @@ export default function App() {
         Skip to main content
       </a>
 
-      <main id="main-content" className="p-4 max-w-5xl mx-auto">
-        {/* SEO Content */}
-        <section className="mb-8" aria-labelledby="main-heading">
+      <main
+        id="main-content"
+        className="container mx-auto px-4 py-8 max-w-7xl"
+        role="main"
+        aria-label="Forge Tools - Free AI-Powered Content Creation Tools"
+      >
+        {/* Hero Section */}
+        <motion.section
+          className="mb-12 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           <h1
             id="main-heading"
-            className="text-4xl font-bold mb-6 text-center text-white"
+            className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary-300 bg-clip-text text-transparent"
           >
             Free AI-Powered Content Creation Tools
           </h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+            Create professional content with Forge's suite of free AI-powered
+            tools. Generate eye-catching YouTube thumbnails, engaging podcast
+            captions, stunning audiograms, and viral-ready video clips.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="text-lg px-8">
+              <Sparkles className="h-5 w-5 mr-2" />
+              Start Creating
+            </Button>
+            <Button variant="outline" size="lg" className="text-lg px-8">
+              <BookOpen className="h-5 w-5 mr-2" />
+              Learn More
+            </Button>
+            <ShareButton size="lg" className="text-lg px-8" />
+          </div>
+        </motion.section>
 
-          <div className="max-w-4xl mx-auto space-y-4 text-lg leading-relaxed text-white mb-8">
-            <p>
-              Create professional content with Forge's suite of free AI-powered
-              tools. Generate eye-catching YouTube thumbnails, engaging podcast
-              captions, stunning audiograms, and viral-ready video clips.
-              Perfect for content creators, podcasters, and marketers looking to
-              maximize their social media impact. Learn more in our
-              <a href="/blog" className="link-primary">
-                comprehensive blog
-              </a>
-              with expert tips and tutorials.
-            </p>
+        {/* Tools Grid */}
+        <motion.section
+          className="mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Our Free Content Creation Tools
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                title: "Snapthumb - YouTube Thumbnail Generator",
+                description:
+                  "Create eye-catching YouTube thumbnails that get more clicks. Upload images, add text overlays, and design professional thumbnails optimized for maximum engagement.",
+                href: "/free-youtube-thumbnail-tool",
+                icon: <Image className="h-8 w-8" />,
+                color: "bg-red-500",
+                trackId: "youtube-thumbnail",
+              },
+              {
+                title: "Captiq - Podcast Caption Generator",
+                description:
+                  "Generate engaging social media captions from your podcast episodes. Upload audio files to get automatic transcription and AI-optimized captions for all platforms.",
+                href: "/free-podcast-caption-generator",
+                icon: <Type className="h-8 w-8" />,
+                color: "bg-blue-500",
+                trackId: "podcast-caption",
+              },
+              {
+                title: "AI Audiogram Creator",
+                description:
+                  "Transform your audio content into stunning visual audiograms. Perfect for social media marketing with automatic transcription and professional design.",
+                href: "/free-ai-audiogram-generator",
+                icon: <Music className="h-8 w-8" />,
+                color: "bg-purple-500",
+                trackId: "ai-audiogram",
+              },
+              {
+                title: "Automatic Video Clipper",
+                description:
+                  "Automatically generate short video clips from longer content. Our AI identifies the most engaging moments for TikTok, Instagram Reels, and YouTube Shorts.",
+                href: "/clip-short-video-automatically",
+                icon: <Scissors className="h-8 w-8" />,
+                color: "bg-green-500",
+                trackId: "video-clipper",
+              },
+            ].map((tool, index) => (
+              <motion.div
+                key={tool.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 * index }}
+              >
+                <Card className="h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                  <CardHeader>
+                    <div
+                      className={`w-12 h-12 ${tool.color} rounded-lg flex items-center justify-center text-white mb-4`}
+                    >
+                      {tool.icon}
+                    </div>
+                    <CardTitle className="text-xl">
+                      <a
+                        href={tool.href}
+                        className="hover:text-primary transition-colors"
+                        onClick={() =>
+                          trackToolDiscovery(tool.trackId, "homepage")
+                        }
+                      >
+                        {tool.title}
+                      </a>
+                    </CardTitle>
+                    <CardDescription className="text-sm">
+                      {tool.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() =>
+                          trackToolDiscovery(tool.trackId, "homepage")
+                        }
+                      >
+                        Try Now
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                      <div className="flex gap-2">
+                        <ShareButton
+                          size="sm"
+                          variant="ghost"
+                          className="flex-1"
+                        />
+                        <UpgradeCTA
+                          variant="inline"
+                          size="sm"
+                          feature={tool.title}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
 
-            <h2 className="text-2xl font-semibold mt-8 mb-4">
-              Our Free Content Creation Tools
-            </h2>
+        {/* Blog Section */}
+        <motion.section
+          className="mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <Card className="bg-gradient-to-r from-primary/10 to-primary-300/10 border-primary/20">
+            <CardHeader>
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <BookOpen className="h-6 w-6" />
+                Content Creation Blog
+              </CardTitle>
+              <CardDescription className="text-lg">
+                Get expert tips, tutorials, and insights to maximize your
+                content creation potential.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => trackToolDiscovery("blog", "homepage")}
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Read Our Blog
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.section>
 
-            <div
-              className="grid md:grid-cols-2 gap-6 mb-8"
-              role="list"
-              aria-label="Available tools"
-            >
-              <div className="bg-gray-800 rounded-lg p-6" role="listitem">
-                <h3 className="text-xl font-semibold mb-3">
-                  <a
-                    href="/free-youtube-thumbnail-tool"
-                    className="link-primary"
-                    onClick={() =>
-                      trackToolDiscovery("youtube-thumbnail", "homepage")
-                    }
+        {/* Tool Interface */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <div className="flex flex-col lg:flex-row gap-6 mb-8">
+            <div className="flex-1">
+              <Tabs
+                value={tab}
+                onValueChange={(value) => {
+                  setTab(value as "captions" | "thumb");
+                  trackActivity("tab_switch");
+                  trackToolDiscovery(
+                    value === "captions" ? "captions" : "thumbnail",
+                    "homepage"
+                  );
+                }}
+              >
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger
+                    value="captions"
+                    className="flex items-center gap-2"
                   >
-                    YouTube Thumbnail Generator
-                  </a>
-                </h3>
-                <p className="text-gray-300">
-                  Create eye-catching YouTube thumbnails that get more clicks.
-                  Upload images, add text overlays, and design professional
-                  thumbnails optimized for maximum engagement.
-                </p>
-              </div>
-
-              <div className="bg-gray-800 rounded-lg p-6" role="listitem">
-                <h3 className="text-xl font-semibold mb-3">
-                  <a
-                    href="/free-podcast-caption-generator"
-                    className="link-primary"
-                    onClick={() =>
-                      trackToolDiscovery("podcast-caption", "homepage")
-                    }
+                    <Type className="h-4 w-4" />
+                    Captiq
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="thumb"
+                    className="flex items-center gap-2"
                   >
-                    Podcast Caption Generator
-                  </a>
-                </h3>
-                <p className="text-gray-300">
-                  Generate engaging social media captions from your podcast
-                  episodes. Upload audio files to get automatic transcription
-                  and AI-optimized captions for all platforms.
-                </p>
-              </div>
-
-              <div className="bg-gray-800 rounded-lg p-6" role="listitem">
-                <h3 className="text-xl font-semibold mb-3">
-                  <a
-                    href="/free-ai-audiogram-generator"
-                    className="link-primary"
-                    onClick={() =>
-                      trackToolDiscovery("ai-audiogram", "homepage")
-                    }
-                  >
-                    AI Audiogram Creator
-                  </a>
-                </h3>
-                <p className="text-gray-300">
-                  Transform your audio content into stunning visual audiograms.
-                  Perfect for social media marketing with automatic
-                  transcription and professional design.
-                </p>
-              </div>
-
-              <div className="bg-gray-800 rounded-lg p-6" role="listitem">
-                <h3 className="text-xl font-semibold mb-3">
-                  <a
-                    href="/clip-short-video-automatically"
-                    className="link-primary"
-                    onClick={() =>
-                      trackToolDiscovery("video-clipper", "homepage")
-                    }
-                  >
-                    Automatic Video Clipper
-                  </a>
-                </h3>
-                <p className="text-gray-300">
-                  Automatically generate short video clips from longer content.
-                  Our AI identifies the most engaging moments for TikTok,
-                  Instagram Reels, and YouTube Shorts.
-                </p>
-              </div>
+                    <Image className="h-4 w-4" />
+                    Snapthumb
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="captions" className="mt-6">
+                  <ForgePlusDashboard />
+                </TabsContent>
+                <TabsContent value="thumb" className="mt-6">
+                  <ThumbTool />
+                </TabsContent>
+              </Tabs>
             </div>
-
-            <h2 className="text-2xl font-semibold mt-8 mb-4">
-              Why Choose Forge Tools?
-            </h2>
-            <p>
-              All our tools are completely free to use with no watermarks or
-              limitations. Powered by advanced AI technology, they're designed
-              to help content creators save time while producing
-              professional-quality content that drives engagement and grows your
-              audience across all social media platforms.
-            </p>
-
-            <h2 className="text-2xl font-semibold mt-8 mb-4">Learn & Grow</h2>
-            <p className="mb-6">
-              Get expert tips, tutorials, and insights to maximize your content
-              creation potential. Our blog covers everything from YouTube
-              optimization to social media strategies.
-            </p>
-            <div className="bg-gray-800 rounded-lg p-6 mb-8">
-              <h3 className="text-xl font-semibold mb-3">
-                <a
-                  href="/blog"
-                  className="link-primary"
-                  onClick={() => trackToolDiscovery("blog", "homepage")}
-                >
-                  📚 Content Creation Blog
-                </a>
-              </h3>
-              <p className="text-gray-300">
-                Learn how to create professional content with our comprehensive
-                guides. From YouTube thumbnail design to podcast caption
-                strategies, we've got you covered.
-              </p>
+            <div className="lg:w-80">
+              <PlanSelector />
             </div>
           </div>
-        </section>
-
-        <div className="flex justify-between items-center mb-4">
-          <nav
-            className="flex gap-2"
-            role="navigation"
-            aria-label="Tool selection"
-          >
-            <button
-              className={`btn ${tab === "captions" ? "border-white" : ""}`}
-              onClick={() => {
-                setTab("captions");
-                trackActivity("tab_switch");
-                trackToolDiscovery("captions", "homepage");
-              }}
-              aria-pressed={tab === "captions"}
-            >
-              Captions
-            </button>
-            <button
-              className={`btn ${tab === "thumb" ? "border-white" : ""}`}
-              onClick={() => {
-                setTab("thumb");
-                trackActivity("tab_switch");
-                trackToolDiscovery("thumbnail", "homepage");
-              }}
-              aria-pressed={tab === "thumb"}
-            >
-              Thumbnail
-            </button>
-          </nav>
-          <PlanSelector />
-        </div>
-        {tab === "captions" ? <ForgePlusDashboard /> : <ThumbTool />}
+        </motion.section>
       </main>
 
       <footer
-        className="mt-8 py-4 border-t border-gray-700 text-center text-gray-400 text-sm"
+        className="mt-16 py-8 border-t border-border text-center text-muted-foreground text-sm"
         role="contentinfo"
       >
         <p>&copy; 2024 Forge Tools. All rights reserved.</p>
       </footer>
+
+      <Toaster toasts={toasts} onRemove={removeToast} />
     </HelmetProvider>
   );
 }

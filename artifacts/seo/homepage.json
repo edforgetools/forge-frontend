@@ -1,0 +1,24 @@
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Forge Tools",
+  "description": "Create professional content with Forge's free AI tools: YouTube thumbnails, podcast captions, audiograms, and video clips. Boost your social media presence with our powerful content creation suite.",
+  "url": "https://forge-frontend.vercel.app",
+  "applicationCategory": "MultimediaApplication",
+  "operatingSystem": "Web Browser",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "creator": {
+    "@type": "Organization",
+    "name": "Forge Tools"
+  },
+  "featureList": [
+    "Snapthumb - YouTube Thumbnail Generator",
+    "Captiq - Podcast Caption Generator",
+    "AI Audiogram Creator",
+    "Automatic Video Clipper"
+  ]
+}

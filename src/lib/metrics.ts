@@ -19,6 +19,10 @@ import { logEvent } from "./logEvent";
 
 export type AcquisitionEvent =
   | "page_view"
+  | "page_view_thumbnail_tool"
+  | "page_view_caption_tool"
+  | "page_view_audiogram_tool"
+  | "page_view_clipper_tool"
   | "tool_discovery"
   | "external_referral"
   | "search_landing";
@@ -47,6 +51,11 @@ export type RevenueEvent =
 
 export type ReferralEvent =
   | "share_clicked"
+  | "share_clicked_copy"
+  | "share_clicked_native"
+  | "share_clicked_twitter"
+  | "share_clicked_facebook"
+  | "share_clicked_linkedin"
   | "export_shared"
   | "social_share"
   | "referral_link_used";
@@ -73,6 +82,10 @@ export const EVENT_CATEGORIES = {
 export const AARRR_MAPPING: Record<MetricsEvent, string> = {
   // Acquisition Events
   page_view: EVENT_CATEGORIES.ACQUISITION,
+  page_view_thumbnail_tool: EVENT_CATEGORIES.ACQUISITION,
+  page_view_caption_tool: EVENT_CATEGORIES.ACQUISITION,
+  page_view_audiogram_tool: EVENT_CATEGORIES.ACQUISITION,
+  page_view_clipper_tool: EVENT_CATEGORIES.ACQUISITION,
   tool_discovery: EVENT_CATEGORIES.ACQUISITION,
   external_referral: EVENT_CATEGORIES.ACQUISITION,
   search_landing: EVENT_CATEGORIES.ACQUISITION,
@@ -101,6 +114,11 @@ export const AARRR_MAPPING: Record<MetricsEvent, string> = {
 
   // Referral Events
   share_clicked: EVENT_CATEGORIES.REFERRAL,
+  share_clicked_copy: EVENT_CATEGORIES.REFERRAL,
+  share_clicked_native: EVENT_CATEGORIES.REFERRAL,
+  share_clicked_twitter: EVENT_CATEGORIES.REFERRAL,
+  share_clicked_facebook: EVENT_CATEGORIES.REFERRAL,
+  share_clicked_linkedin: EVENT_CATEGORIES.REFERRAL,
   export_shared: EVENT_CATEGORIES.REFERRAL,
   social_share: EVENT_CATEGORIES.REFERRAL,
   referral_link_used: EVENT_CATEGORIES.REFERRAL,
@@ -226,6 +244,50 @@ export function trackToolDiscovery(
   source: "homepage" | "navigation" | "direct"
 ): void {
   trackEvent("tool_discovery", { tool, source });
+}
+
+/**
+ * Track page views for specific tools
+ */
+export function trackPageViewTool(tool: string): void {
+  const eventMap = {
+    thumbnail: "page_view_thumbnail_tool",
+    caption: "page_view_caption_tool",
+    audiogram: "page_view_audiogram_tool",
+    clipper: "page_view_clipper_tool",
+  } as const;
+
+  const event = eventMap[tool as keyof typeof eventMap];
+  if (event) {
+    trackEvent(event, { tool });
+  }
+}
+
+/**
+ * Track share clicks with platform
+ */
+export function trackShareClick(platform: string, url?: string): void {
+  const eventMap = {
+    copy: "share_clicked_copy",
+    native: "share_clicked_native",
+    twitter: "share_clicked_twitter",
+    facebook: "share_clicked_facebook",
+    linkedin: "share_clicked_linkedin",
+  } as const;
+
+  const event = eventMap[platform as keyof typeof eventMap] || "share_clicked";
+  trackEvent(event, { platform, url });
+}
+
+/**
+ * Track return visits
+ */
+export function trackReturnVisit(): void {
+  trackEvent("return_visit", {
+    timestamp: Date.now(),
+    url: window.location.href,
+    referrer: document.referrer,
+  });
 }
 
 // ===== SESSION TRACKING =====
