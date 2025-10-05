@@ -1,0 +1,1 @@
+{"root":["./src/main.tsx","./src/components/canvasstage.tsx","./src/components/cropper.tsx","./src/components/exportbar.tsx","./src/components/framegrabber.tsx","./src/components/overlay.tsx","./src/hooks/usecanvas.ts","./src/hooks/useoverlay.ts","./src/lib/download.ts","./src/lib/image.ts","./src/lib/video.ts","./src/pages/app.tsx","./src/pages/index.tsx"],"version":"5.9.3"}

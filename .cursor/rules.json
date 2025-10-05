@@ -1,0 +1,40 @@
+{
+  "project": "Forge • Frontend (Snapthumb v1)",
+  "mission": "Lightweight in-browser thumbnail tool with export ≤2MB.",
+  "acceptance": {
+    "perf_tti_ms_max": 1500,
+    "bundle_gzip_kb_max": 250,
+    "a11y_lighthouse_min": 90,
+    "export_bytes_max": 2097152
+  },
+  "stack": {
+    "framework": "React+Vite+TS",
+    "ui": ["Tailwind", "shadcn/ui", "lucide-react"],
+    "motion": "framer-motion",
+    "testing": ["Playwright"]
+  },
+  "principles": [
+    "Tailwind only",
+    "explicit types",
+    "keyboard parity",
+    "graceful failure on large inputs"
+  ],
+  "layout_contract": {
+    "src/pages": ["index.tsx", "app.tsx"],
+    "src/components": [
+      "CanvasStage.tsx",
+      "FrameGrabber.tsx",
+      "Cropper.tsx",
+      "Overlay.tsx",
+      "ExportBar.tsx"
+    ],
+    "src/hooks": ["useCanvas.ts", "useOverlay.ts"],
+    "src/lib": ["image.ts", "video.ts", "download.ts"],
+    "src/styles": ["globals.css"]
+  },
+  "definition_of_done": [
+    "typecheck clean",
+    "Playwright e2e stub passes",
+    "README updated"
+  ]
+}
