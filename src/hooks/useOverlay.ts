@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { sessionDB, SessionData } from "@/lib/db";
 
 export interface OverlayItem {
   id: string;
@@ -31,6 +32,8 @@ interface OverlayActions {
   undo: () => void;
   redo: () => void;
   clearAll: () => void;
+  saveSession: () => Promise<void>;
+  restoreSession: () => Promise<Partial<SessionData> | null>;
 }
 
 export function useOverlay(): [OverlayState, OverlayActions] {
@@ -169,6 +172,36 @@ export function useOverlay(): [OverlayState, OverlayActions] {
     setState((prev) => ({ ...prev, selectedId: null }));
   }, [saveToHistory]);
 
+  const saveSession = useCallback(async () => {
+    if (!sessionDB.isSessionRestoreEnabled()) return;
+
+    const sessionData: Partial<SessionData> = {
+      overlays: state.items,
+    };
+
+    await sessionDB.saveSession(sessionData);
+  }, [state.items]);
+
+  const restoreSession = useCallback(async (): Promise<Partial<SessionData> | null> => {
+    if (!sessionDB.isSessionRestoreEnabled()) return null;
+
+    const sessionData = await sessionDB.loadSession();
+    if (!sessionData || !sessionData.overlays) return null;
+
+    // Restore overlays
+    if (Array.isArray(sessionData.overlays)) {
+      setState((prev) => ({
+        ...prev,
+        items: sessionData.overlays!,
+        history: [sessionData.overlays!],
+        historyIndex: 0,
+        selectedId: null,
+      }));
+    }
+
+    return sessionData;
+  }, []);
+
   const actions: OverlayActions = {
     addOverlay,
     updateOverlay,
@@ -181,6 +214,8 @@ export function useOverlay(): [OverlayState, OverlayActions] {
     undo,
     redo,
     clearAll,
+    saveSession,
+    restoreSession,
   };
 
   return [state, actions];

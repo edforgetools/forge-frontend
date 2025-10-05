@@ -1,12 +1,15 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { CanvasStage } from "../components/CanvasStage";
 import { FrameGrabber } from "../components/FrameGrabber";
 import { Cropper } from "../components/Cropper";
 import { Overlay } from "../components/Overlay";
 import { ExportBar } from "../components/ExportBar";
+import { Settings } from "../components/Settings";
 import { useCanvas } from "../hooks/useCanvas";
+import { useOverlay } from "../hooks/useOverlay";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { sessionDB } from "@/lib/db";
 
 interface AppPageProps {
   onBack: () => void;
@@ -14,6 +17,7 @@ interface AppPageProps {
 
 export default function AppPage({ onBack }: AppPageProps) {
   const [canvasState, canvasActions] = useCanvas();
+  const [overlayState, overlayActions] = useOverlay();
   const [currentMedia, setCurrentMedia] = useState<
     HTMLImageElement | HTMLVideoElement | null
   >(null);
@@ -26,6 +30,7 @@ export default function AppPage({ onBack }: AppPageProps) {
   } | null>(null);
   const [showCropOverlay, setShowCropOverlay] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isRestoring, setIsRestoring] = useState(false);
 
   const handleFrameCaptured = useCallback(
     (media: HTMLImageElement | HTMLVideoElement, type: "image" | "video") => {
@@ -93,6 +98,63 @@ export default function AppPage({ onBack }: AppPageProps) {
     setError(null);
   }, []);
 
+  // Session restore functionality
+  const restoreSession = useCallback(async () => {
+    if (!sessionDB.isSessionRestoreEnabled()) return;
+
+    setIsRestoring(true);
+    try {
+      const sessionData = await canvasActions.restoreSession();
+      if (sessionData) {
+        // Restore overlays
+        await overlayActions.restoreSession();
+        
+        // Restore crop area if available
+        if (sessionData.cropArea) {
+          setCropArea(sessionData.cropArea);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to restore session:", error);
+    } finally {
+      setIsRestoring(false);
+    }
+  }, [canvasActions, overlayActions]);
+
+  // Save session data periodically
+  const saveSession = useCallback(async () => {
+    if (!sessionDB.isSessionRestoreEnabled()) return;
+
+    try {
+      await Promise.all([
+        canvasActions.saveSession(),
+        overlayActions.saveSession(),
+      ]);
+    } catch (error) {
+      console.error("Failed to save session:", error);
+    }
+  }, [canvasActions, overlayActions]);
+
+  // Auto-save session data when state changes
+  useEffect(() => {
+    const timeoutId = setTimeout(saveSession, 1000); // Debounce saves
+    return () => clearTimeout(timeoutId);
+  }, [canvasState, overlayState, cropArea, saveSession]);
+
+  // Restore session on mount
+  useEffect(() => {
+    restoreSession();
+  }, [restoreSession]);
+
+  const handleClearSession = useCallback(() => {
+    setCurrentMedia(null);
+    setMediaType(null);
+    setCropArea(null);
+    setShowCropOverlay(false);
+    canvasActions.clearCanvas();
+    overlayActions.clearAll();
+  }, [canvasActions, overlayActions]);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Toolbar */}
@@ -142,8 +204,8 @@ export default function AppPage({ onBack }: AppPageProps) {
 
       {/* Main Content */}
       <div className="flex-1 p-4 overflow-auto">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Left Panel - Tools */}
             <div className="lg:col-span-1 space-y-4">
               <FrameGrabber
@@ -163,6 +225,14 @@ export default function AppPage({ onBack }: AppPageProps) {
 
             {/* Center Panel - Canvas */}
             <div className="lg:col-span-2">
+              {isRestoring && (
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                    <span className="text-blue-800 text-sm">Restoring session...</span>
+                  </div>
+                </div>
+              )}
               <CanvasStage
                 cropArea={cropArea || undefined}
                 showCropOverlay={showCropOverlay}
@@ -170,6 +240,11 @@ export default function AppPage({ onBack }: AppPageProps) {
                 canvasState={canvasState}
                 canvasActions={canvasActions}
               />
+            </div>
+
+            {/* Right Panel - Settings */}
+            <div className="lg:col-span-1">
+              <Settings onClearSession={handleClearSession} />
             </div>
           </div>
         </div>

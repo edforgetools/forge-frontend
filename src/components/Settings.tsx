@@ -1,0 +1,84 @@
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { sessionDB } from "@/lib/db";
+
+interface SettingsProps {
+  onClearSession?: () => void;
+}
+
+export function Settings({ onClearSession }: SettingsProps) {
+  const [isSessionRestoreEnabled, setIsSessionRestoreEnabled] = useState(true);
+
+  useEffect(() => {
+    // Initialize the enabled state
+    setIsSessionRestoreEnabled(sessionDB.isSessionRestoreEnabled());
+  }, []);
+
+  const handleToggleSessionRestore = () => {
+    const newEnabled = !isSessionRestoreEnabled;
+    setIsSessionRestoreEnabled(newEnabled);
+    sessionDB.setEnabled(newEnabled);
+  };
+
+  const handleClearSession = async () => {
+    if (window.confirm("Are you sure you want to clear all saved session data? This cannot be undone.")) {
+      await sessionDB.clearSession();
+      onClearSession?.();
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-lg border border-gray-200 p-4">
+      <h2 className="text-lg font-semibold mb-4">Settings</h2>
+      
+      <div className="space-y-4">
+        {/* Session Restore Toggle */}
+        <div className="flex items-center justify-between">
+          <div>
+            <label className="text-sm font-medium text-gray-700">
+              Auto-restore session
+            </label>
+            <p className="text-xs text-gray-500 mt-1">
+              Automatically restore your last session when you reload the page
+            </p>
+          </div>
+          <button
+            onClick={handleToggleSessionRestore}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              isSessionRestoreEnabled ? "bg-blue-600" : "bg-gray-200"
+            }`}
+            role="switch"
+            aria-checked={isSessionRestoreEnabled}
+            aria-label="Toggle session restore"
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                isSessionRestoreEnabled ? "translate-x-6" : "translate-x-1"
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* Clear Session Button */}
+        <div className="pt-2 border-t border-gray-100">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClearSession}
+            className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            Clear Saved Session
+          </Button>
+        </div>
+
+        {/* Info */}
+        <div className="text-xs text-gray-500 pt-2 border-t border-gray-100">
+          <p>
+            Session data includes: uploaded files, canvas settings, overlays, and export preferences.
+            Data is stored locally in your browser.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

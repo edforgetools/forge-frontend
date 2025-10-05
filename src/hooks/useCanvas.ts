@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { exportCanvasUnder2MB } from "@/lib/image";
+import { sessionDB, SessionData } from "@/lib/db";
 
 export interface CanvasState {
   width: number;
@@ -32,6 +33,8 @@ export interface CanvasActions {
   drawVideoFrame: (video: HTMLVideoElement, timestamp: number) => Promise<void>;
   getContext: () => CanvasRenderingContext2D | null;
   setLoading: (loading: boolean) => void;
+  saveSession: () => Promise<void>;
+  restoreSession: () => Promise<Partial<SessionData> | null>;
 }
 
 export function useCanvas(): [CanvasState, CanvasActions] {
@@ -211,6 +214,45 @@ export function useCanvas(): [CanvasState, CanvasActions] {
     [state.hasContent]
   );
 
+  const saveSession = useCallback(async () => {
+    if (!sessionDB.isSessionRestoreEnabled()) return;
+
+    const sessionData: Partial<SessionData> = {
+      canvasDimensions: {
+        width: state.width,
+        height: state.height,
+      },
+      canvasScale: state.scale,
+      selectedArea: state.selectedArea,
+    };
+
+    await sessionDB.saveSession(sessionData);
+  }, [state.width, state.height, state.scale, state.selectedArea]);
+
+  const restoreSession = useCallback(async (): Promise<Partial<SessionData> | null> => {
+    if (!sessionDB.isSessionRestoreEnabled()) return null;
+
+    const sessionData = await sessionDB.loadSession();
+    if (!sessionData) return null;
+
+    // Restore canvas dimensions
+    if (sessionData.canvasDimensions) {
+      setDimensions(sessionData.canvasDimensions.width, sessionData.canvasDimensions.height);
+    }
+
+    // Restore canvas scale
+    if (sessionData.canvasScale !== undefined) {
+      setScale(sessionData.canvasScale);
+    }
+
+    // Restore selected area
+    if (sessionData.selectedArea !== undefined) {
+      setSelectedArea(sessionData.selectedArea);
+    }
+
+    return sessionData;
+  }, [setDimensions, setScale, setSelectedArea]);
+
   // Initialize canvas dimensions
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -231,6 +273,8 @@ export function useCanvas(): [CanvasState, CanvasActions] {
     drawVideoFrame,
     getContext,
     setLoading,
+    saveSession,
+    restoreSession,
   };
 
   return [state, actions];
