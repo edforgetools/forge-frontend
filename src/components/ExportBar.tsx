@@ -8,7 +8,10 @@ import {
 } from "@/lib/download";
 
 interface ExportBarProps {
-  onExport?: () => Promise<Blob>;
+  onExport?: (
+    format?: "image/jpeg" | "image/webp" | "image/png",
+    quality?: number
+  ) => Promise<Blob>;
   hasContent?: boolean;
 }
 
@@ -35,7 +38,7 @@ export function ExportBar({ onExport, hasContent = false }: ExportBarProps) {
         throw new Error("No export function provided");
       }
 
-      const blob = await onExport();
+      const blob = await onExport(exportFormat, quality[0]);
       setFileSize(blob.size);
       setLastExportSize(blob.size);
 

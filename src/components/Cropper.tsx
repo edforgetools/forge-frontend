@@ -5,13 +5,27 @@ import { Label } from "@/components/ui/label";
 import { cropTo16to9 } from "@/lib/image";
 
 interface CropperProps {
-  onCropComplete?: (cropArea: { x: number; y: number; width: number; height: number }) => void;
+  onCropComplete?: (cropArea: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }) => void;
   sourceImage?: HTMLImageElement | HTMLVideoElement;
   canvasWidth?: number;
   canvasHeight?: number;
+  showCropOverlay?: boolean;
+  onToggleCropOverlay?: () => void;
 }
 
-export function Cropper({ onCropComplete, sourceImage, canvasWidth = 800, canvasHeight = 450 }: CropperProps) {
+export function Cropper({
+  onCropComplete,
+  sourceImage,
+  canvasWidth = 800,
+  canvasHeight = 450,
+  showCropOverlay = false,
+  onToggleCropOverlay,
+}: CropperProps) {
   const [cropArea, setCropArea] = useState({
     x: 0,
     y: 0,
@@ -23,7 +37,11 @@ export function Cropper({ onCropComplete, sourceImage, canvasWidth = 800, canvas
 
   // Auto-crop when source image changes
   useEffect(() => {
-    if (sourceImage && autoCropEnabled && sourceImage instanceof HTMLImageElement) {
+    if (
+      sourceImage &&
+      autoCropEnabled &&
+      sourceImage instanceof HTMLImageElement
+    ) {
       const autoCrop = cropTo16to9(sourceImage);
       setCropArea({
         x: autoCrop.x,
@@ -43,24 +61,36 @@ export function Cropper({ onCropComplete, sourceImage, canvasWidth = 800, canvas
     switch (event.key) {
       case "ArrowLeft":
         event.preventDefault();
-        setCropArea((prev) => ({ ...prev, x: Math.max(0, prev.x - step * precision) }));
+        setCropArea((prev) => ({
+          ...prev,
+          x: Math.max(0, prev.x - step * precision),
+        }));
         break;
       case "ArrowRight":
         event.preventDefault();
-        setCropArea((prev) => ({ 
-          ...prev, 
-          x: Math.min((sourceImage?.width || canvasWidth) - prev.width, prev.x + step * precision) 
+        setCropArea((prev) => ({
+          ...prev,
+          x: Math.min(
+            (sourceImage?.width || canvasWidth) - prev.width,
+            prev.x + step * precision
+          ),
         }));
         break;
       case "ArrowUp":
         event.preventDefault();
-        setCropArea((prev) => ({ ...prev, y: Math.max(0, prev.y - step * precision) }));
+        setCropArea((prev) => ({
+          ...prev,
+          y: Math.max(0, prev.y - step * precision),
+        }));
         break;
       case "ArrowDown":
         event.preventDefault();
-        setCropArea((prev) => ({ 
-          ...prev, 
-          y: Math.min((sourceImage?.height || canvasHeight) - prev.height, prev.y + step * precision) 
+        setCropArea((prev) => ({
+          ...prev,
+          y: Math.min(
+            (sourceImage?.height || canvasHeight) - prev.height,
+            prev.y + step * precision
+          ),
         }));
         break;
       case "Enter":
@@ -97,7 +127,8 @@ export function Cropper({ onCropComplete, sourceImage, canvasWidth = 800, canvas
 
   const aspectRatio = 16 / 9;
   const currentAspectRatio = cropArea.width / cropArea.height;
-  const isCorrectAspectRatio = Math.abs(currentAspectRatio - aspectRatio) < 0.01;
+  const isCorrectAspectRatio =
+    Math.abs(currentAspectRatio - aspectRatio) < 0.01;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -105,22 +136,40 @@ export function Cropper({ onCropComplete, sourceImage, canvasWidth = 800, canvas
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <Label htmlFor="crop-active" className="text-sm font-medium text-gray-700">
+          <Label
+            htmlFor="crop-active"
+            className="text-sm font-medium text-gray-700"
+          >
             Crop Area
           </Label>
-          <Button
-            id="crop-active"
-            size="sm"
-            variant={isActive ? "default" : "outline"}
-            onClick={() => setIsActive(!isActive)}
-          >
-            {isActive ? "Active" : "Inactive"}
-          </Button>
+          <div className="flex space-x-2">
+            <Button
+              id="crop-active"
+              size="sm"
+              variant={isActive ? "default" : "outline"}
+              onClick={() => setIsActive(!isActive)}
+            >
+              {isActive ? "Active" : "Inactive"}
+            </Button>
+            {sourceImage && (
+              <Button
+                size="sm"
+                variant={showCropOverlay ? "default" : "outline"}
+                onClick={onToggleCropOverlay}
+                className="text-xs"
+              >
+                {showCropOverlay ? "Hide Overlay" : "Show Overlay"}
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <Label htmlFor="crop-x" className="block text-xs text-gray-500 mb-1">
+            <Label
+              htmlFor="crop-x"
+              className="block text-xs text-gray-500 mb-1"
+            >
               X Position
             </Label>
             <Input
@@ -136,7 +185,10 @@ export function Cropper({ onCropComplete, sourceImage, canvasWidth = 800, canvas
             />
           </div>
           <div>
-            <Label htmlFor="crop-y" className="block text-xs text-gray-500 mb-1">
+            <Label
+              htmlFor="crop-y"
+              className="block text-xs text-gray-500 mb-1"
+            >
               Y Position
             </Label>
             <Input
@@ -155,7 +207,10 @@ export function Cropper({ onCropComplete, sourceImage, canvasWidth = 800, canvas
 
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <Label htmlFor="crop-width" className="block text-xs text-gray-500 mb-1">
+            <Label
+              htmlFor="crop-width"
+              className="block text-xs text-gray-500 mb-1"
+            >
               Width
             </Label>
             <Input
@@ -165,14 +220,21 @@ export function Cropper({ onCropComplete, sourceImage, canvasWidth = 800, canvas
               onChange={(e) => {
                 const newWidth = Number(e.target.value);
                 const newHeight = newWidth / aspectRatio;
-                setCropArea((prev) => ({ ...prev, width: newWidth, height: newHeight }));
+                setCropArea((prev) => ({
+                  ...prev,
+                  width: newWidth,
+                  height: newHeight,
+                }));
               }}
               className="text-xs"
               disabled={!isActive}
             />
           </div>
           <div>
-            <Label htmlFor="crop-height" className="block text-xs text-gray-500 mb-1">
+            <Label
+              htmlFor="crop-height"
+              className="block text-xs text-gray-500 mb-1"
+            >
               Height
             </Label>
             <Input
@@ -182,7 +244,11 @@ export function Cropper({ onCropComplete, sourceImage, canvasWidth = 800, canvas
               onChange={(e) => {
                 const newHeight = Number(e.target.value);
                 const newWidth = newHeight * aspectRatio;
-                setCropArea((prev) => ({ ...prev, width: newWidth, height: newHeight }));
+                setCropArea((prev) => ({
+                  ...prev,
+                  width: newWidth,
+                  height: newHeight,
+                }));
               }}
               className="text-xs"
               disabled={!isActive}
@@ -226,11 +292,17 @@ export function Cropper({ onCropComplete, sourceImage, canvasWidth = 800, canvas
         <div className="text-xs space-y-1">
           <div className="flex justify-between">
             <span className="text-gray-500">Size:</span>
-            <span>{Math.round(cropArea.width)} × {Math.round(cropArea.height)}</span>
+            <span>
+              {Math.round(cropArea.width)} × {Math.round(cropArea.height)}
+            </span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-500">Aspect Ratio:</span>
-            <span className={isCorrectAspectRatio ? "text-green-600" : "text-orange-600"}>
+            <span
+              className={
+                isCorrectAspectRatio ? "text-green-600" : "text-orange-600"
+              }
+            >
               {currentAspectRatio.toFixed(2)} {isCorrectAspectRatio ? "✓" : "⚠"}
             </span>
           </div>

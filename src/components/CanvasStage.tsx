@@ -1,13 +1,30 @@
-import { useCanvas } from "@/hooks/useCanvas";
 import { useOverlay, type OverlayItem } from "@/hooks/useOverlay";
+import { CropOverlay } from "./CropOverlay";
 import { motion } from "framer-motion";
+import type { CanvasState, CanvasActions } from "@/hooks/useCanvas";
 
 interface CanvasStageProps {
   className?: string;
+  cropArea?: { x: number; y: number; width: number; height: number };
+  showCropOverlay?: boolean;
+  onCropChange?: (cropArea: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }) => void;
+  canvasState: CanvasState;
+  canvasActions: CanvasActions;
 }
 
-export function CanvasStage({ className = "" }: CanvasStageProps) {
-  const [canvasState, canvasActions] = useCanvas();
+export function CanvasStage({
+  className = "",
+  cropArea,
+  showCropOverlay = false,
+  onCropChange,
+  canvasState,
+  canvasActions,
+}: CanvasStageProps) {
   const [overlayState, overlayActions] = useOverlay();
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -92,6 +109,40 @@ export function CanvasStage({ className = "" }: CanvasStageProps) {
           overlayActions.redo();
         }
         break;
+      case "a":
+        if (event.metaKey || event.ctrlKey) {
+          event.preventDefault();
+          // Select all overlays (future enhancement)
+        }
+        break;
+      case "l":
+        if (overlayState.selectedId) {
+          event.preventDefault();
+          const overlay = overlayState.items.find(
+            (item) => item.id === overlayState.selectedId
+          );
+          if (overlay) {
+            overlayActions.toggleLock(overlay.id);
+          }
+        }
+        break;
+      case "v":
+        if (overlayState.selectedId) {
+          event.preventDefault();
+          const overlay = overlayState.items.find(
+            (item) => item.id === overlayState.selectedId
+          );
+          if (overlay) {
+            overlayActions.toggleVisibility(overlay.id);
+          }
+        }
+        break;
+      case "Enter":
+        if (event.metaKey || event.ctrlKey) {
+          event.preventDefault();
+          // Trigger export (this will be handled by ExportBar)
+        }
+        break;
     }
   };
 
@@ -138,12 +189,59 @@ export function CanvasStage({ className = "" }: CanvasStageProps) {
         )}
 
         {/* Resize handles */}
-        {overlayState.selectedId === overlay.id && (
+        {overlayState.selectedId === overlay.id && !overlay.locked && (
           <>
-            <div className="absolute -top-1 -left-1 w-3 h-3 bg-blue-500 rounded-full cursor-nw-resize" />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full cursor-ne-resize" />
-            <div className="absolute -bottom-1 -left-1 w-3 h-3 bg-blue-500 rounded-full cursor-sw-resize" />
-            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 rounded-full cursor-se-resize" />
+            <motion.div
+              className="absolute -top-1 -left-1 w-3 h-3 bg-blue-500 rounded-full cursor-nw-resize border border-white"
+              drag
+              dragMomentum={false}
+              onDrag={(_, info) => {
+                const newWidth = Math.max(20, overlay.width - info.offset.x);
+                const newHeight = Math.max(20, overlay.height - info.offset.y);
+                const newX = overlay.x + info.offset.x;
+                const newY = overlay.y + info.offset.y;
+                overlayActions.resizeOverlay(overlay.id, newWidth, newHeight);
+                overlayActions.moveOverlay(overlay.id, newX, newY);
+              }}
+              whileDrag={{ scale: 1.2 }}
+            />
+            <motion.div
+              className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full cursor-ne-resize border border-white"
+              drag
+              dragMomentum={false}
+              onDrag={(_, info) => {
+                const newWidth = Math.max(20, overlay.width + info.offset.x);
+                const newHeight = Math.max(20, overlay.height - info.offset.y);
+                const newY = overlay.y + info.offset.y;
+                overlayActions.resizeOverlay(overlay.id, newWidth, newHeight);
+                overlayActions.moveOverlay(overlay.id, overlay.x, newY);
+              }}
+              whileDrag={{ scale: 1.2 }}
+            />
+            <motion.div
+              className="absolute -bottom-1 -left-1 w-3 h-3 bg-blue-500 rounded-full cursor-sw-resize border border-white"
+              drag
+              dragMomentum={false}
+              onDrag={(_, info) => {
+                const newWidth = Math.max(20, overlay.width - info.offset.x);
+                const newHeight = Math.max(20, overlay.height + info.offset.y);
+                const newX = overlay.x + info.offset.x;
+                overlayActions.resizeOverlay(overlay.id, newWidth, newHeight);
+                overlayActions.moveOverlay(overlay.id, newX, overlay.y);
+              }}
+              whileDrag={{ scale: 1.2 }}
+            />
+            <motion.div
+              className="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 rounded-full cursor-se-resize border border-white"
+              drag
+              dragMomentum={false}
+              onDrag={(_, info) => {
+                const newWidth = Math.max(20, overlay.width + info.offset.x);
+                const newHeight = Math.max(20, overlay.height + info.offset.y);
+                overlayActions.resizeOverlay(overlay.id, newWidth, newHeight);
+              }}
+              whileDrag={{ scale: 1.2 }}
+            />
           </>
         )}
       </motion.div>
@@ -176,6 +274,17 @@ export function CanvasStage({ className = "" }: CanvasStageProps) {
           tabIndex={0}
           aria-label="Canvas for thumbnail editing"
         />
+
+        {/* Crop overlay */}
+        {showCropOverlay && cropArea && (
+          <CropOverlay
+            cropArea={cropArea}
+            canvasWidth={canvasState.width}
+            canvasHeight={canvasState.height}
+            isVisible={showCropOverlay}
+            onCropChange={onCropChange}
+          />
+        )}
 
         {/* Overlay container */}
         <div className="absolute inset-0 pointer-events-none">

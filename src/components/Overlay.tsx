@@ -129,6 +129,20 @@ export function Overlay({ onOverlayComplete }: OverlayProps) {
                             overlay.visible ? "Hide" : "Show"
                           } overlay`}
                         />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            overlayActions.toggleLock(overlay.id);
+                          }}
+                          className={`ml-1 text-xs ${
+                            overlay.locked ? "text-blue-600" : "text-gray-400"
+                          }`}
+                          aria-label={`${
+                            overlay.locked ? "Unlock" : "Lock"
+                          } overlay`}
+                        >
+                          {overlay.locked ? "🔒" : "🔓"}
+                        </button>
                       </div>
                       <div className="flex items-center space-x-1">
                         <span className="text-xs text-gray-500">

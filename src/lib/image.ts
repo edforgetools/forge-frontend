@@ -18,7 +18,7 @@ export async function exportCanvasUnder2MB(
 ): Promise<Blob> {
   const maxSizeBytes = 2 * 1024 * 1024; // 2MB limit
   const minQuality = 0.1;
-  const qualityStep = 0.1;
+  const qualityStep = 0.05; // Smaller steps for better quality control
 
   // For PNG format, we need to resize the canvas instead of reducing quality
   if (format === "image/png") {
@@ -26,8 +26,10 @@ export async function exportCanvasUnder2MB(
   }
 
   let quality = initialQuality;
+  let attempts = 0;
+  const maxAttempts = 15; // Prevent infinite loops
 
-  while (quality >= minQuality) {
+  while (quality >= minQuality && attempts < maxAttempts) {
     const blob = await new Promise<Blob | null>((resolve) => {
       canvas.toBlob(resolve, format, quality);
     });
@@ -37,13 +39,22 @@ export async function exportCanvasUnder2MB(
     }
 
     if (blob.size <= maxSizeBytes) {
+      console.log(
+        `Export successful: ${format} at ${(quality * 100).toFixed(
+          1
+        )}% quality, ${(blob.size / 1024 / 1024).toFixed(2)}MB`
+      );
       return blob;
     }
 
     quality -= qualityStep;
+    attempts++;
   }
 
   // If we still can't get under the limit, try resizing
+  console.log(
+    `Quality reduction insufficient, attempting resize for ${format}`
+  );
   return exportResizedCanvas(canvas, format, maxSizeBytes);
 }
 

@@ -78,9 +78,23 @@ test.describe("Snapthumb Export", () => {
   });
 
   test("should handle image upload and cropping", async ({ page }) => {
-    // Skip file upload test for now - requires proper file fixtures
-    // TODO: Implement proper file upload test with fixtures
-    test.skip(true, "File upload test requires proper fixtures setup");
+    // Wait for the page to load completely
+    await page.waitForLoadState("networkidle");
+
+    // Upload test image
+    const fileInput = page.locator('input[type="file"]');
+    await fileInput.setInputFiles("e2e/fixtures/test-image.png");
+
+    // Wait for image processing
+    await page.waitForTimeout(1000);
+
+    // Check that canvas has content
+    const canvas = page.locator("canvas");
+    await expect(canvas).toBeVisible();
+
+    // Check that crop controls are now available
+    await expect(page.locator("text=Auto Crop")).toBeVisible();
+    await expect(page.locator("text=Show Overlay")).toBeVisible();
   });
 
   test("should handle overlay functionality", async ({ page }) => {
@@ -129,17 +143,14 @@ test.describe("Snapthumb Export", () => {
     // Wait for the page to load completely
     await page.waitForLoadState("networkidle");
 
-    // First, we need to have some content to export
-    // This test assumes the previous tests have set up content
+    // Upload test image first
+    const fileInput = page.locator('input[type="file"]');
+    await fileInput.setInputFiles("e2e/fixtures/test-image.png");
+    await page.waitForTimeout(1000);
 
-    // Check that export button is enabled when there's content
+    // Check that export button is now enabled
     const exportButton = page.locator('button:has-text("Export Thumbnail")');
-
-    // Without content, button should be disabled
-    await expect(exportButton).toBeDisabled();
-
-    // For this test, we'll verify the export UI works
-    // The actual export functionality would require a more complex setup
+    await expect(exportButton).toBeEnabled();
 
     // Test format selection
     const formatSelect = page.locator("select");
@@ -147,11 +158,18 @@ test.describe("Snapthumb Export", () => {
 
     // Test quality slider (custom slider component)
     const qualitySlider = page.locator('[role="slider"]');
-    // Just verify the slider exists and is visible
     await expect(qualitySlider).toBeVisible();
 
-    // Verify the quality percentage is displayed (should show current value)
+    // Verify the quality percentage is displayed
     await expect(page.locator("text=80%")).toBeVisible();
+
+    // Test export functionality
+    const downloadPromise = page.waitForEvent("download");
+    await exportButton.click();
+    const download = await downloadPromise;
+
+    // Verify download started
+    expect(download.suggestedFilename()).toMatch(/snapthumb.*\.webp$/);
   });
 
   test("should support keyboard shortcuts", async ({ page }) => {
