@@ -1,103 +1,250 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cropTo16to9 } from "@/lib/image";
 
 interface CropperProps {
-  onCropComplete?: () => void;
+  onCropComplete?: (cropArea: { x: number; y: number; width: number; height: number }) => void;
+  sourceImage?: HTMLImageElement | HTMLVideoElement;
+  canvasWidth?: number;
+  canvasHeight?: number;
 }
 
-export function Cropper({ onCropComplete }: CropperProps) {
+export function Cropper({ onCropComplete, sourceImage, canvasWidth = 800, canvasHeight = 450 }: CropperProps) {
   const [cropArea, setCropArea] = useState({
     x: 0,
     y: 0,
-    width: 800,
-    height: 450,
+    width: canvasWidth,
+    height: canvasHeight,
   });
   const [isActive, setIsActive] = useState(false);
+  const [autoCropEnabled, setAutoCropEnabled] = useState(true);
+
+  // Auto-crop when source image changes
+  useEffect(() => {
+    if (sourceImage && autoCropEnabled && sourceImage instanceof HTMLImageElement) {
+      const autoCrop = cropTo16to9(sourceImage);
+      setCropArea({
+        x: autoCrop.x,
+        y: autoCrop.y,
+        width: autoCrop.width,
+        height: autoCrop.height,
+      });
+    }
+  }, [sourceImage, autoCropEnabled, canvasWidth, canvasHeight]);
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    // TODO: Keyboard controls for crop area
-    // - Arrow keys: move crop area
-    // - Shift + Arrow: resize crop area
-    // - Enter: confirm crop
-    // - Escape: cancel crop
+    if (!isActive) return;
+
     const step = event.shiftKey ? 10 : 1;
     const precision = event.altKey ? 0.1 : 1;
 
     switch (event.key) {
       case "ArrowLeft":
-        setCropArea((prev) => ({ ...prev, x: prev.x - step * precision }));
+        event.preventDefault();
+        setCropArea((prev) => ({ ...prev, x: Math.max(0, prev.x - step * precision) }));
         break;
       case "ArrowRight":
-        setCropArea((prev) => ({ ...prev, x: prev.x + step * precision }));
+        event.preventDefault();
+        setCropArea((prev) => ({ 
+          ...prev, 
+          x: Math.min((sourceImage?.width || canvasWidth) - prev.width, prev.x + step * precision) 
+        }));
         break;
       case "ArrowUp":
-        setCropArea((prev) => ({ ...prev, y: prev.y - step * precision }));
+        event.preventDefault();
+        setCropArea((prev) => ({ ...prev, y: Math.max(0, prev.y - step * precision) }));
         break;
       case "ArrowDown":
-        setCropArea((prev) => ({ ...prev, y: prev.y + step * precision }));
+        event.preventDefault();
+        setCropArea((prev) => ({ 
+          ...prev, 
+          y: Math.min((sourceImage?.height || canvasHeight) - prev.height, prev.y + step * precision) 
+        }));
         break;
       case "Enter":
-        onCropComplete?.();
+        event.preventDefault();
+        onCropComplete?.(cropArea);
+        break;
+      case "Escape":
+        event.preventDefault();
+        setIsActive(false);
         break;
     }
   };
+
+  const handleAutoCrop = () => {
+    if (sourceImage && sourceImage instanceof HTMLImageElement) {
+      const autoCrop = cropTo16to9(sourceImage);
+      setCropArea({
+        x: autoCrop.x,
+        y: autoCrop.y,
+        width: autoCrop.width,
+        height: autoCrop.height,
+      });
+    }
+  };
+
+  const handleReset = () => {
+    setCropArea({
+      x: 0,
+      y: 0,
+      width: canvasWidth,
+      height: canvasHeight,
+    });
+  };
+
+  const aspectRatio = 16 / 9;
+  const currentAspectRatio = cropArea.width / cropArea.height;
+  const isCorrectAspectRatio = Math.abs(currentAspectRatio - aspectRatio) < 0.01;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <h2 className="text-lg font-semibold mb-4">16:9 Crop</h2>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <label className="text-sm font-medium text-gray-700">Crop Area</label>
-          <button
+          <Label htmlFor="crop-active" className="text-sm font-medium text-gray-700">
+            Crop Area
+          </Label>
+          <Button
+            id="crop-active"
+            size="sm"
+            variant={isActive ? "default" : "outline"}
             onClick={() => setIsActive(!isActive)}
-            className={`px-3 py-1 text-sm rounded ${
-              isActive
-                ? "bg-blue-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
           >
             {isActive ? "Active" : "Inactive"}
-          </button>
+          </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 text-sm">
+        <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <label className="block text-xs text-gray-500 mb-1">
+            <Label htmlFor="crop-x" className="block text-xs text-gray-500 mb-1">
               X Position
-            </label>
-            <input
+            </Label>
+            <Input
+              id="crop-x"
               type="number"
-              value={cropArea.x}
+              value={Math.round(cropArea.x)}
               onChange={(e) =>
                 setCropArea((prev) => ({ ...prev, x: Number(e.target.value) }))
               }
-              className="w-full px-2 py-1 border border-gray-300 rounded text-xs"
+              className="text-xs"
               onKeyDown={handleKeyDown}
+              disabled={!isActive}
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">
+            <Label htmlFor="crop-y" className="block text-xs text-gray-500 mb-1">
               Y Position
-            </label>
-            <input
+            </Label>
+            <Input
+              id="crop-y"
               type="number"
-              value={cropArea.y}
+              value={Math.round(cropArea.y)}
               onChange={(e) =>
                 setCropArea((prev) => ({ ...prev, y: Number(e.target.value) }))
               }
-              className="w-full px-2 py-1 border border-gray-300 rounded text-xs"
+              className="text-xs"
               onKeyDown={handleKeyDown}
+              disabled={!isActive}
             />
           </div>
         </div>
 
-        <div className="text-xs text-gray-500">
-          Size: {cropArea.width} × {cropArea.height} (16:9)
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div>
+            <Label htmlFor="crop-width" className="block text-xs text-gray-500 mb-1">
+              Width
+            </Label>
+            <Input
+              id="crop-width"
+              type="number"
+              value={Math.round(cropArea.width)}
+              onChange={(e) => {
+                const newWidth = Number(e.target.value);
+                const newHeight = newWidth / aspectRatio;
+                setCropArea((prev) => ({ ...prev, width: newWidth, height: newHeight }));
+              }}
+              className="text-xs"
+              disabled={!isActive}
+            />
+          </div>
+          <div>
+            <Label htmlFor="crop-height" className="block text-xs text-gray-500 mb-1">
+              Height
+            </Label>
+            <Input
+              id="crop-height"
+              type="number"
+              value={Math.round(cropArea.height)}
+              onChange={(e) => {
+                const newHeight = Number(e.target.value);
+                const newWidth = newHeight * aspectRatio;
+                setCropArea((prev) => ({ ...prev, width: newWidth, height: newHeight }));
+              }}
+              className="text-xs"
+              disabled={!isActive}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="mt-3 text-sm text-gray-600">
-        TODO: Visual crop overlay, aspect ratio lock, drag handles
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            id="auto-crop"
+            checked={autoCropEnabled}
+            onChange={(e) => setAutoCropEnabled(e.target.checked)}
+            className="rounded"
+          />
+          <Label htmlFor="auto-crop" className="text-xs text-gray-600">
+            Auto-crop on image load
+          </Label>
+        </div>
+
+        <div className="flex space-x-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleAutoCrop}
+            disabled={!sourceImage || sourceImage instanceof HTMLVideoElement}
+            className="flex-1 text-xs"
+          >
+            Auto Crop
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleReset}
+            className="flex-1 text-xs"
+          >
+            Reset
+          </Button>
+        </div>
+
+        <div className="text-xs space-y-1">
+          <div className="flex justify-between">
+            <span className="text-gray-500">Size:</span>
+            <span>{Math.round(cropArea.width)} × {Math.round(cropArea.height)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Aspect Ratio:</span>
+            <span className={isCorrectAspectRatio ? "text-green-600" : "text-orange-600"}>
+              {currentAspectRatio.toFixed(2)} {isCorrectAspectRatio ? "✓" : "⚠"}
+            </span>
+          </div>
+        </div>
+
+        {isActive && (
+          <Button
+            size="sm"
+            onClick={() => onCropComplete?.(cropArea)}
+            className="w-full"
+          >
+            Apply Crop
+          </Button>
+        )}
       </div>
     </div>
   );

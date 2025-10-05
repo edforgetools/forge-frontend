@@ -15,10 +15,6 @@ export async function extractFrameFromVideo(
   video: HTMLVideoElement,
   timestamp: number
 ): Promise<VideoFrame> {
-  // TODO: Implement frame extraction
-  // TODO: Use video.currentTime and canvas.drawImage
-  // TODO: Handle video loading states
-
   return new Promise((resolve, reject) => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
@@ -28,46 +24,79 @@ export async function extractFrameFromVideo(
       return;
     }
 
+    // Ensure video is ready
+    if (video.readyState < 2) {
+      reject(new Error("Video not ready for frame extraction"));
+      return;
+    }
+
+    // Validate timestamp
+    if (timestamp < 0 || timestamp > video.duration) {
+      reject(new Error("Timestamp out of range"));
+      return;
+    }
+
     // Set canvas dimensions to video dimensions
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
 
     // Store original time
     const originalTime = video.currentTime;
+    let timeoutId: number;
 
-    // Seek to desired timestamp
-    video.currentTime = timestamp;
-
-    const onSeeked = () => {
-      // Draw video frame to canvas
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-      // Get image data
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-      // Restore original time
-      video.currentTime = originalTime;
-
-      // Clean up event listener
-      video.removeEventListener("seeked", onSeeked);
-
-      resolve({
-        timestamp,
-        imageData,
-        canvas,
-      });
-    };
-
-    video.addEventListener("seeked", onSeeked);
-
-    // Handle seek errors
-    const onError = () => {
+    const cleanup = () => {
       video.removeEventListener("seeked", onSeeked);
       video.removeEventListener("error", onError);
+      video.removeEventListener("canplay", onSeeked);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+
+    const onSeeked = () => {
+      try {
+        // Draw video frame to canvas
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Get image data
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        // Restore original time
+        video.currentTime = originalTime;
+
+        cleanup();
+
+        resolve({
+          timestamp,
+          imageData,
+          canvas,
+        });
+      } catch (error) {
+        cleanup();
+        reject(new Error("Failed to extract frame from video"));
+      }
+    };
+
+    const onError = () => {
+      cleanup();
       reject(new Error("Failed to seek video"));
     };
 
+    // Set up event listeners
+    video.addEventListener("seeked", onSeeked);
     video.addEventListener("error", onError);
+
+    // Set timeout to prevent hanging
+    timeoutId = setTimeout(() => {
+      cleanup();
+      reject(new Error("Frame extraction timeout"));
+    }, 5000);
+
+    // Seek to desired timestamp
+    try {
+      video.currentTime = timestamp;
+    } catch (error) {
+      cleanup();
+      reject(new Error("Failed to set video currentTime"));
+    }
   });
 }
 
@@ -162,6 +191,10 @@ export async function generateThumbnailPreviews(
   count: number = 10
 ): Promise<VideoFrame[]> {
   const duration = video.duration;
+  if (!duration || duration <= 0) {
+    throw new Error("Video duration is invalid");
+  }
+
   const interval = duration / (count + 1);
   const frames: VideoFrame[] = [];
 
@@ -172,8 +205,64 @@ export async function generateThumbnailPreviews(
       frames.push(frame);
     } catch (error) {
       console.warn(`Failed to extract frame at ${timestamp}s:`, error);
+      // Continue with other frames even if one fails
     }
   }
 
   return frames;
+}
+
+/**
+ * Create video element with proper settings for frame extraction
+ */
+export function createVideoElement(): HTMLVideoElement {
+  const video = document.createElement("video");
+  video.preload = "metadata";
+  video.crossOrigin = "anonymous";
+  video.muted = true; // Required for autoplay in some browsers
+  return video;
+}
+
+/**
+ * Wait for video to be ready for frame extraction
+ */
+export function waitForVideoReady(video: HTMLVideoElement): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (video.readyState >= 2) {
+      resolve();
+      return;
+    }
+
+    const onCanPlay = () => {
+      video.removeEventListener("canplay", onCanPlay);
+      video.removeEventListener("error", onError);
+      resolve();
+    };
+
+    const onError = () => {
+      video.removeEventListener("canplay", onCanPlay);
+      video.removeEventListener("error", onError);
+      reject(new Error("Video failed to load"));
+    };
+
+    video.addEventListener("canplay", onCanPlay);
+    video.addEventListener("error", onError);
+
+    // Set timeout
+    setTimeout(() => {
+      video.removeEventListener("canplay", onCanPlay);
+      video.removeEventListener("error", onError);
+      reject(new Error("Video load timeout"));
+    }, 10000);
+  });
+}
+
+/**
+ * Get optimal timestamp for thumbnail (middle of video or at specific percentage)
+ */
+export function getOptimalThumbnailTimestamp(
+  duration: number,
+  percentage: number = 0.5
+): number {
+  return Math.max(0, Math.min(duration, duration * percentage));
 }

@@ -14,31 +14,137 @@ export interface ExportOptions {
 export async function exportCanvasUnder2MB(
   canvas: HTMLCanvasElement,
   format: "image/jpeg" | "image/webp" | "image/png" = "image/jpeg",
-  quality: number = 0.8
+  initialQuality: number = 0.8
 ): Promise<Blob> {
   const maxSizeBytes = 2 * 1024 * 1024; // 2MB limit
+  const minQuality = 0.1;
+  const qualityStep = 0.1;
 
-  // TODO: Implement quality adjustment algorithm
-  // TODO: Try different quality levels until file size is under limit
-  // TODO: Handle different formats appropriately
+  // For PNG format, we need to resize the canvas instead of reducing quality
+  if (format === "image/png") {
+    return exportPNGUnder2MB(canvas, maxSizeBytes);
+  }
 
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
+  let quality = initialQuality;
+
+  while (quality >= minQuality) {
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, format, quality);
+    });
+
+    if (!blob) {
+      throw new Error("Failed to create blob from canvas");
+    }
+
+    if (blob.size <= maxSizeBytes) {
+      return blob;
+    }
+
+    quality -= qualityStep;
+  }
+
+  // If we still can't get under the limit, try resizing
+  return exportResizedCanvas(canvas, format, maxSizeBytes);
+}
+
+/**
+ * Export PNG with size optimization by resizing
+ */
+async function exportPNGUnder2MB(
+  canvas: HTMLCanvasElement,
+  maxSizeBytes: number
+): Promise<Blob> {
+  const originalBlob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, "image/png");
+  });
+
+  if (!originalBlob) {
+    throw new Error("Failed to create PNG blob from canvas");
+  }
+
+  if (originalBlob.size <= maxSizeBytes) {
+    return originalBlob;
+  }
+
+  // Calculate resize factor to get under size limit
+  const sizeRatio = Math.sqrt(maxSizeBytes / originalBlob.size);
+  const newWidth = Math.floor(canvas.width * sizeRatio);
+  const newHeight = Math.floor(canvas.height * sizeRatio);
+
+  // Create resized canvas
+  const resizedCanvas = document.createElement("canvas");
+  const resizedCtx = resizedCanvas.getContext("2d");
+
+  if (!resizedCtx) {
+    throw new Error("Failed to get resized canvas context");
+  }
+
+  resizedCanvas.width = newWidth;
+  resizedCanvas.height = newHeight;
+
+  // Draw resized image
+  resizedCtx.drawImage(canvas, 0, 0, newWidth, newHeight);
+
+  return new Promise<Blob>((resolve, reject) => {
+    resizedCanvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error("Failed to create resized PNG blob"));
+        return;
+      }
+      resolve(blob);
+    }, "image/png");
+  });
+}
+
+/**
+ * Export resized canvas when quality reduction isn't enough
+ */
+async function exportResizedCanvas(
+  canvas: HTMLCanvasElement,
+  format: "image/jpeg" | "image/webp",
+  maxSizeBytes: number
+): Promise<Blob> {
+  // Try with minimum quality first
+  const minQualityBlob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob(resolve, format, 0.1);
+  });
+
+  if (minQualityBlob && minQualityBlob.size <= maxSizeBytes) {
+    return minQualityBlob;
+  }
+
+  // Calculate resize factor
+  const sizeRatio = Math.sqrt(
+    maxSizeBytes / (minQualityBlob?.size || maxSizeBytes * 2)
+  );
+  const newWidth = Math.floor(canvas.width * sizeRatio);
+  const newHeight = Math.floor(canvas.height * sizeRatio);
+
+  // Create resized canvas
+  const resizedCanvas = document.createElement("canvas");
+  const resizedCtx = resizedCanvas.getContext("2d");
+
+  if (!resizedCtx) {
+    throw new Error("Failed to get resized canvas context");
+  }
+
+  resizedCanvas.width = newWidth;
+  resizedCanvas.height = newHeight;
+
+  // Draw resized image
+  resizedCtx.drawImage(canvas, 0, 0, newWidth, newHeight);
+
+  return new Promise<Blob>((resolve, reject) => {
+    resizedCanvas.toBlob(
       (blob) => {
         if (!blob) {
-          reject(new Error("Failed to create blob from canvas"));
+          reject(new Error("Failed to create resized blob"));
           return;
         }
-
-        if (blob.size > maxSizeBytes) {
-          // TODO: Implement recursive quality reduction
-          console.warn(`Export size ${blob.size} exceeds 2MB limit`);
-        }
-
         resolve(blob);
       },
       format,
-      quality
+      0.8
     );
   });
 }
@@ -129,4 +235,86 @@ export function validateImageFile(file: File): {
   }
 
   return { valid: true };
+}
+
+/**
+ * Create image element from file
+ */
+export function createImageFromFile(file: File): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Failed to load image"));
+    };
+
+    img.src = url;
+  });
+}
+
+/**
+ * Draw image to canvas with proper scaling and positioning
+ */
+export function drawImageToCanvas(
+  canvas: HTMLCanvasElement,
+  image: HTMLImageElement,
+  cropArea?: { x: number; y: number; width: number; height: number }
+): void {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (cropArea) {
+    // Draw cropped portion of image
+    ctx.drawImage(
+      image,
+      cropArea.x,
+      cropArea.y,
+      cropArea.width,
+      cropArea.height,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+  } else {
+    // Draw full image, scaling to fit canvas
+    const { width, height } = resizeImageToFit(
+      image,
+      canvas.width,
+      canvas.height
+    );
+    const x = (canvas.width - width) / 2;
+    const y = (canvas.height - height) / 2;
+
+    ctx.drawImage(image, x, y, width, height);
+  }
+}
+
+/**
+ * Get optimal canvas dimensions for 16:9 aspect ratio
+ */
+export function getOptimalCanvasDimensions(
+  containerWidth: number,
+  containerHeight: number
+): { width: number; height: number } {
+  const aspectRatio = 16 / 9;
+
+  let width = containerWidth;
+  let height = containerWidth / aspectRatio;
+
+  if (height > containerHeight) {
+    height = containerHeight;
+    width = height * aspectRatio;
+  }
+
+  return { width: Math.floor(width), height: Math.floor(height) };
 }

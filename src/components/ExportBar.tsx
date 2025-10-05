@@ -1,53 +1,100 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import {
+  downloadBlob,
+  generateFilename,
+  getExtensionFromMimeType,
+} from "@/lib/download";
 
-export function ExportBar() {
+interface ExportBarProps {
+  onExport?: () => Promise<Blob>;
+  hasContent?: boolean;
+}
+
+export function ExportBar({ onExport, hasContent = false }: ExportBarProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [exportFormat, setExportFormat] = useState<
     "image/jpeg" | "image/webp" | "image/png"
   >("image/jpeg");
-  const [quality, setQuality] = useState(0.8);
+  const [quality, setQuality] = useState([0.8]);
   const [fileSize, setFileSize] = useState(0);
+  const [lastExportSize, setLastExportSize] = useState(0);
 
   const handleExport = async () => {
+    if (!hasContent) {
+      alert("No content to export. Please upload an image or video first.");
+      return;
+    }
+
     setIsExporting(true);
+    setFileSize(0);
 
     try {
-      // TODO: Implement actual export logic
-      // TODO: Ensure file size is under 2MB
-      // TODO: Use exportCanvasUnder2MB from lib/image.ts
-      console.log("Exporting with format:", exportFormat, "quality:", quality);
+      if (!onExport) {
+        throw new Error("No export function provided");
+      }
 
-      // Simulate export
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const blob = await onExport();
+      setFileSize(blob.size);
+      setLastExportSize(blob.size);
 
-      // TODO: Trigger download
-      setFileSize(1024 * 1024); // Simulate 1MB file
+      // Generate filename
+      const extension = getExtensionFromMimeType(exportFormat);
+      const filename = generateFilename("snapthumb", extension);
+
+      // Download the file
+      downloadBlob(blob, filename);
     } catch (error) {
       console.error("Export failed:", error);
+      alert(
+        `Export failed: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
     } finally {
       setIsExporting(false);
     }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    // TODO: Keyboard shortcuts for export
     if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+      event.preventDefault();
       handleExport();
     }
   };
 
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+  };
+
+  const isOverLimit = fileSize > 2 * 1024 * 1024;
+  const qualityPercent = Math.round(quality[0] * 100);
+
   return (
     <div
-      className="flex items-center justify-between"
+      className="flex items-center justify-between p-4 bg-white border-t border-gray-200"
       onKeyDown={handleKeyDown}
     >
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-6">
+        {/* Format Selection */}
         <div className="flex items-center space-x-2">
-          <label className="text-sm font-medium text-gray-700">Format:</label>
+          <label
+            htmlFor="export-format"
+            className="text-sm font-medium text-gray-700"
+          >
+            Format:
+          </label>
           <select
+            id="export-format"
             value={exportFormat}
             onChange={(e) => setExportFormat(e.target.value as any)}
-            className="px-2 py-1 text-sm border border-gray-300 rounded"
+            className="px-3 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            disabled={isExporting}
           >
             <option value="image/jpeg">JPEG</option>
             <option value="image/webp">WebP</option>
@@ -55,36 +102,65 @@ export function ExportBar() {
           </select>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <label className="text-sm font-medium text-gray-700">Quality:</label>
-          <input
-            type="range"
-            min="0.1"
-            max="1"
-            step="0.1"
-            value={quality}
-            onChange={(e) => setQuality(Number(e.target.value))}
-            className="w-20"
-          />
-          <span className="text-sm text-gray-600 w-8">
-            {Math.round(quality * 100)}%
-          </span>
-        </div>
+        {/* Quality Slider */}
+        {exportFormat !== "image/png" && (
+          <div className="flex items-center space-x-3">
+            <label
+              htmlFor="quality-slider"
+              className="text-sm font-medium text-gray-700"
+            >
+              Quality:
+            </label>
+            <div className="flex items-center space-x-2 w-32">
+              <Slider
+                id="quality-slider"
+                value={quality}
+                onValueChange={setQuality}
+                max={1}
+                min={0.1}
+                step={0.1}
+                className="flex-1"
+                disabled={isExporting}
+              />
+              <span className="text-sm text-gray-600 w-8 text-right">
+                {qualityPercent}%
+              </span>
+            </div>
+          </div>
+        )}
 
+        {/* File Size Display */}
         {fileSize > 0 && (
-          <div className="text-sm text-gray-600">
-            Size: {(fileSize / 1024 / 1024).toFixed(1)}MB
-            {fileSize > 2 * 1024 * 1024 && (
-              <span className="text-red-600 ml-1">⚠️ Over 2MB limit</span>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-600">
+              Size: {formatFileSize(fileSize)}
+            </span>
+            {isOverLimit && (
+              <span className="text-red-600 text-sm" role="alert">
+                ⚠️ Over 2MB limit
+              </span>
+            )}
+            {!isOverLimit && lastExportSize > 0 && (
+              <span className="text-green-600 text-sm">✓ Under limit</span>
             )}
           </div>
         )}
+
+        {/* Export Info */}
+        <div className="text-xs text-gray-500">
+          {exportFormat === "image/png" && "PNG: Lossless, larger files"}
+          {exportFormat === "image/webp" && "WebP: Modern, smaller files"}
+          {exportFormat === "image/jpeg" &&
+            "JPEG: Compatible, adjustable quality"}
+        </div>
       </div>
 
-      <button
+      {/* Export Button */}
+      <Button
         onClick={handleExport}
-        disabled={isExporting}
-        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold rounded-lg transition-colors"
+        disabled={isExporting || !hasContent}
+        size="lg"
+        className="px-8 py-2"
       >
         {isExporting ? (
           <div className="flex items-center space-x-2">
@@ -92,9 +168,14 @@ export function ExportBar() {
             <span>Exporting...</span>
           </div>
         ) : (
-          "Export Thumbnail"
+          <div className="flex items-center space-x-2">
+            <span>Export Thumbnail</span>
+            {hasContent && (
+              <span className="text-xs opacity-75">(Ctrl+Enter)</span>
+            )}
+          </div>
         )}
-      </button>
+      </Button>
     </div>
   );
 }
