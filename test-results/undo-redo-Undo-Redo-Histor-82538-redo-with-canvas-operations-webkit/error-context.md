@@ -1,0 +1,134 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - button "Back" [ref=e7]:
+        - img
+        - text: Back
+      - heading "Snapthumb Editor" [level=1] [ref=e8]
+    - generic [ref=e9]:
+      - button "Show keyboard shortcuts" [ref=e10]:
+        - img
+        - text: Shortcuts
+      - generic [ref=e11]: 📷 Image
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - heading "Upload Media" [level=2] [ref=e17]
+        - button "Upload video or image file" [ref=e18] [cursor=pointer]:
+          - generic [ref=e19] [cursor=pointer]:
+            - generic [ref=e20] [cursor=pointer]: 📁
+            - paragraph [ref=e21] [cursor=pointer]: Click to upload video or image
+            - paragraph [ref=e22] [cursor=pointer]: Supports MP4, WebM, JPG, PNG, WebP
+        - generic [ref=e23]:
+          - generic [ref=e24]:
+            - strong [ref=e25]: "File:"
+            - text: test-image.png
+          - button "Remove File" [ref=e26]
+      - generic [ref=e27]:
+        - heading "16:9 Crop" [level=2] [ref=e28]
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e31]: Crop Area
+            - generic [ref=e32]:
+              - button "Crop Area" [ref=e33]: Inactive
+              - button "Show Overlay" [ref=e34]
+          - generic [ref=e35]:
+            - generic [ref=e36]:
+              - generic [ref=e37]: X Position
+              - spinbutton "X Position" [disabled] [ref=e38]: "0"
+            - generic [ref=e39]:
+              - generic [ref=e40]: Y Position
+              - spinbutton "Y Position" [disabled] [ref=e41]: "0"
+          - generic [ref=e42]:
+            - generic [ref=e43]:
+              - generic [ref=e44]: Width
+              - spinbutton "Width" [disabled] [ref=e45]: "1"
+            - generic [ref=e46]:
+              - generic [ref=e47]: Height
+              - spinbutton "Height" [disabled] [ref=e48]: "1"
+          - generic [ref=e49]:
+            - checkbox "Auto-crop on image load" [checked] [ref=e50]
+            - generic [ref=e51]: Auto-crop on image load
+          - generic [ref=e52]:
+            - button "Auto Crop" [ref=e53]
+            - button "Reset" [ref=e54]
+          - generic [ref=e55]:
+            - generic [ref=e56]:
+              - generic [ref=e57]: "Size:"
+              - generic [ref=e58]: 1 × 1
+            - generic [ref=e59]:
+              - generic [ref=e60]: "Aspect Ratio:"
+              - generic [ref=e61]: 1.78 ✓
+      - generic [ref=e62]:
+        - heading "Overlays" [level=2] [ref=e63]
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - generic [ref=e66]:
+              - button "Add Logo" [ref=e67]
+              - button "Add Text" [disabled]
+            - generic [ref=e68]:
+              - generic [ref=e69]: Text Content
+              - textbox "Text Content" [ref=e70]
+          - generic [ref=e71]:
+            - heading "Active Overlays (1)" [level=3] [ref=e72]
+            - generic [ref=e75] [cursor=pointer]:
+              - generic [ref=e76] [cursor=pointer]:
+                - generic [ref=e77] [cursor=pointer]:
+                  - generic [ref=e78] [cursor=pointer]: text
+                  - button "Hide overlay" [ref=e79]
+                  - button "Lock overlay" [ref=e80]: 🔓
+                - generic [ref=e81] [cursor=pointer]:
+                  - generic [ref=e82] [cursor=pointer]: 50, 50
+                  - button "Remove overlay" [ref=e83]: ×
+              - textbox "Enter text..." [ref=e84]: Test Overlay
+          - button "Clear All" [ref=e86]
+    - generic [ref=e87]:
+      - generic [ref=e91]: Restoring session...
+      - generic [ref=e92]:
+        - generic [ref=e93]:
+          - heading "Canvas" [level=2] [ref=e94]
+          - generic [ref=e96]: 16:9 • 800×450
+        - generic [ref=e97]:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Test Overlay
+        - generic [ref=e101]: 1 overlay
+    - generic [ref=e103]:
+      - heading "Settings" [level=2] [ref=e104]
+      - generic [ref=e105]:
+        - generic [ref=e106]:
+          - generic [ref=e107]:
+            - generic [ref=e108]: Auto-restore session
+            - paragraph [ref=e109]: Automatically restore your last session when you reload the page
+          - switch "Toggle session restore" [checked] [ref=e110]
+        - button "Clear Saved Session" [ref=e112]
+        - paragraph [ref=e114]: "Session data includes: uploaded files, canvas settings, overlays, and export preferences. Data is stored locally in your browser."
+  - generic [ref=e116]:
+    - generic [ref=e117]:
+      - generic [ref=e118]:
+        - button "Undo last action" [ref=e119]:
+          - img
+        - button "Redo last undone action" [disabled]:
+          - img
+      - generic [ref=e120]:
+        - generic [ref=e121]: "Format:"
+        - combobox "Format:" [ref=e122]:
+          - option "JPEG" [selected]
+          - option "WebP"
+          - option "PNG"
+      - button "Show Compression" [ref=e124]
+      - generic [ref=e125]:
+        - generic [ref=e126]: "Quality:"
+        - generic [ref=e127]:
+          - slider [ref=e129]
+          - generic [ref=e130]: 80%
+      - generic [ref=e131]: "JPEG: Compatible, adjustable quality"
+    - button "Export Thumbnail (Ctrl+Enter)" [ref=e132]:
+      - generic [ref=e133]:
+        - generic [ref=e134]: Export Thumbnail
+        - generic [ref=e135]: (Ctrl+Enter)
+```
