@@ -1,4 +1,8 @@
-import { useOverlay, type OverlayItem } from "@/hooks/useOverlay";
+import {
+  type OverlayItem,
+  type OverlayState,
+  type OverlayActions,
+} from "@/hooks/useOverlay";
 import { CropOverlay } from "./CropOverlay";
 import { motion } from "framer-motion";
 import type { CanvasState, CanvasActions } from "@/hooks/useCanvas";
@@ -15,6 +19,8 @@ interface CanvasStageProps {
   }) => void;
   canvasState: CanvasState;
   canvasActions: CanvasActions;
+  overlayState: OverlayState;
+  overlayActions: OverlayActions;
 }
 
 export function CanvasStage({
@@ -24,9 +30,9 @@ export function CanvasStage({
   onCropChange,
   canvasState,
   canvasActions,
+  overlayState,
+  overlayActions,
 }: CanvasStageProps) {
-  const [overlayState, overlayActions] = useOverlay();
-
   const handleKeyDown = (event: React.KeyboardEvent) => {
     const step = event.shiftKey ? 10 : 1;
     const precision = event.altKey ? 0.1 : 1;
@@ -93,22 +99,7 @@ export function CanvasStage({
           overlayActions.removeOverlay(overlayState.selectedId);
         }
         break;
-      case "z":
-        if (event.metaKey || event.ctrlKey) {
-          event.preventDefault();
-          if (event.shiftKey) {
-            overlayActions.redo();
-          } else {
-            overlayActions.undo();
-          }
-        }
-        break;
-      case "y":
-        if (event.metaKey || event.ctrlKey) {
-          event.preventDefault();
-          overlayActions.redo();
-        }
-        break;
+      // Undo/Redo is now handled at the app level
       case "a":
         if (event.metaKey || event.ctrlKey) {
           event.preventDefault();
@@ -311,24 +302,6 @@ export function CanvasStage({
               {overlayState.items.length !== 1 ? "s" : ""}
             </span>
           )}
-        </div>
-        <div className="flex space-x-2">
-          <button
-            onClick={overlayActions.undo}
-            disabled={overlayState.historyIndex === 0}
-            className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 rounded"
-          >
-            Undo
-          </button>
-          <button
-            onClick={overlayActions.redo}
-            disabled={
-              overlayState.historyIndex === overlayState.history.length - 1
-            }
-            className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 rounded"
-          >
-            Redo
-          </button>
         </div>
       </div>
     </div>

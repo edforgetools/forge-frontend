@@ -1,6 +1,9 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useReducer } from "react";
 import { exportCanvasUnder2MB } from "@/lib/image";
+import { compressCanvasWithSSIM } from "@/lib/compression";
+import type { CompressionSettings } from "@/components/CompressionSelector";
 import { sessionDB, SessionData } from "@/lib/db";
+import { HistoryCommand } from "./useHistory";
 
 export interface CanvasState {
   width: number;
@@ -16,6 +19,46 @@ export interface CanvasState {
   isLoading: boolean;
 }
 
+export type CanvasAction =
+  | { type: "SET_DIMENSIONS"; payload: { width: number; height: number } }
+  | { type: "SET_SCALE"; payload: { scale: number } }
+  | {
+      type: "SET_SELECTED_AREA";
+      payload: { selectedArea: CanvasState["selectedArea"] };
+    }
+  | { type: "SET_LOADING"; payload: { isLoading: boolean } }
+  | { type: "SET_HAS_CONTENT"; payload: { hasContent: boolean } }
+  | { type: "CLEAR_CANVAS" }
+  | { type: "DRAW_IMAGE"; payload: { hasContent: boolean } }
+  | { type: "RESTORE_STATE"; payload: Partial<CanvasState> };
+
+function canvasReducer(state: CanvasState, action: CanvasAction): CanvasState {
+  switch (action.type) {
+    case "SET_DIMENSIONS":
+      return {
+        ...state,
+        width: action.payload.width,
+        height: action.payload.height,
+      };
+    case "SET_SCALE":
+      return { ...state, scale: action.payload.scale };
+    case "SET_SELECTED_AREA":
+      return { ...state, selectedArea: action.payload.selectedArea };
+    case "SET_LOADING":
+      return { ...state, isLoading: action.payload.isLoading };
+    case "SET_HAS_CONTENT":
+      return { ...state, hasContent: action.payload.hasContent };
+    case "CLEAR_CANVAS":
+      return { ...state, hasContent: false };
+    case "DRAW_IMAGE":
+      return { ...state, hasContent: action.payload.hasContent };
+    case "RESTORE_STATE":
+      return { ...state, ...action.payload };
+    default:
+      return state;
+  }
+}
+
 export interface CanvasActions {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   setDimensions: (width: number, height: number) => void;
@@ -24,7 +67,8 @@ export interface CanvasActions {
   clearCanvas: () => void;
   exportCanvas: (
     format?: "image/jpeg" | "image/webp" | "image/png",
-    quality?: number
+    quality?: number,
+    compressionSettings?: CompressionSettings
   ) => Promise<Blob>;
   drawImage: (
     image: HTMLImageElement,
@@ -35,12 +79,18 @@ export interface CanvasActions {
   setLoading: (loading: boolean) => void;
   saveSession: () => Promise<void>;
   restoreSession: () => Promise<Partial<SessionData> | null>;
+  applyHistoryCommand: (command: HistoryCommand) => void;
+  createHistoryCommand: (
+    type: string,
+    data: any,
+    description: string
+  ) => HistoryCommand;
 }
 
 export function useCanvas(): [CanvasState, CanvasActions] {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const [state, setState] = useState<CanvasState>({
+  const [state, dispatch] = useReducer(canvasReducer, {
     width: 800,
     height: 450,
     scale: 1,
@@ -50,7 +100,7 @@ export function useCanvas(): [CanvasState, CanvasActions] {
   });
 
   const setDimensions = useCallback((width: number, height: number) => {
-    setState((prev) => ({ ...prev, width, height }));
+    dispatch({ type: "SET_DIMENSIONS", payload: { width, height } });
 
     // Update canvas element dimensions
     const canvas = canvasRef.current;
@@ -61,15 +111,15 @@ export function useCanvas(): [CanvasState, CanvasActions] {
   }, []);
 
   const setScale = useCallback((scale: number) => {
-    setState((prev) => ({ ...prev, scale }));
+    dispatch({ type: "SET_SCALE", payload: { scale } });
   }, []);
 
   const setSelectedArea = useCallback((area: CanvasState["selectedArea"]) => {
-    setState((prev) => ({ ...prev, selectedArea: area }));
+    dispatch({ type: "SET_SELECTED_AREA", payload: { selectedArea: area } });
   }, []);
 
   const setLoading = useCallback((loading: boolean) => {
-    setState((prev) => ({ ...prev, isLoading: loading }));
+    dispatch({ type: "SET_LOADING", payload: { isLoading: loading } });
   }, []);
 
   const getContext = useCallback((): CanvasRenderingContext2D | null => {
@@ -82,7 +132,7 @@ export function useCanvas(): [CanvasState, CanvasActions] {
       const ctx = canvas.getContext("2d");
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        setState((prev) => ({ ...prev, hasContent: false }));
+        dispatch({ type: "CLEAR_CANVAS" });
       }
     }
   }, []);
@@ -136,7 +186,7 @@ export function useCanvas(): [CanvasState, CanvasActions] {
         ctx.drawImage(image, x, y, drawWidth, drawHeight);
       }
 
-      setState((prev) => ({ ...prev, hasContent: true }));
+      dispatch({ type: "DRAW_IMAGE", payload: { hasContent: true } });
     },
     []
   );
@@ -149,7 +199,7 @@ export function useCanvas(): [CanvasState, CanvasActions] {
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      setLoading(true);
+      dispatch({ type: "SET_LOADING", payload: { isLoading: true } });
 
       try {
         // Store original time
@@ -185,20 +235,21 @@ export function useCanvas(): [CanvasState, CanvasActions] {
         // Restore original time
         video.currentTime = originalTime;
 
-        setState((prev) => ({ ...prev, hasContent: true }));
+        dispatch({ type: "DRAW_IMAGE", payload: { hasContent: true } });
       } catch (error) {
         console.error("Failed to draw video frame:", error);
       } finally {
-        setLoading(false);
+        dispatch({ type: "SET_LOADING", payload: { isLoading: false } });
       }
     },
-    [setLoading]
+    []
   );
 
   const exportCanvas = useCallback(
     async (
       format: "image/jpeg" | "image/webp" | "image/png" = "image/jpeg",
-      quality: number = 0.8
+      quality: number = 0.8,
+      compressionSettings?: CompressionSettings
     ): Promise<Blob> => {
       const canvas = canvasRef.current;
       if (!canvas) {
@@ -209,6 +260,17 @@ export function useCanvas(): [CanvasState, CanvasActions] {
         throw new Error("Canvas has no content to export");
       }
 
+      // Use advanced compression if settings are provided
+      if (compressionSettings) {
+        const result = await compressCanvasWithSSIM(canvas, {
+          format,
+          settings: compressionSettings,
+          enableSSIM: true,
+        });
+        return result.blob;
+      }
+
+      // Fallback to legacy compression
       return exportCanvasUnder2MB(canvas, format, quality);
     },
     [state.hasContent]
@@ -229,29 +291,69 @@ export function useCanvas(): [CanvasState, CanvasActions] {
     await sessionDB.saveSession(sessionData);
   }, [state.width, state.height, state.scale, state.selectedArea]);
 
-  const restoreSession = useCallback(async (): Promise<Partial<SessionData> | null> => {
-    if (!sessionDB.isSessionRestoreEnabled()) return null;
+  const restoreSession =
+    useCallback(async (): Promise<Partial<SessionData> | null> => {
+      if (!sessionDB.isSessionRestoreEnabled()) return null;
 
-    const sessionData = await sessionDB.loadSession();
-    if (!sessionData) return null;
+      const sessionData = await sessionDB.loadSession();
+      if (!sessionData) return null;
 
-    // Restore canvas dimensions
-    if (sessionData.canvasDimensions) {
-      setDimensions(sessionData.canvasDimensions.width, sessionData.canvasDimensions.height);
+      // Restore canvas dimensions
+      if (sessionData.canvasDimensions) {
+        setDimensions(
+          sessionData.canvasDimensions.width,
+          sessionData.canvasDimensions.height
+        );
+      }
+
+      // Restore canvas scale
+      if (sessionData.canvasScale !== undefined) {
+        setScale(sessionData.canvasScale);
+      }
+
+      // Restore selected area
+      if (sessionData.selectedArea !== undefined) {
+        setSelectedArea(sessionData.selectedArea);
+      }
+
+      return sessionData;
+    }, [setDimensions, setScale, setSelectedArea]);
+
+  const applyHistoryCommand = useCallback((command: HistoryCommand) => {
+    switch (command.type) {
+      case "CANVAS_DIMENSIONS":
+        dispatch({ type: "SET_DIMENSIONS", payload: command.data });
+        break;
+      case "CANVAS_SCALE":
+        dispatch({ type: "SET_SCALE", payload: command.data });
+        break;
+      case "CANVAS_SELECTED_AREA":
+        dispatch({ type: "SET_SELECTED_AREA", payload: command.data });
+        break;
+      case "CANVAS_CLEAR":
+        dispatch({ type: "CLEAR_CANVAS" });
+        break;
+      case "CANVAS_DRAW_IMAGE":
+        dispatch({ type: "DRAW_IMAGE", payload: command.data });
+        break;
+      case "CANVAS_RESTORE_STATE":
+        dispatch({ type: "RESTORE_STATE", payload: command.data });
+        break;
     }
+  }, []);
 
-    // Restore canvas scale
-    if (sessionData.canvasScale !== undefined) {
-      setScale(sessionData.canvasScale);
-    }
-
-    // Restore selected area
-    if (sessionData.selectedArea !== undefined) {
-      setSelectedArea(sessionData.selectedArea);
-    }
-
-    return sessionData;
-  }, [setDimensions, setScale, setSelectedArea]);
+  const createHistoryCommand = useCallback(
+    (type: string, data: any, description: string): HistoryCommand => {
+      return {
+        id: `canvas-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type,
+        timestamp: Date.now(),
+        data,
+        description,
+      };
+    },
+    []
+  );
 
   // Initialize canvas dimensions
   useEffect(() => {
@@ -275,6 +377,8 @@ export function useCanvas(): [CanvasState, CanvasActions] {
     setLoading,
     saveSession,
     restoreSession,
+    applyHistoryCommand,
+    createHistoryCommand,
   };
 
   return [state, actions];

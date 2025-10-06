@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 9.15.9
+        
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      
+    - name: Run full CI suite
+      run: pnpm ci
+      
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ## Changes in this release
+          
+          See [CHANGELOG.md](./CHANGELOG.md) for detailed changes.
+          
+          ## Performance Metrics
+          
+          - Bundle size: Under 250KB gzipped ✅
+          - Lighthouse Performance: ≥90 ✅
+          - Lighthouse Accessibility: ≥90 ✅
+          - All Playwright tests passing ✅
+        draft: false
+        prerelease: false

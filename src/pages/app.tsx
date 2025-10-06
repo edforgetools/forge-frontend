@@ -1,15 +1,19 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, lazy, Suspense } from "react";
 import { CanvasStage } from "../components/CanvasStage";
 import { FrameGrabber } from "../components/FrameGrabber";
 import { Cropper } from "../components/Cropper";
 import { Overlay } from "../components/Overlay";
 import { ExportBar } from "../components/ExportBar";
 import { Settings } from "../components/Settings";
+
+// Lazy load heavy components
+const ShortcutsOverlay = lazy(() => import("../components/ShortcutsOverlay"));
 import { useCanvas } from "../hooks/useCanvas";
 import { useOverlay } from "../hooks/useOverlay";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, HelpCircle } from "lucide-react";
 import { sessionDB } from "@/lib/db";
+import type { CompressionSettings } from "@/components/CompressionSelector";
 
 interface AppPageProps {
   onBack: () => void;
@@ -31,6 +35,7 @@ export default function AppPage({ onBack }: AppPageProps) {
   const [showCropOverlay, setShowCropOverlay] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const handleFrameCaptured = useCallback(
     (media: HTMLImageElement | HTMLVideoElement, type: "image" | "video") => {
@@ -77,10 +82,15 @@ export default function AppPage({ onBack }: AppPageProps) {
   const handleExport = useCallback(
     async (
       format?: "image/jpeg" | "image/webp" | "image/png",
-      quality?: number
+      quality?: number,
+      compressionSettings?: CompressionSettings
     ) => {
       try {
-        return await canvasActions.exportCanvas(format, quality);
+        return await canvasActions.exportCanvas(
+          format,
+          quality,
+          compressionSettings
+        );
       } catch (error) {
         console.error("Export error:", error);
         throw error;
@@ -108,7 +118,7 @@ export default function AppPage({ onBack }: AppPageProps) {
       if (sessionData) {
         // Restore overlays
         await overlayActions.restoreSession();
-        
+
         // Restore crop area if available
         if (sessionData.cropArea) {
           setCropArea(sessionData.cropArea);
@@ -155,6 +165,78 @@ export default function AppPage({ onBack }: AppPageProps) {
     overlayActions.clearAll();
   }, [canvasActions, overlayActions]);
 
+  // Undo/Redo handlers - simple approach using overlay state
+  const handleUndo = useCallback(() => {
+    overlayActions.undo();
+  }, [overlayActions]);
+
+  const handleRedo = useCallback(() => {
+    overlayActions.redo();
+  }, [overlayActions]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Prevent shortcuts when typing in input fields
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement ||
+        (event.target as HTMLElement)?.contentEditable === "true"
+      ) {
+        return;
+      }
+
+      // Undo/Redo shortcuts
+      if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+        event.preventDefault();
+        if (event.shiftKey) {
+          handleRedo();
+        } else {
+          handleUndo();
+        }
+        return;
+      }
+
+      // Other shortcuts
+      switch (event.key.toLowerCase()) {
+        case "u":
+          // Upload - handled by FrameGrabber component
+          break;
+        case "f":
+          // Capture - handled by FrameGrabber component
+          break;
+        case "c":
+          event.preventDefault();
+          handleToggleCropOverlay();
+          break;
+        case "v":
+          // Move - could be implemented for canvas panning
+          break;
+        case "t":
+          // Text - handled by Overlay component
+          break;
+        case "e":
+          // Export - could trigger export dialog
+          break;
+        case "r":
+          // Toggle Restore - could toggle session restore setting
+          break;
+        case "?":
+          event.preventDefault();
+          setShowShortcuts(true);
+          break;
+        case "escape":
+          if (showShortcuts) {
+            setShowShortcuts(false);
+          }
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleUndo, handleRedo, handleToggleCropOverlay, showShortcuts]);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Toolbar */}
@@ -175,6 +257,16 @@ export default function AppPage({ onBack }: AppPageProps) {
             </h1>
           </div>
           <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowShortcuts(true)}
+              className="text-gray-600 hover:text-gray-900"
+              aria-label="Show keyboard shortcuts"
+            >
+              <HelpCircle className="w-4 h-4 mr-1" />
+              Shortcuts
+            </Button>
             {currentMedia && (
               <div className="text-sm text-gray-600">
                 {mediaType === "image" ? "📷" : "🎬"}
@@ -220,7 +312,10 @@ export default function AppPage({ onBack }: AppPageProps) {
                 showCropOverlay={showCropOverlay}
                 onToggleCropOverlay={handleToggleCropOverlay}
               />
-              <Overlay />
+              <Overlay
+                overlayState={overlayState}
+                overlayActions={overlayActions}
+              />
             </div>
 
             {/* Center Panel - Canvas */}
@@ -229,7 +324,9 @@ export default function AppPage({ onBack }: AppPageProps) {
                 <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                   <div className="flex items-center space-x-2">
                     <div className="animate-spin w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
-                    <span className="text-blue-800 text-sm">Restoring session...</span>
+                    <span className="text-blue-800 text-sm">
+                      Restoring session...
+                    </span>
                   </div>
                 </div>
               )}
@@ -239,6 +336,8 @@ export default function AppPage({ onBack }: AppPageProps) {
                 onCropChange={handleCropChange}
                 canvasState={canvasState}
                 canvasActions={canvasActions}
+                overlayState={overlayState}
+                overlayActions={overlayActions}
               />
             </div>
 
@@ -255,8 +354,20 @@ export default function AppPage({ onBack }: AppPageProps) {
         <ExportBar
           onExport={handleExport}
           hasContent={canvasState.hasContent}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={overlayState.historyIndex >= 0}
+          canRedo={overlayState.historyIndex < overlayState.history.length - 1}
         />
       </div>
+
+      {/* Shortcuts Overlay */}
+      <Suspense fallback={<div>Loading shortcuts...</div>}>
+        <ShortcutsOverlay
+          isOpen={showShortcuts}
+          onClose={() => setShowShortcuts(false)}
+        />
+      </Suspense>
     </div>
   );
 }

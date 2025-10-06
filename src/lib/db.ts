@@ -13,7 +13,7 @@ export interface SessionData {
   };
   mediaType?: "image" | "video";
   videoTimestamp?: number;
-  
+
   // Canvas state
   canvasDimensions?: {
     width: number;
@@ -26,7 +26,7 @@ export interface SessionData {
     width: number;
     height: number;
   } | null;
-  
+
   // Crop data
   cropArea?: {
     x: number;
@@ -34,7 +34,7 @@ export interface SessionData {
     width: number;
     height: number;
   } | null;
-  
+
   // Overlay data
   overlays?: Array<{
     id: string;
@@ -47,13 +47,21 @@ export interface SessionData {
     visible: boolean;
     locked: boolean;
   }>;
-  
+
   // Export settings
   exportSettings?: {
     format: "image/jpeg" | "image/webp" | "image/png";
     quality: number;
   };
-  
+
+  // Compression settings
+  compressionSettings?: {
+    preset: "high" | "medium" | "low";
+    quality: number;
+    targetSizeMB: number;
+    ssimThreshold: number;
+  };
+
   // Metadata
   lastSaved: number;
   version: string;
@@ -70,21 +78,21 @@ class SessionDB {
 
   async init(): Promise<void> {
     if (!this.isEnabled) return;
-    
+
     return new Promise((resolve) => {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
-      
+
       request.onerror = () => {
         console.warn("IndexedDB not available, session restore disabled");
         this.isEnabled = false;
         resolve();
       };
-      
+
       request.onsuccess = () => {
         this.db = request.result;
         resolve();
       };
-      
+
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
         if (!db.objectStoreNames.contains(STORE_NAME)) {

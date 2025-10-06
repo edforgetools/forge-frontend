@@ -10,6 +10,7 @@ export interface ExportOptions {
 
 /**
  * Export canvas with automatic quality adjustment to stay under size limit
+ * @deprecated Use compressCanvasWithSSIM for advanced compression with SSIM control
  */
 export async function exportCanvasUnder2MB(
   canvas: HTMLCanvasElement,

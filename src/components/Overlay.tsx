@@ -2,15 +2,20 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useOverlay } from "@/hooks/useOverlay";
+import { type OverlayState, type OverlayActions } from "@/hooks/useOverlay";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface OverlayProps {
+  overlayState: OverlayState;
+  overlayActions: OverlayActions;
   onOverlayComplete?: () => void;
 }
 
-export function Overlay({ onOverlayComplete }: OverlayProps) {
-  const [overlayState, overlayActions] = useOverlay();
+export function Overlay({
+  overlayState,
+  overlayActions,
+  onOverlayComplete,
+}: OverlayProps) {
   const [textInput, setTextInput] = useState("");
 
   const addTextOverlay = () => {
@@ -86,129 +91,111 @@ export function Overlay({ onOverlayComplete }: OverlayProps) {
         </div>
 
         {/* Active Overlays List */}
-        <AnimatePresence>
-          {overlayState.items.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-              className="space-y-2"
-            >
-              <h3 className="text-sm font-medium text-gray-700">
-                Active Overlays ({overlayState.items.length})
-              </h3>
+        <div className="space-y-2">
+          <h3 className="text-sm font-medium text-gray-700">
+            Active Overlays ({overlayState.items.length})
+          </h3>
 
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {overlayState.items.map((overlay) => (
-                  <motion.div
-                    key={overlay.id}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                      overlayState.selectedId === overlay.id
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    onClick={() => overlayActions.selectOverlay(overlay.id)}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm font-medium capitalize">
-                          {overlay.type}
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleOverlayVisibility(overlay.id);
-                          }}
-                          className={`w-2 h-2 rounded-full ${
-                            overlay.visible ? "bg-green-500" : "bg-gray-400"
-                          }`}
-                          aria-label={`${
-                            overlay.visible ? "Hide" : "Show"
-                          } overlay`}
+          <AnimatePresence>
+            {overlayState.items.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="space-y-2"
+              >
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {overlayState.items.map((overlay) => (
+                    <motion.div
+                      key={overlay.id}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                        overlayState.selectedId === overlay.id
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                      onClick={() => overlayActions.selectOverlay(overlay.id)}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-medium capitalize">
+                            {overlay.type}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleOverlayVisibility(overlay.id);
+                            }}
+                            className={`w-2 h-2 rounded-full ${
+                              overlay.visible ? "bg-green-500" : "bg-gray-400"
+                            }`}
+                            aria-label={`${
+                              overlay.visible ? "Hide" : "Show"
+                            } overlay`}
+                          />
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              overlayActions.toggleLock(overlay.id);
+                            }}
+                            className={`ml-1 text-xs ${
+                              overlay.locked ? "text-blue-600" : "text-gray-400"
+                            }`}
+                            aria-label={`${
+                              overlay.locked ? "Unlock" : "Lock"
+                            } overlay`}
+                          >
+                            {overlay.locked ? "🔒" : "🔓"}
+                          </button>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <span className="text-xs text-gray-500">
+                            {Math.round(overlay.x)}, {Math.round(overlay.y)}
+                          </span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              overlayActions.removeOverlay(overlay.id);
+                            }}
+                            className="text-xs text-red-500 hover:text-red-700 ml-2"
+                            aria-label="Remove overlay"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+
+                      {overlay.type === "text" && (
+                        <Input
+                          type="text"
+                          value={overlay.content}
+                          onChange={(e) =>
+                            updateOverlayContent(overlay.id, e.target.value)
+                          }
+                          className="text-xs"
+                          onClick={(e) => e.stopPropagation()}
+                          placeholder="Enter text..."
                         />
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            overlayActions.toggleLock(overlay.id);
-                          }}
-                          className={`ml-1 text-xs ${
-                            overlay.locked ? "text-blue-600" : "text-gray-400"
-                          }`}
-                          aria-label={`${
-                            overlay.locked ? "Unlock" : "Lock"
-                          } overlay`}
-                        >
-                          {overlay.locked ? "🔒" : "🔓"}
-                        </button>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <span className="text-xs text-gray-500">
-                          {Math.round(overlay.x)}, {Math.round(overlay.y)}
-                        </span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            overlayActions.removeOverlay(overlay.id);
-                          }}
-                          className="text-xs text-red-500 hover:text-red-700 ml-2"
-                          aria-label="Remove overlay"
-                        >
-                          ×
-                        </button>
-                      </div>
-                    </div>
+                      )}
 
-                    {overlay.type === "text" && (
-                      <Input
-                        type="text"
-                        value={overlay.content}
-                        onChange={(e) =>
-                          updateOverlayContent(overlay.id, e.target.value)
-                        }
-                        className="text-xs"
-                        onClick={(e) => e.stopPropagation()}
-                        placeholder="Enter text..."
-                      />
-                    )}
-
-                    {overlay.type === "logo" && (
-                      <div className="text-xs text-gray-500 italic">
-                        Logo placeholder - upload functionality coming soon
-                      </div>
-                    )}
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                      {overlay.type === "logo" && (
+                        <div className="text-xs text-gray-500 italic">
+                          Logo placeholder - upload functionality coming soon
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Quick Actions */}
         {overlayState.items.length > 0 && (
           <div className="flex space-x-2 pt-2 border-t">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={overlayActions.undo}
-              disabled={overlayState.historyIndex === 0}
-              className="flex-1 text-xs"
-            >
-              Undo
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={overlayActions.redo}
-              disabled={
-                overlayState.historyIndex === overlayState.history.length - 1
-              }
-              className="flex-1 text-xs"
-            >
-              Redo
-            </Button>
             <Button
               size="sm"
               variant="outline"

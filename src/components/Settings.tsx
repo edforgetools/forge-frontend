@@ -21,7 +21,11 @@ export function Settings({ onClearSession }: SettingsProps) {
   };
 
   const handleClearSession = async () => {
-    if (window.confirm("Are you sure you want to clear all saved session data? This cannot be undone.")) {
+    if (
+      window.confirm(
+        "Are you sure you want to clear all saved session data? This cannot be undone."
+      )
+    ) {
       await sessionDB.clearSession();
       onClearSession?.();
     }
@@ -30,7 +34,7 @@ export function Settings({ onClearSession }: SettingsProps) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <h2 className="text-lg font-semibold mb-4">Settings</h2>
-      
+
       <div className="space-y-4">
         {/* Session Restore Toggle */}
         <div className="flex items-center justify-between">
@@ -74,8 +78,8 @@ export function Settings({ onClearSession }: SettingsProps) {
         {/* Info */}
         <div className="text-xs text-gray-500 pt-2 border-t border-gray-100">
           <p>
-            Session data includes: uploaded files, canvas settings, overlays, and export preferences.
-            Data is stored locally in your browser.
+            Session data includes: uploaded files, canvas settings, overlays,
+            and export preferences. Data is stored locally in your browser.
           </p>
         </div>
       </div>

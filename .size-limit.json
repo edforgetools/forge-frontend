@@ -1,0 +1,37 @@
+[
+  {
+    "path": "dist/assets/vendor-react-*.js",
+    "limit": "130 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/vendor-misc-*.js",
+    "limit": "50 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/components-*.js",
+    "limit": "140 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/vendor-utils-*.js",
+    "limit": "30 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/lib-*.js",
+    "limit": "15 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/hooks-*.js",
+    "limit": "130 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/index-*.js",
+    "limit": "150 KB",
+    "gzip": true
+  }
+]

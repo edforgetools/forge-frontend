@@ -1,5 +1,6 @@
-import { useState, useCallback } from "react";
+import { useCallback, useReducer } from "react";
 import { sessionDB, SessionData } from "@/lib/db";
+import { HistoryCommand } from "./useHistory";
 
 export interface OverlayItem {
   id: string;
@@ -13,14 +14,144 @@ export interface OverlayItem {
   locked: boolean;
 }
 
-interface OverlayState {
+export interface OverlayState {
   items: OverlayItem[];
   selectedId: string | null;
   history: OverlayItem[][];
   historyIndex: number;
 }
 
-interface OverlayActions {
+export type OverlayAction =
+  | { type: "SET_ITEMS"; payload: { items: OverlayItem[] } }
+  | { type: "SET_SELECTED_ID"; payload: { selectedId: string | null } }
+  | { type: "ADD_OVERLAY"; payload: { overlay: OverlayItem } }
+  | {
+      type: "UPDATE_OVERLAY";
+      payload: { id: string; updates: Partial<OverlayItem> };
+    }
+  | { type: "REMOVE_OVERLAY"; payload: { id: string } }
+  | { type: "CLEAR_ALL" }
+  | {
+      type: "RESTORE_STATE";
+      payload: { items: OverlayItem[]; selectedId: string | null };
+    }
+  | { type: "UNDO" }
+  | { type: "REDO" }
+  | { type: "SAVE_TO_HISTORY"; payload: { items: OverlayItem[] } };
+
+function overlayReducer(
+  state: OverlayState,
+  action: OverlayAction
+): OverlayState {
+  switch (action.type) {
+    case "SET_ITEMS":
+      return { ...state, items: action.payload.items };
+    case "SET_SELECTED_ID":
+      return { ...state, selectedId: action.payload.selectedId };
+    case "ADD_OVERLAY":
+      const newItems = [...state.items, action.payload.overlay];
+      const addHistory =
+        state.historyIndex === -1
+          ? []
+          : state.history.slice(0, state.historyIndex + 1);
+      addHistory.push([...newItems]);
+      return {
+        ...state,
+        items: newItems,
+        history: addHistory,
+        historyIndex: addHistory.length - 1,
+      };
+    case "UPDATE_OVERLAY":
+      const updatedItems = state.items.map((item) =>
+        item.id === action.payload.id
+          ? { ...item, ...action.payload.updates }
+          : item
+      );
+      const updateHistory =
+        state.historyIndex === -1
+          ? []
+          : state.history.slice(0, state.historyIndex + 1);
+      updateHistory.push([...updatedItems]);
+      return {
+        ...state,
+        items: updatedItems,
+        history: updateHistory,
+        historyIndex: updateHistory.length - 1,
+      };
+    case "REMOVE_OVERLAY":
+      const filteredItems = state.items.filter(
+        (item) => item.id !== action.payload.id
+      );
+      const removeHistory =
+        state.historyIndex === -1
+          ? []
+          : state.history.slice(0, state.historyIndex + 1);
+      removeHistory.push([...filteredItems]);
+      return {
+        ...state,
+        items: filteredItems,
+        selectedId:
+          state.selectedId === action.payload.id ? null : state.selectedId,
+        history: removeHistory,
+        historyIndex: removeHistory.length - 1,
+      };
+    case "CLEAR_ALL":
+      const clearHistory =
+        state.historyIndex === -1
+          ? []
+          : state.history.slice(0, state.historyIndex + 1);
+      clearHistory.push([]);
+      return {
+        ...state,
+        items: [],
+        selectedId: null,
+        history: clearHistory,
+        historyIndex: clearHistory.length - 1,
+      };
+    case "RESTORE_STATE":
+      // When restoring state, reset history so we start fresh
+      return {
+        ...state,
+        items: action.payload.items,
+        selectedId: action.payload.selectedId,
+        history: [],
+        historyIndex: -1,
+      };
+    case "SAVE_TO_HISTORY":
+      const newHistory = state.history.slice(0, state.historyIndex + 1);
+      newHistory.push([...action.payload.items]);
+      return {
+        ...state,
+        items: action.payload.items,
+        history: newHistory,
+        historyIndex: newHistory.length - 1,
+      };
+    case "UNDO":
+      if (state.historyIndex > 0) {
+        const newIndex = state.historyIndex - 1;
+        return {
+          ...state,
+          items: [...state.history[newIndex]],
+          historyIndex: newIndex,
+        };
+      }
+      return state;
+    case "REDO":
+      if (state.historyIndex < state.history.length - 1) {
+        const newIndex = state.historyIndex + 1;
+        return {
+          ...state,
+          items: [...state.history[newIndex]],
+          historyIndex: newIndex,
+        };
+      }
+      return state;
+    default:
+      return state;
+  }
+}
+
+export interface OverlayActions {
   addOverlay: (type: "logo" | "text", initialContent?: string) => string;
   updateOverlay: (id: string, updates: Partial<OverlayItem>) => void;
   removeOverlay: (id: string) => void;
@@ -29,33 +160,26 @@ interface OverlayActions {
   resizeOverlay: (id: string, width: number, height: number) => void;
   toggleVisibility: (id: string) => void;
   toggleLock: (id: string) => void;
+  clearAll: () => void;
   undo: () => void;
   redo: () => void;
-  clearAll: () => void;
   saveSession: () => Promise<void>;
   restoreSession: () => Promise<Partial<SessionData> | null>;
+  applyHistoryCommand: (command: HistoryCommand) => void;
+  createHistoryCommand: (
+    type: string,
+    data: any,
+    description: string
+  ) => HistoryCommand;
 }
 
 export function useOverlay(): [OverlayState, OverlayActions] {
-  const [state, setState] = useState<OverlayState>({
+  const [state, dispatch] = useReducer(overlayReducer, {
     items: [],
     selectedId: null,
-    history: [[]],
-    historyIndex: 0,
+    history: [],
+    historyIndex: -1,
   });
-
-  const saveToHistory = useCallback((newItems: OverlayItem[]) => {
-    setState((prev) => {
-      const newHistory = prev.history.slice(0, prev.historyIndex + 1);
-      newHistory.push([...newItems]);
-      return {
-        ...prev,
-        items: newItems,
-        history: newHistory,
-        historyIndex: newHistory.length - 1,
-      };
-    });
-  }, []);
 
   const addOverlay = useCallback(
     (type: "logo" | "text", initialContent?: string): string => {
@@ -72,37 +196,25 @@ export function useOverlay(): [OverlayState, OverlayActions] {
         locked: false,
       };
 
-      const newItems = [...state.items, newOverlay];
-      saveToHistory(newItems);
+      dispatch({ type: "ADD_OVERLAY", payload: { overlay: newOverlay } });
       return newOverlay.id;
     },
-    [state.items, saveToHistory]
+    []
   );
 
   const updateOverlay = useCallback(
     (id: string, updates: Partial<OverlayItem>) => {
-      const newItems = state.items.map((item) =>
-        item.id === id ? { ...item, ...updates } : item
-      );
-      saveToHistory(newItems);
+      dispatch({ type: "UPDATE_OVERLAY", payload: { id, updates } });
     },
-    [state.items, saveToHistory]
+    []
   );
 
-  const removeOverlay = useCallback(
-    (id: string) => {
-      const newItems = state.items.filter((item) => item.id !== id);
-      saveToHistory(newItems);
-
-      if (state.selectedId === id) {
-        setState((prev) => ({ ...prev, selectedId: null }));
-      }
-    },
-    [state.items, state.selectedId, saveToHistory]
-  );
+  const removeOverlay = useCallback((id: string) => {
+    dispatch({ type: "REMOVE_OVERLAY", payload: { id } });
+  }, []);
 
   const selectOverlay = useCallback((id: string | null) => {
-    setState((prev) => ({ ...prev, selectedId: id }));
+    dispatch({ type: "SET_SELECTED_ID", payload: { selectedId: id } });
   }, []);
 
   const moveOverlay = useCallback(
@@ -139,38 +251,17 @@ export function useOverlay(): [OverlayState, OverlayActions] {
     [state.items, updateOverlay]
   );
 
+  const clearAll = useCallback(() => {
+    dispatch({ type: "CLEAR_ALL" });
+  }, []);
+
   const undo = useCallback(() => {
-    setState((prev) => {
-      if (prev.historyIndex > 0) {
-        const newIndex = prev.historyIndex - 1;
-        return {
-          ...prev,
-          items: [...prev.history[newIndex]],
-          historyIndex: newIndex,
-        };
-      }
-      return prev;
-    });
+    dispatch({ type: "UNDO" });
   }, []);
 
   const redo = useCallback(() => {
-    setState((prev) => {
-      if (prev.historyIndex < prev.history.length - 1) {
-        const newIndex = prev.historyIndex + 1;
-        return {
-          ...prev,
-          items: [...prev.history[newIndex]],
-          historyIndex: newIndex,
-        };
-      }
-      return prev;
-    });
+    dispatch({ type: "REDO" });
   }, []);
-
-  const clearAll = useCallback(() => {
-    saveToHistory([]);
-    setState((prev) => ({ ...prev, selectedId: null }));
-  }, [saveToHistory]);
 
   const saveSession = useCallback(async () => {
     if (!sessionDB.isSessionRestoreEnabled()) return;
@@ -182,25 +273,62 @@ export function useOverlay(): [OverlayState, OverlayActions] {
     await sessionDB.saveSession(sessionData);
   }, [state.items]);
 
-  const restoreSession = useCallback(async (): Promise<Partial<SessionData> | null> => {
-    if (!sessionDB.isSessionRestoreEnabled()) return null;
+  const restoreSession =
+    useCallback(async (): Promise<Partial<SessionData> | null> => {
+      if (!sessionDB.isSessionRestoreEnabled()) return null;
 
-    const sessionData = await sessionDB.loadSession();
-    if (!sessionData || !sessionData.overlays) return null;
+      const sessionData = await sessionDB.loadSession();
+      if (!sessionData || !sessionData.overlays) return null;
 
-    // Restore overlays
-    if (Array.isArray(sessionData.overlays)) {
-      setState((prev) => ({
-        ...prev,
-        items: sessionData.overlays!,
-        history: [sessionData.overlays!],
-        historyIndex: 0,
-        selectedId: null,
-      }));
+      // Restore overlays
+      if (Array.isArray(sessionData.overlays)) {
+        dispatch({
+          type: "RESTORE_STATE",
+          payload: {
+            items: sessionData.overlays!,
+            selectedId: null,
+          },
+        });
+      }
+
+      return sessionData;
+    }, []);
+
+  const applyHistoryCommand = useCallback((command: HistoryCommand) => {
+    switch (command.type) {
+      case "OVERLAY_ADD":
+        dispatch({ type: "ADD_OVERLAY", payload: { overlay: command.data } });
+        break;
+      case "OVERLAY_UPDATE":
+        dispatch({ type: "UPDATE_OVERLAY", payload: command.data });
+        break;
+      case "OVERLAY_REMOVE":
+        dispatch({ type: "REMOVE_OVERLAY", payload: command.data });
+        break;
+      case "OVERLAY_SELECT":
+        dispatch({ type: "SET_SELECTED_ID", payload: command.data });
+        break;
+      case "OVERLAY_CLEAR_ALL":
+        dispatch({ type: "CLEAR_ALL" });
+        break;
+      case "OVERLAY_RESTORE_STATE":
+        dispatch({ type: "RESTORE_STATE", payload: command.data });
+        break;
     }
-
-    return sessionData;
   }, []);
+
+  const createHistoryCommand = useCallback(
+    (type: string, data: any, description: string): HistoryCommand => {
+      return {
+        id: `overlay-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type,
+        timestamp: Date.now(),
+        data,
+        description,
+      };
+    },
+    []
+  );
 
   const actions: OverlayActions = {
     addOverlay,
@@ -211,11 +339,13 @@ export function useOverlay(): [OverlayState, OverlayActions] {
     resizeOverlay,
     toggleVisibility,
     toggleLock,
+    clearAll,
     undo,
     redo,
-    clearAll,
     saveSession,
     restoreSession,
+    applyHistoryCommand,
+    createHistoryCommand,
   };
 
   return [state, actions];

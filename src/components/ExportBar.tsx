@@ -1,21 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import {
+  CompressionSelector,
+  type CompressionSettings,
+} from "@/components/CompressionSelector";
 import {
   downloadBlob,
   generateFilename,
   getExtensionFromMimeType,
 } from "@/lib/download";
+import { sessionDB } from "@/lib/db";
+import { Undo2, Redo2 } from "lucide-react";
 
 interface ExportBarProps {
   onExport?: (
     format?: "image/jpeg" | "image/webp" | "image/png",
-    quality?: number
+    quality?: number,
+    compressionSettings?: CompressionSettings
   ) => Promise<Blob>;
   hasContent?: boolean;
+  onUndo?: () => void;
+  onRedo?: () => void;
+  canUndo?: boolean;
+  canRedo?: boolean;
 }
 
-export function ExportBar({ onExport, hasContent = false }: ExportBarProps) {
+export function ExportBar({
+  onExport,
+  hasContent = false,
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
+}: ExportBarProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [exportFormat, setExportFormat] = useState<
     "image/jpeg" | "image/webp" | "image/png"
@@ -23,6 +41,39 @@ export function ExportBar({ onExport, hasContent = false }: ExportBarProps) {
   const [quality, setQuality] = useState([0.8]);
   const [fileSize, setFileSize] = useState(0);
   const [lastExportSize, setLastExportSize] = useState(0);
+  const [compressionSettings, setCompressionSettings] =
+    useState<CompressionSettings>({
+      preset: "medium",
+      quality: 0.7,
+      targetSizeMB: 1.0,
+      ssimThreshold: 0.8,
+    });
+  const [showCompressionSettings, setShowCompressionSettings] = useState(false);
+
+  // Load compression settings from IndexedDB on mount
+  useEffect(() => {
+    const loadCompressionSettings = async () => {
+      if (sessionDB.isSessionRestoreEnabled()) {
+        const sessionData = await sessionDB.loadSession();
+        if (sessionData?.compressionSettings) {
+          setCompressionSettings(sessionData.compressionSettings);
+        }
+      }
+    };
+    loadCompressionSettings();
+  }, []);
+
+  // Save compression settings to IndexedDB when they change
+  useEffect(() => {
+    const saveCompressionSettings = async () => {
+      if (sessionDB.isSessionRestoreEnabled()) {
+        await sessionDB.saveSession({
+          compressionSettings,
+        });
+      }
+    };
+    saveCompressionSettings();
+  }, [compressionSettings]);
 
   const handleExport = async () => {
     if (!hasContent) {
@@ -38,7 +89,11 @@ export function ExportBar({ onExport, hasContent = false }: ExportBarProps) {
         throw new Error("No export function provided");
       }
 
-      const blob = await onExport(exportFormat, quality[0]);
+      const blob = await onExport(
+        exportFormat,
+        quality[0],
+        compressionSettings
+      );
       setFileSize(blob.size);
       setLastExportSize(blob.size);
 
@@ -84,6 +139,30 @@ export function ExportBar({ onExport, hasContent = false }: ExportBarProps) {
       onKeyDown={handleKeyDown}
     >
       <div className="flex items-center space-x-6">
+        {/* Undo/Redo Controls */}
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onUndo}
+            disabled={!canUndo || isExporting}
+            aria-label="Undo last action"
+            title="Undo (⌘Z)"
+          >
+            <Undo2 className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onRedo}
+            disabled={!canRedo || isExporting}
+            aria-label="Redo last undone action"
+            title="Redo (⌘⇧Z)"
+          >
+            <Redo2 className="w-4 h-4" />
+          </Button>
+        </div>
+
         {/* Format Selection */}
         <div className="flex items-center space-x-2">
           <label
@@ -105,8 +184,34 @@ export function ExportBar({ onExport, hasContent = false }: ExportBarProps) {
           </select>
         </div>
 
-        {/* Quality Slider */}
-        {exportFormat !== "image/png" && (
+        {/* Compression Settings */}
+        <div className="flex items-center space-x-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowCompressionSettings(!showCompressionSettings)}
+            disabled={isExporting}
+            className="text-xs"
+          >
+            {showCompressionSettings ? "Hide" : "Show"} Compression
+          </Button>
+          {showCompressionSettings && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">
+                {compressionSettings.preset.charAt(0).toUpperCase() +
+                  compressionSettings.preset.slice(1)}{" "}
+                Quality
+              </span>
+              <span className="text-xs text-gray-500">
+                (≤{compressionSettings.targetSizeMB}MB, SSIM ≥
+                {Math.round(compressionSettings.ssimThreshold * 100)}%)
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Legacy Quality Slider - Hide when compression settings are shown */}
+        {exportFormat !== "image/png" && !showCompressionSettings && (
           <div className="flex items-center space-x-3">
             <label
               htmlFor="quality-slider"
@@ -157,6 +262,18 @@ export function ExportBar({ onExport, hasContent = false }: ExportBarProps) {
             "JPEG: Compatible, adjustable quality"}
         </div>
       </div>
+
+      {/* Compression Settings Panel */}
+      {showCompressionSettings && (
+        <div className="mt-4 p-4 bg-gray-50 border-t border-gray-200">
+          <CompressionSelector
+            value={compressionSettings}
+            onChange={setCompressionSettings}
+            disabled={isExporting}
+            showAdvanced={false}
+          />
+        </div>
+      )}
 
       {/* Export Button */}
       <Button
