@@ -5,15 +5,23 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Snapthumb - Create Perfect 16:9 Thumbnails</title>
-    <meta name="description" content="Create perfect 16:9 thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB." />
-    
+    <meta
+      name="description"
+      content="Create perfect 16:9 thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB."
+    />
+
     <!-- Critical CSS inlined for instant rendering -->
     <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { 
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-        line-height: 1.5; 
-        color: #1f2937; 
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        line-height: 1.5;
+        color: #1f2937;
         background: linear-gradient(to bottom right, #eff6ff, #ffffff, #e0e7ff);
         min-height: 100vh;
         display: flex;
@@ -21,91 +29,93 @@
         justify-content: center;
         padding: 1rem;
       }
-      .container { 
-        max-width: 42rem; 
-        text-align: center; 
-        margin: 0 auto; 
+      .container {
+        max-width: 42rem;
+        text-align: center;
+        margin: 0 auto;
       }
-      .logo { 
-        width: 5rem; 
-        height: 5rem; 
-        background: #2563eb; 
-        border-radius: 1rem; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        margin: 0 auto 1rem; 
+      .logo {
+        width: 5rem;
+        height: 5rem;
+        background: #2563eb;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
       }
-      .icon { 
-        width: 2.5rem; 
-        height: 2.5rem; 
-        color: white; 
+      .icon {
+        width: 2.5rem;
+        height: 2.5rem;
+        color: white;
       }
-      h1 { 
-        font-size: 3rem; 
-        font-weight: 700; 
-        color: #111827; 
-        margin-bottom: 1.5rem; 
+      h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 1.5rem;
       }
-      .subtitle { 
-        font-size: 1.25rem; 
-        color: #4b5563; 
-        margin-bottom: 3rem; 
-        max-width: 32rem; 
-        margin-left: auto; 
-        margin-right: auto; 
+      .subtitle {
+        font-size: 1.25rem;
+        color: #4b5563;
+        margin-bottom: 3rem;
+        max-width: 32rem;
+        margin-left: auto;
+        margin-right: auto;
       }
-      .features { 
-        display: grid; 
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-        gap: 1.5rem; 
-        margin-bottom: 3rem; 
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
       }
-      .feature { 
-        background: white; 
-        border-radius: 0.5rem; 
-        padding: 1.5rem; 
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-        border: 1px solid #f3f4f6; 
+      .feature {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #f3f4f6;
       }
-      .feature-icon { 
-        width: 2rem; 
-        height: 2rem; 
-        color: #2563eb; 
-        margin: 0 auto 0.75rem; 
+      .feature-icon {
+        width: 2rem;
+        height: 2rem;
+        color: #2563eb;
+        margin: 0 auto 0.75rem;
       }
-      .feature-title { 
-        font-weight: 600; 
-        color: #111827; 
-        margin-bottom: 0.5rem; 
+      .feature-title {
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 0.5rem;
       }
-      .feature-desc { 
-        font-size: 0.875rem; 
-        color: #4b5563; 
+      .feature-desc {
+        font-size: 0.875rem;
+        color: #4b5563;
       }
-      .cta-button { 
-        background: #2563eb; 
-        color: white; 
-        border: none; 
-        border-radius: 0.5rem; 
-        padding: 1rem 2rem; 
-        font-size: 1.125rem; 
-        font-weight: 600; 
-        cursor: pointer; 
-        display: inline-flex; 
-        align-items: center; 
-        gap: 0.5rem; 
-        transition: background-color 0.2s; 
+      .cta-button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 1rem 2rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.2s;
       }
-      .cta-button:hover { 
-        background: #1d4ed8; 
+      .cta-button:hover {
+        background: #1d4ed8;
       }
-      .loading { 
-        display: none; 
-        margin-top: 1rem; 
-        color: #6b7280; 
+      .loading {
+        display: none;
+        margin-top: 1rem;
+        color: #6b7280;
       }
-      #root { min-height: 100vh; }
+      #root {
+        min-height: 100vh;
+      }
     </style>
   </head>
   <body>
@@ -113,54 +123,69 @@
       <div class="container">
         <div class="logo">
           <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h16V6H4zm2 2h12v2H6V8zm0 4h12v2H6v-2zm0 4h8v2H6v-2z"/>
+            <path
+              d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm0 2v12h16V6H4zm2 2h12v2H6V8zm0 4h12v2H6v-2zm0 4h8v2H6v-2z"
+            />
           </svg>
         </div>
         <h1>Snapthumb</h1>
-        <p class="subtitle">Create perfect thumbnails from your videos and images with our intuitive editor</p>
-        
+        <p class="subtitle">
+          Create perfect thumbnails from your videos and images with our
+          intuitive editor
+        </p>
+
         <div class="features">
           <div class="feature">
             <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"/>
+              <path
+                d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"
+              />
             </svg>
             <div class="feature-title">Video Frames</div>
-            <div class="feature-desc">Extract frames from any video at any timestamp</div>
+            <div class="feature-desc">
+              Extract frames from any video at any timestamp
+            </div>
           </div>
-          
+
           <div class="feature">
             <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm16 14H5V5h14v14zm-8-2h2v-2h2v-2h-2v-2h-2v2H9v2h2v2z"/>
+              <path
+                d="M3 5v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2zm16 14H5V5h14v14zm-8-2h2v-2h2v-2h-2v-2h-2v2H9v2h2v2z"
+              />
             </svg>
             <div class="feature-title">Smart Cropping</div>
-            <div class="feature-desc">Auto-crop to perfect 16:9 aspect ratio</div>
+            <div class="feature-desc">
+              Auto-crop to perfect 16:9 aspect ratio
+            </div>
           </div>
-          
+
           <div class="feature">
             <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+              <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
             </svg>
             <div class="feature-title">Export Ready</div>
-            <div class="feature-desc">Optimized files under 2MB for all platforms</div>
+            <div class="feature-desc">
+              Optimized files under 2MB for all platforms
+            </div>
           </div>
         </div>
-        
+
         <button class="cta-button" onclick="startApp()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8 5v14l11-7z"/>
+            <path d="M8 5v14l11-7z" />
           </svg>
           Start Creating
         </button>
-        
+
         <div class="loading" id="loading">Loading editor...</div>
       </div>
     </div>
-    
+
     <script>
       function startApp() {
-        document.getElementById('loading').style.display = 'block';
+        document.getElementById("loading").style.display = "block";
         // Navigate to app route
-        window.location.href = '/app';
+        window.location.href = "/app";
       }
     </script>
     <script type="module" src="/src/main.tsx"></script>

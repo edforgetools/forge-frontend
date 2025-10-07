@@ -10,8 +10,12 @@ const TermsPage = lazy(() => import("./pages/terms"));
 const PrivacyPage = lazy(() => import("./pages/privacy"));
 const AboutPage = lazy(() => import("./pages/about"));
 const AppPage = lazy(() => import("./pages/app"));
-const Toaster = lazy(() => import("@/lib/ui/toaster").then(m => ({ default: m.Toaster })));
-const Analytics = lazy(() => import("@vercel/analytics/react").then(m => ({ default: m.Analytics })));
+const Toaster = lazy(() =>
+  import("@/lib/ui/toaster").then((m) => ({ default: m.Toaster }))
+);
+const Analytics = lazy(() =>
+  import("@vercel/analytics/react").then((m) => ({ default: m.Analytics }))
+);
 
 // AppPage is already declared above
 
@@ -79,7 +83,13 @@ function App() {
 
   if (currentPage === "terms") {
     return (
-      <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            Loading...
+          </div>
+        }
+      >
         <TermsPage onBack={() => navigateTo("index")} />
       </Suspense>
     );
@@ -87,7 +97,13 @@ function App() {
 
   if (currentPage === "privacy") {
     return (
-      <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            Loading...
+          </div>
+        }
+      >
         <PrivacyPage onBack={() => navigateTo("index")} />
       </Suspense>
     );
@@ -95,7 +111,13 @@ function App() {
 
   if (currentPage === "about") {
     return (
-      <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            Loading...
+          </div>
+        }
+      >
         <AboutPage onBack={() => navigateTo("index")} />
       </Suspense>
     );
@@ -105,7 +127,9 @@ function App() {
   if (currentPage === "index") {
     if (useAnimatedIndex) {
       return (
-        <Suspense fallback={<IndexPageStatic onStart={() => navigateTo("app")} />}>
+        <Suspense
+          fallback={<IndexPageStatic onStart={() => navigateTo("app")} />}
+        >
           <IndexPage onStart={() => navigateTo("app")} />
         </Suspense>
       );

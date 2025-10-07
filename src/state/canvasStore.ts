@@ -75,6 +75,8 @@ export type CanvasState = {
   zoom: number;
   showGrid: boolean;
   showSafeZone: boolean;
+  // Pro tier state
+  isPro: boolean;
 };
 
 const defaultCrop: Crop = {
@@ -105,6 +107,8 @@ const defaultState: CanvasState = {
   zoom: 1,
   showGrid: false,
   showSafeZone: false,
+  // Pro tier defaults
+  isPro: false,
 };
 
 export type CanvasActions = {
@@ -138,6 +142,8 @@ export type CanvasActions = {
   resetView: () => void;
   toggleGrid: () => void;
   toggleSafeZone: () => void;
+  // Pro tier actions
+  setIsPro: (isPro: boolean) => void;
 };
 
 export type CanvasStore = CanvasState & CanvasActions;
@@ -506,6 +512,11 @@ export const useCanvasStore = create<CanvasStore>()(
       toggleSafeZone: () => {
         set((state) => ({ showSafeZone: !state.showSafeZone }));
       },
+
+      // Pro tier actions
+      setIsPro: (isPro) => {
+        set({ isPro });
+      },
     }),
     { name: "canvas-store" }
   )
@@ -541,6 +552,8 @@ export const canvasActions: CanvasActions = {
   resetView: () => useCanvasStore.getState().resetView(),
   toggleGrid: () => useCanvasStore.getState().toggleGrid(),
   toggleSafeZone: () => useCanvasStore.getState().toggleSafeZone(),
+  // Pro tier actions
+  setIsPro: (isPro) => useCanvasStore.getState().setIsPro(isPro),
 };
 
 function calculateAutoCrop(image: HTMLImageElement | ImageBitmap): Crop {

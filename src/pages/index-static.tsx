@@ -17,9 +17,7 @@ export default function IndexPage({ onStart }: IndexPageProps) {
         </div>
 
         {/* Main Heading */}
-        <h1 className="text-5xl font-bold text-gray-900 mb-6">
-          Snapthumb
-        </h1>
+        <h1 className="text-5xl font-bold text-gray-900 mb-6">Snapthumb</h1>
 
         {/* Subtitle */}
         <p className="text-xl text-gray-600 mb-12 max-w-lg mx-auto">
