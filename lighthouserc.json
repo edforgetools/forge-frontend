@@ -1,28 +1,14 @@
 {
   "ci": {
     "collect": {
-      "staticDistDir": "./dist",
-      "numberOfRuns": 3
+      "staticDistDir": "./dist"
     },
     "assert": {
       "assertions": {
-        "categories:performance": ["warn", { "minScore": 0.4 }],
-        "categories:accessibility": ["error", { "minScore": 0.8 }],
-        "categories:best-practices": ["warn", { "minScore": 0.6 }],
-        "categories:seo": ["warn", { "minScore": 0.7 }],
-        "categories:pwa": "off",
-        "errors-in-console": "off",
-        "heading-order": "off",
-        "network-dependency-tree-insight": "off",
-        "unused-javascript": "off",
-        "legacy-javascript": "off",
-        "first-contentful-paint": "off",
-        "render-blocking-insight": "off",
-        "render-blocking-resources": "off"
+        "categories:performance": ["error", { "minScore": 0.9 }],
+        "categories:accessibility": ["error", { "minScore": 0.95 }],
+        "categories:seo": ["error", { "minScore": 0.95 }]
       }
-    },
-    "upload": {
-      "target": "temporary-public-storage"
     }
   }
 }

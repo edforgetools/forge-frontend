@@ -19,7 +19,8 @@ const proBenefits = [
   {
     icon: <Download className="w-6 h-6 text-blue-600" />,
     title: "HD Export",
-    description: "Export your thumbnails in high definition up to 4K resolution",
+    description:
+      "Export your thumbnails in high definition up to 4K resolution",
   },
   {
     icon: <Shield className="w-6 h-6 text-green-600" />,
@@ -29,7 +30,8 @@ const proBenefits = [
   {
     icon: <Cloud className="w-6 h-6 text-purple-600" />,
     title: "Cloud Save",
-    description: "Save your projects in the cloud and access them from anywhere",
+    description:
+      "Save your projects in the cloud and access them from anywhere",
   },
   {
     icon: <Zap className="w-6 h-6 text-yellow-600" />,
@@ -44,7 +46,7 @@ export function UpgradeModal({ children }: UpgradeModalProps) {
   const handleUpgrade = () => {
     // Placeholder for future Stripe integration
     console.log("Upgrade to Pro clicked - Stripe integration coming soon");
-    
+
     // For now, just simulate upgrading (remove this in production)
     setIsPro(true);
   };
@@ -79,9 +81,7 @@ export function UpgradeModal({ children }: UpgradeModalProps) {
                 <Card key={index} className="border-l-4 border-l-blue-500">
                   <CardContent className="p-4">
                     <div className="flex items-start space-x-3">
-                      <div className="flex-shrink-0 mt-1">
-                        {benefit.icon}
-                      </div>
+                      <div className="flex-shrink-0 mt-1">{benefit.icon}</div>
                       <div className="flex-1">
                         <h4 className="font-semibold text-gray-900">
                           {benefit.title}
@@ -102,7 +102,9 @@ export function UpgradeModal({ children }: UpgradeModalProps) {
             <div className="text-center">
               <div className="text-3xl font-bold text-gray-900 mb-2">
                 $9.99
-                <span className="text-lg font-normal text-gray-600">/month</span>
+                <span className="text-lg font-normal text-gray-600">
+                  /month
+                </span>
               </div>
               <p className="text-sm text-gray-600">
                 Cancel anytime • 7-day free trial
@@ -123,7 +125,8 @@ export function UpgradeModal({ children }: UpgradeModalProps) {
           {/* Fine Print */}
           <div className="text-xs text-center text-gray-500">
             <p>
-              By upgrading, you agree to our Terms of Service and Privacy Policy.
+              By upgrading, you agree to our Terms of Service and Privacy
+              Policy.
             </p>
             <p className="mt-1">
               Payment processing powered by Stripe (coming soon)

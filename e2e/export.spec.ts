@@ -42,7 +42,7 @@ test.describe("Export Flow", () => {
     await page.click("text=Export");
 
     // Debug: Take a screenshot before clicking export button
-    await page.screenshot({ path: 'debug-before-export.png' });
+    await page.screenshot({ path: "debug-before-export.png" });
 
     // Click the actual export button (the one in the sticky footer)
     const exportButton = page.locator('button[aria-label*="Export thumbnail"]');
@@ -50,7 +50,7 @@ test.describe("Export Flow", () => {
     await exportButton.click();
 
     // Debug: Take a screenshot after clicking export button
-    await page.screenshot({ path: 'debug-after-export.png' });
+    await page.screenshot({ path: "debug-after-export.png" });
 
     // Wait for export dialog
     await page.waitForSelector('[data-testid="export-dialog"]', {
@@ -58,7 +58,9 @@ test.describe("Export Flow", () => {
     });
 
     // Click export button in dialog (could be "Smart Export" or "Export JPEG")
-    const dialogExportButton = page.locator('[data-testid="export-dialog"] button:has-text("Export")');
+    const dialogExportButton = page.locator(
+      '[data-testid="export-dialog"] button:has-text("Export")'
+    );
     await dialogExportButton.click();
 
     // Wait for and verify the success toast appears
@@ -67,6 +69,8 @@ test.describe("Export Flow", () => {
     });
 
     // Verify the toast contains file size information
-    await expect(page.locator("text=/Downloaded .* in .*/").first()).toBeVisible();
+    await expect(
+      page.locator("text=/Downloaded .* in .*/").first()
+    ).toBeVisible();
   });
 });
