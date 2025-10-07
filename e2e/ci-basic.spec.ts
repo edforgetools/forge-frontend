@@ -5,28 +5,9 @@ test.describe("CI Basic Smoke Tests", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle", { timeout: 15000 });
 
-    // Debug: Log page content and check for errors
-    console.log("Page title:", await page.title());
-    console.log("Page URL:", page.url());
-    
-    // Check for any console errors
-    page.on('console', msg => {
-      if (msg.type() === 'error') {
-        console.log('Console error:', msg.text());
-      }
-    });
-
     // Check main elements are present
     await expect(page.locator("h1")).toContainText("Snapthumb");
-    
-    // Debug: Check what buttons are actually on the page
-    const buttons = await page.locator('button').all();
-    console.log(`Found ${buttons.length} buttons on the page`);
-    for (let i = 0; i < buttons.length; i++) {
-      const text = await buttons[i].textContent();
-      console.log(`Button ${i}: "${text}"`);
-    }
-    
+
     await expect(page.locator('button:has-text("Start Creating")')).toBeVisible(
       { timeout: 10000 }
     );
