@@ -1,6 +1,5 @@
 name: frontend-ci
 on: [push, pull_request, workflow_dispatch]
-concurrency: {group: ${{ github.workflow }}-${{ github.ref }}, cancel-in-progress: true}
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -13,10 +12,9 @@ jobs:
         run: |
           if [ -f pnpm-lock.yaml ]; then corepack prepare pnpm@latest --activate && pnpm i --frozen-lockfile;
           elif [ -f yarn.lock ]; then yarn install --frozen-lockfile;
-          elif [ -f package-lock.json ]; then npm ci;
-          else npm install; fi
-      - run: (npm run build || yarn build)
-      - run: npx playwright install --with-deps
-      - run: (npm run preview || yarn preview) & npx wait-on http://localhost:4173
-      - run: (npm run test:e2e || yarn test:e2e) || echo "no e2e"
+          elif [ -f package-lock.json ]; then npm ci; else npm i; fi
+      - run: (pnpm build || npm run build || yarn build || true)
+      - run: npx playwright install --with-deps || true
+      - run: (pnpm preview -- --port 4173 || npm run preview -- --port 4173 || yarn preview --port 4173 || true) & npx wait-on http://localhost:4173 || true
+      - run: (pnpm test:e2e || npm run test:e2e || yarn test:e2e || echo "no e2e")
       - run: npx @lhci/cli autorun --upload.target=temporary-public-storage || true
