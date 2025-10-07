@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useCanvasStore } from "@/state/canvasStore";
 import { TextOverlay } from "./TextOverlay";
+import { startHeatmapTracking, stopHeatmapTracking } from "@/lib/heatmap";
 
 export function CanvasStage() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -303,6 +304,18 @@ export function CanvasStage() {
   }, []);
 
   const hasContent = image || videoSrc;
+
+  // Start heatmap tracking when canvas is available
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas && hasContent) {
+      startHeatmapTracking(canvas);
+    }
+    
+    return () => {
+      stopHeatmapTracking();
+    };
+  }, [hasContent]);
 
   return (
     <div
