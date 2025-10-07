@@ -99,7 +99,10 @@ export type CanvasActions = {
   setVideo: (videoSrc: string) => void;
   setCrop: (crop: Partial<Crop>) => void;
   addOverlay: (overlay: Omit<LogoOverlay | TextOverlay, "id" | "z">) => void;
-  updateOverlay: (id: string, updates: Partial<LogoOverlay | TextOverlay>) => void;
+  updateOverlay: (
+    id: string,
+    updates: Partial<LogoOverlay | TextOverlay>
+  ) => void;
   select: (id?: string) => void;
   bringToFront: (id: string) => void;
   sendToBack: (id: string) => void;
@@ -151,7 +154,9 @@ export const useCanvasStore = create<CanvasStore>()(
 
         const newOverlay = {
           ...overlay,
-          id: `overlay_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `overlay_${Date.now()}_${Math.random()
+            .toString(36)
+            .substr(2, 9)}`,
           z: maxZ + 1,
         } as LogoOverlay | TextOverlay;
 
@@ -161,10 +166,15 @@ export const useCanvasStore = create<CanvasStore>()(
         });
       },
 
-      updateOverlay: (id: string, updates: Partial<LogoOverlay | TextOverlay>) => {
+      updateOverlay: (
+        id: string,
+        updates: Partial<LogoOverlay | TextOverlay>
+      ) => {
         set((state) => ({
           overlays: state.overlays.map((overlay) =>
-            overlay.id === id ? { ...overlay, ...updates } as LogoOverlay | TextOverlay : overlay
+            overlay.id === id
+              ? ({ ...overlay, ...updates } as LogoOverlay | TextOverlay)
+              : overlay
           ),
         }));
       },
@@ -284,9 +294,7 @@ export const useCanvasStore = create<CanvasStore>()(
 
 // Actions are now part of the store itself
 
-function calculateAutoCrop(
-  image: HTMLImageElement | ImageBitmap
-): Crop {
+function calculateAutoCrop(image: HTMLImageElement | ImageBitmap): Crop {
   const imgWidth = image.width;
   const imgHeight = image.height;
   const targetRatio = 16 / 9;

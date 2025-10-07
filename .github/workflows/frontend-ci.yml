@@ -1,20 +1,46 @@
 name: frontend-ci
-on: [push, pull_request, workflow_dispatch]
+
+on:
+  push:
+    branches: [ main, feat/snapthumb-v1-1 ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.15.9 }
+
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - run: corepack enable
-      - name: Install
-        run: |
-          if [ -f pnpm-lock.yaml ]; then corepack prepare pnpm@latest --activate && pnpm i --frozen-lockfile;
-          elif [ -f yarn.lock ]; then yarn install --frozen-lockfile;
-          elif [ -f package-lock.json ]; then npm ci; else npm i; fi
-      - run: (pnpm build || npm run build || yarn build || true)
-      - run: npx playwright install --with-deps || true
-      - run: (pnpm preview -- --port 4173 || npm run preview -- --port 4173 || yarn preview --port 4173 || true) & npx wait-on http://localhost:4173 || true
-      - run: (pnpm test:e2e || npm run test:e2e || yarn test:e2e || echo "no e2e")
-      - run: npx @lhci/cli autorun --upload.target=temporary-public-storage || true
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # build once
+      - run: pnpm run build
+
+      # start local preview server for e2e (no Vercel URL needed)
+      - run: pnpm add -D wait-on
+      - run: |
+          pnpm run preview -- --port 4173 &
+          npx wait-on http://127.0.0.1:4173
+
+      # playwright
+      - run: pnpm exec playwright install --with-deps
+      - run: pnpm exec playwright test
+        env:
+          # ensure tests use the local server
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+
+      # lighthouse on built dist
+      - run: npx @lhci/cli autorun --collect.staticDistDir=dist
