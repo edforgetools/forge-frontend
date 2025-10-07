@@ -63,9 +63,11 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: process.env.PREVIEW_URL ? undefined : {
-    command: "pnpm dev",
-    url: "http://localhost:5183",
-    reuseExistingServer: !process.env.CI,
-  },
+  webServer: process.env.PREVIEW_URL
+    ? undefined
+    : {
+        command: "pnpm dev",
+        url: "http://localhost:5183",
+        reuseExistingServer: !process.env.CI,
+      },
 });
