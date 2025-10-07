@@ -1,20 +1,120 @@
 name: frontend-ci
-on: [push, pull_request, workflow_dispatch]
+
+on:
+  push:
+    branches: [main, feat/snapthumb-v1-1]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with: { version: 9.15.9 }
+
       - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - run: corepack enable
-      - name: Install
+        with:
+          node-version: 20
+
+      - name: Install dependencies
         run: |
-          if [ -f pnpm-lock.yaml ]; then corepack prepare pnpm@latest --activate && pnpm i --frozen-lockfile;
-          elif [ -f yarn.lock ]; then yarn install --frozen-lockfile;
-          elif [ -f package-lock.json ]; then npm ci; else npm i; fi
-      - run: (pnpm build || npm run build || yarn build || true)
-      - run: npx playwright install --with-deps || true
-      - run: (pnpm preview -- --port 4173 || npm run preview -- --port 4173 || yarn preview --port 4173 || true) & npx wait-on http://localhost:4173 || true
-      - run: (pnpm test:e2e || npm run test:e2e || yarn test:e2e || echo "no e2e")
-      - run: npx @lhci/cli autorun --upload.target=temporary-public-storage || true
+          echo "Installing dependencies..."
+          pnpm install --frozen-lockfile
+          echo "Dependencies installed successfully!"
+        timeout-minutes: 5
+
+      # build once
+      - name: Build application
+        run: |
+          echo "Building application..."
+          pnpm run build
+          echo "Build completed successfully!"
+        timeout-minutes: 5
+
+      # start local preview server for e2e (no Vercel URL needed)
+      - name: Verify build output
+        run: |
+          echo "Verifying build output..."
+          ls -la dist/
+          echo "Build output verified!"
+        timeout-minutes: 1
+
+      - name: Install wait-on
+        run: |
+          echo "Installing wait-on..."
+          pnpm add -D wait-on
+          echo "wait-on installed successfully!"
+        timeout-minutes: 2
+
+      # playwright with caching and optimization
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright browsers (Chromium only for CI)
+        run: |
+          echo "Installing Playwright browsers..."
+          pnpm exec playwright install chromium --with-deps
+          echo "Playwright browsers installed successfully!"
+        timeout-minutes: 10
+
+      - name: Start server and run Playwright tests
+        run: |
+          echo "Starting preview server..."
+          # Start server directly with vite to have full control over arguments
+          npx vite preview --port 4173 --host 127.0.0.1 &
+          SERVER_PID=$!
+          echo "Server PID: $SERVER_PID"
+
+          # Wait for server to start
+          echo "Waiting for server to start..."
+          for i in {1..30}; do
+            if curl -f http://127.0.0.1:4173 > /dev/null 2>&1; then
+              echo "Server is ready after $((i*2)) seconds!"
+              break
+            fi
+            echo "Attempt $i: Server not ready yet, waiting..."
+            sleep 2
+            if [ $i -eq 30 ]; then
+              echo "Server failed to start after 60 seconds"
+              echo "Checking if server process is still running..."
+              ps aux | grep preview || echo "No preview process found"
+              exit 1
+            fi
+          done
+
+          echo "Server health check passed!"
+          echo "Running Playwright tests..."
+
+          # Run tests with server running
+          pnpm exec playwright test ci-basic.spec.ts --project=chromium
+          echo "Playwright tests completed successfully!"
+
+          # Clean up server
+          echo "Stopping server..."
+          kill $SERVER_PID || echo "Server already stopped"
+        timeout-minutes: 10
+        env:
+          # ensure tests use the local server
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+
+      # lighthouse on built dist
+      - name: Run Lighthouse CI
+        run: |
+          echo "Running Lighthouse CI..."
+          npx @lhci/cli autorun --collect.staticDistDir=dist --config=lighthouserc.json
+          echo "Lighthouse CI completed successfully!"
+        timeout-minutes: 5

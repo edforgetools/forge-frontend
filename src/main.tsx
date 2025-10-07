@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import IndexPage from "./pages/index";
 import AppPage from "./pages/app";
 import "./styles/globals.css";
+import { Toaster } from "@/lib/ui/toaster";
 
 // Register service worker for caching
 if ("serviceWorker" in navigator) {
@@ -34,5 +35,6 @@ function App() {
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />
+    <Toaster />
   </React.StrictMode>
 );

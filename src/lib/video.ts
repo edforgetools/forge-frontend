@@ -42,7 +42,7 @@ export async function extractFrameFromVideo(
 
     // Store original time
     const originalTime = video.currentTime;
-    let timeoutId: number;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     const cleanup = () => {
       video.removeEventListener("seeked", onSeeked);
