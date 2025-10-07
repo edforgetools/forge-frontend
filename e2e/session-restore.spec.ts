@@ -121,7 +121,7 @@ test.describe("Session Restore", () => {
   }) => {
     // Mock IndexedDB as unavailable
     await page.addInitScript(() => {
-      // @ts-ignore
+      // @ts-expect-error - Mocking IndexedDB as unavailable for testing
       window.indexedDB = undefined;
     });
 

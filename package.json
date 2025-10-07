@@ -65,6 +65,7 @@
     "class-variance-authority": "^0.7.1",
     "eslint": "^9.37.0",
     "framer-motion": "^12.23.22",
+    "globals": "^16.4.0",
     "lighthouse": "^12.8.2",
     "lucide-react": "^0.544.0",
     "playwright": "^1.55.1",
