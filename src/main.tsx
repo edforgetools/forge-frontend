@@ -2,6 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import IndexPage from "./pages/index";
 import AppPage from "./pages/app";
+import TermsPage from "./pages/terms";
+import PrivacyPage from "./pages/privacy";
+import AboutPage from "./pages/about";
 import "./styles/globals.css";
 import { Toaster } from "@/lib/ui/toaster";
 import { Analytics } from "@vercel/analytics/react";
@@ -22,15 +25,50 @@ if ("serviceWorker" in navigator) {
 
 // Simple routing without react-router-dom for now
 function App() {
-  const [currentPage, setCurrentPage] = React.useState<"index" | "app">(
+  const [currentPage, setCurrentPage] = React.useState<"index" | "app" | "terms" | "privacy" | "about">(
     "index"
   );
 
+  // Handle URL-based routing
+  React.useEffect(() => {
+    const path = window.location.pathname;
+    if (path === "/terms") {
+      setCurrentPage("terms");
+    } else if (path === "/privacy") {
+      setCurrentPage("privacy");
+    } else if (path === "/about") {
+      setCurrentPage("about");
+    } else if (path === "/app") {
+      setCurrentPage("app");
+    } else {
+      setCurrentPage("index");
+    }
+  }, []);
+
+  // Update URL when page changes
+  const navigateTo = (page: typeof currentPage) => {
+    setCurrentPage(page);
+    const path = page === "index" ? "/" : `/${page}`;
+    window.history.pushState({}, "", path);
+  };
+
   if (currentPage === "app") {
-    return <AppPage onBack={() => setCurrentPage("index")} />;
+    return <AppPage onBack={() => navigateTo("index")} />;
   }
 
-  return <IndexPage onStart={() => setCurrentPage("app")} />;
+  if (currentPage === "terms") {
+    return <TermsPage onBack={() => navigateTo("index")} />;
+  }
+
+  if (currentPage === "privacy") {
+    return <PrivacyPage onBack={() => navigateTo("index")} />;
+  }
+
+  if (currentPage === "about") {
+    return <AboutPage onBack={() => navigateTo("index")} />;
+  }
+
+  return <IndexPage onStart={() => navigateTo("app")} />;
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

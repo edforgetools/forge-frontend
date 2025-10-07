@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Play, Camera, Video, Download } from "lucide-react";
+import { Play, Camera, Video, Download, ExternalLink } from "lucide-react";
 
 interface IndexPageProps {
   onStart: () => void;
@@ -103,7 +103,43 @@ export default function IndexPage({ onStart }: IndexPageProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.6 }}
         >
-          <p>Drag & drop support • Keyboard shortcuts • Responsive design</p>
+          <p className="mb-4">Drag & drop support • Keyboard shortcuts • Responsive design</p>
+          
+          {/* Navigation Links */}
+          <div className="flex flex-wrap justify-center gap-6 mb-6">
+            <button
+              onClick={() => window.location.href = '/about'}
+              className="text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              About
+            </button>
+            <button
+              onClick={() => window.location.href = '/privacy'}
+              className="text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              Privacy
+            </button>
+            <button
+              onClick={() => window.location.href = '/terms'}
+              className="text-gray-600 hover:text-blue-600 transition-colors"
+            >
+              Terms
+            </button>
+          </div>
+          
+          {/* Built with Forge Badge */}
+          <div className="flex items-center justify-center">
+            <a
+              href="https://forge.tools"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 hover:text-gray-900 transition-colors text-sm"
+            >
+              <span>Built with</span>
+              <span className="font-semibold">Forge</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
         </motion.div>
       </motion.div>
     </div>

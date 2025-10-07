@@ -462,14 +462,14 @@ export const useCanvasStore = create<CanvasStore>()(
         const state = get();
         const newCrop = calculateCropForRatio(state.image, ratio);
         const dimensions = getDimensionsForRatio(ratio);
-        
+
         // Send telemetry for ratio change
         sendTelemetry("onRatioChange", {
           ratio,
           previousRatio: state.aspect,
           dimensions,
         });
-        
+
         set({
           aspect: ratio,
           crop: { ...newCrop, active: true },
