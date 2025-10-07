@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import { track } from "@vercel/analytics";
 
 export type OverlayBase = {
   id: string;
@@ -53,12 +54,15 @@ export type CanvasPatch = {
   type: "overlay" | "crop" | "image";
   data: any;
   timestamp: number;
+  description?: string;
 };
+
+export type AspectRatio = "16:9" | "1:1" | "9:16";
 
 export type CanvasState = {
   image?: HTMLImageElement | ImageBitmap;
   videoSrc?: string;
-  aspect: "16:9";
+  aspect: AspectRatio;
   crop: Crop;
   overlays: (LogoOverlay | TextOverlay)[];
   selectedId?: string;
@@ -66,6 +70,10 @@ export type CanvasState = {
   redoStack: any[];
   prefs: ExportPrefs;
   projectId: string;
+  // New toolbar states
+  zoom: number;
+  showGrid: boolean;
+  showSafeZone: boolean;
 };
 
 const defaultCrop: Crop = {
@@ -92,6 +100,10 @@ const defaultState: CanvasState = {
   redoStack: [],
   prefs: defaultPrefs,
   projectId: `project_${Date.now()}`,
+  // New toolbar defaults
+  zoom: 1,
+  showGrid: false,
+  showSafeZone: false,
 };
 
 export type CanvasActions = {
@@ -117,6 +129,14 @@ export type CanvasActions = {
   resetDefaults: () => void;
   clearProject: () => void;
   duplicateProject: () => void;
+  // New toolbar actions
+  setAspectRatio: (ratio: AspectRatio) => void;
+  setZoom: (zoom: number) => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetView: () => void;
+  toggleGrid: () => void;
+  toggleSafeZone: () => void;
 };
 
 export type CanvasStore = CanvasState & CanvasActions;
@@ -170,6 +190,20 @@ export const useCanvasStore = create<CanvasStore>()(
           z: maxZ + 1,
         } as LogoOverlay | TextOverlay;
 
+        // Push undo state
+        get().pushUndo({
+          type: "overlay",
+          data: [...state.overlays],
+          timestamp: Date.now(),
+          description: `Add ${overlay.type} overlay`,
+        });
+
+        // Track telemetry
+        track("overlay_add", {
+          type: overlay.type,
+          overlayId: newOverlay.id,
+        });
+
         set({
           overlays: [...state.overlays, newOverlay],
           selectedId: newOverlay.id,
@@ -177,6 +211,32 @@ export const useCanvasStore = create<CanvasStore>()(
       },
 
       updateOverlay: (id, patch) => {
+        const state = get();
+        const overlay = state.overlays.find((o) => o.id === id);
+
+        // Push undo state for significant changes
+        if (
+          overlay &&
+          ((patch as any).text !== undefined ||
+            patch.x !== undefined ||
+            patch.y !== undefined)
+        ) {
+          get().pushUndo({
+            type: "overlay",
+            data: [...state.overlays],
+            timestamp: Date.now(),
+            description: `Edit ${overlay.type} overlay`,
+          });
+        }
+
+        // Track telemetry for text overlay edits
+        if (overlay?.type === "text") {
+          track("text_overlay_edit", {
+            overlayId: id,
+            properties: Object.keys(patch).join(","),
+          });
+        }
+
         set((state) => ({
           overlays: state.overlays.map((overlay) =>
             overlay.id === id
@@ -228,6 +288,24 @@ export const useCanvasStore = create<CanvasStore>()(
 
       remove: (id) => {
         const state = get();
+        const overlay = state.overlays.find((o) => o.id === id);
+
+        // Push undo state
+        if (overlay) {
+          get().pushUndo({
+            type: "overlay",
+            data: [...state.overlays],
+            timestamp: Date.now(),
+            description: `Remove ${overlay.type} overlay`,
+          });
+
+          // Track telemetry
+          track("overlay_remove", {
+            type: overlay.type,
+            overlayId: id,
+          });
+        }
+
         set({
           overlays: state.overlays.filter((o) => o.id !== id),
           selectedId: state.selectedId === id ? undefined : state.selectedId,
@@ -242,13 +320,99 @@ export const useCanvasStore = create<CanvasStore>()(
       },
 
       undo: () => {
-        // Implementation would restore state from patch
-        // This is a simplified version
+        const state = get();
+        if (state.undoStack.length === 0) return;
+
+        const lastPatch = state.undoStack[state.undoStack.length - 1];
+        const newUndoStack = state.undoStack.slice(0, -1);
+        const newRedoStack = [
+          ...state.redoStack,
+          {
+            type: lastPatch.type,
+            data:
+              lastPatch.type === "overlay"
+                ? state.overlays
+                : lastPatch.type === "crop"
+                ? state.crop
+                : state.image,
+            timestamp: Date.now(),
+          },
+        ];
+
+        // Apply the undo
+        if (lastPatch.type === "overlay") {
+          set({
+            overlays: lastPatch.data,
+            undoStack: newUndoStack,
+            redoStack: newRedoStack,
+          });
+        } else if (lastPatch.type === "crop") {
+          set({
+            crop: lastPatch.data,
+            undoStack: newUndoStack,
+            redoStack: newRedoStack,
+          });
+        } else if (lastPatch.type === "image") {
+          set({
+            image: lastPatch.data,
+            undoStack: newUndoStack,
+            redoStack: newRedoStack,
+          });
+        }
+
+        // Track telemetry
+        track("undo_action", {
+          type: lastPatch.type,
+          description: lastPatch.description,
+        });
       },
 
       redo: () => {
-        // Implementation would restore state from patch
-        // This is a simplified version
+        const state = get();
+        if (state.redoStack.length === 0) return;
+
+        const nextPatch = state.redoStack[state.redoStack.length - 1];
+        const newRedoStack = state.redoStack.slice(0, -1);
+        const newUndoStack = [
+          ...state.undoStack,
+          {
+            type: nextPatch.type,
+            data:
+              nextPatch.type === "overlay"
+                ? state.overlays
+                : nextPatch.type === "crop"
+                ? state.crop
+                : state.image,
+            timestamp: Date.now(),
+          },
+        ];
+
+        // Apply the redo
+        if (nextPatch.type === "overlay") {
+          set({
+            overlays: nextPatch.data,
+            undoStack: newUndoStack,
+            redoStack: newRedoStack,
+          });
+        } else if (nextPatch.type === "crop") {
+          set({
+            crop: nextPatch.data,
+            undoStack: newUndoStack,
+            redoStack: newRedoStack,
+          });
+        } else if (nextPatch.type === "image") {
+          set({
+            image: nextPatch.data,
+            undoStack: newUndoStack,
+            redoStack: newRedoStack,
+          });
+        }
+
+        // Track telemetry
+        track("redo_action", {
+          type: nextPatch.type,
+          description: nextPatch.description,
+        });
       },
 
       setPrefs: (p) => {
@@ -275,6 +439,48 @@ export const useCanvasStore = create<CanvasStore>()(
         set({
           projectId: crypto?.randomUUID?.() ?? "project",
         });
+      },
+
+      // New toolbar actions
+      setAspectRatio: (ratio) => {
+        const state = get();
+        const newCrop = calculateCropForRatio(state.image, ratio);
+        const dimensions = getDimensionsForRatio(ratio);
+        set({
+          aspect: ratio,
+          crop: { ...newCrop, active: true },
+          prefs: {
+            ...state.prefs,
+            width: dimensions.width,
+            height: dimensions.height,
+          },
+        });
+      },
+
+      setZoom: (zoom) => {
+        set({ zoom: Math.max(0.1, Math.min(5, zoom)) });
+      },
+
+      zoomIn: () => {
+        const state = get();
+        set({ zoom: Math.min(5, state.zoom * 1.2) });
+      },
+
+      zoomOut: () => {
+        const state = get();
+        set({ zoom: Math.max(0.1, state.zoom / 1.2) });
+      },
+
+      resetView: () => {
+        set({ zoom: 1 });
+      },
+
+      toggleGrid: () => {
+        set((state) => ({ showGrid: !state.showGrid }));
+      },
+
+      toggleSafeZone: () => {
+        set((state) => ({ showSafeZone: !state.showSafeZone }));
       },
     }),
     { name: "canvas-store" }
@@ -303,12 +509,39 @@ export const canvasActions: CanvasActions = {
   resetDefaults: () => useCanvasStore.getState().resetDefaults(),
   clearProject: () => useCanvasStore.getState().clearProject(),
   duplicateProject: () => useCanvasStore.getState().duplicateProject(),
+  // New toolbar actions
+  setAspectRatio: (ratio) => useCanvasStore.getState().setAspectRatio(ratio),
+  setZoom: (zoom) => useCanvasStore.getState().setZoom(zoom),
+  zoomIn: () => useCanvasStore.getState().zoomIn(),
+  zoomOut: () => useCanvasStore.getState().zoomOut(),
+  resetView: () => useCanvasStore.getState().resetView(),
+  toggleGrid: () => useCanvasStore.getState().toggleGrid(),
+  toggleSafeZone: () => useCanvasStore.getState().toggleSafeZone(),
 };
 
 function calculateAutoCrop(image: HTMLImageElement | ImageBitmap): Crop {
+  return calculateCropForRatio(image, "16:9");
+}
+
+function calculateCropForRatio(
+  image: HTMLImageElement | ImageBitmap | undefined,
+  ratio: AspectRatio
+): Crop {
+  if (!image) {
+    // Default dimensions based on ratio
+    const dimensions = getDimensionsForRatio(ratio);
+    return {
+      x: 0,
+      y: 0,
+      w: dimensions.width,
+      h: dimensions.height,
+      active: true,
+    };
+  }
+
   const imgWidth = image.width;
   const imgHeight = image.height;
-  const targetRatio = 16 / 9;
+  const targetRatio = getRatioValue(ratio);
 
   let cropWidth = imgWidth;
   let cropHeight = imgHeight;
@@ -318,11 +551,11 @@ function calculateAutoCrop(image: HTMLImageElement | ImageBitmap): Crop {
   const currentRatio = imgWidth / imgHeight;
 
   if (currentRatio > targetRatio) {
-    // Image is wider than 16:9, crop width
+    // Image is wider than target ratio, crop width
     cropWidth = imgHeight * targetRatio;
     cropX = (imgWidth - cropWidth) / 2;
   } else if (currentRatio < targetRatio) {
-    // Image is taller than 16:9, crop height
+    // Image is taller than target ratio, crop height
     cropHeight = imgWidth / targetRatio;
     cropY = (imgHeight - cropHeight) / 2;
   }
@@ -334,4 +567,33 @@ function calculateAutoCrop(image: HTMLImageElement | ImageBitmap): Crop {
     h: cropHeight,
     active: true,
   };
+}
+
+function getRatioValue(ratio: AspectRatio): number {
+  switch (ratio) {
+    case "16:9":
+      return 16 / 9;
+    case "1:1":
+      return 1;
+    case "9:16":
+      return 9 / 16;
+    default:
+      return 16 / 9;
+  }
+}
+
+function getDimensionsForRatio(ratio: AspectRatio): {
+  width: number;
+  height: number;
+} {
+  switch (ratio) {
+    case "16:9":
+      return { width: 1280, height: 720 };
+    case "1:1":
+      return { width: 1080, height: 1080 };
+    case "9:16":
+      return { width: 720, height: 1280 };
+    default:
+      return { width: 1280, height: 720 };
+  }
 }

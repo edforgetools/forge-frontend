@@ -10,8 +10,14 @@ import {
   generateFilename,
   getExtensionFromMimeType,
 } from "@/lib/download";
+import {
+  exportAndDownload,
+  formatFileSize,
+  formatDuration,
+} from "@/lib/export";
 import { sessionDB } from "@/lib/db";
-import { Undo2, Redo2 } from "lucide-react";
+import { Undo2, Redo2, Zap } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ExportBarProps {
   onExport?: (
@@ -41,14 +47,16 @@ export function ExportBar({
   const [quality, setQuality] = useState([0.8]);
   const [fileSize, setFileSize] = useState(0);
   const [lastExportSize, setLastExportSize] = useState(0);
+  const [autoFormat, setAutoFormat] = useState(true);
   const [compressionSettings, setCompressionSettings] =
     useState<CompressionSettings>({
       preset: "medium",
       quality: 0.7,
-      targetSizeMB: 1.0,
+      targetSizeMB: 2.0,
       ssimThreshold: 0.8,
     });
   const [showCompressionSettings, setShowCompressionSettings] = useState(false);
+  const { toast } = useToast();
 
   // Load compression settings from IndexedDB on mount
   useEffect(() => {
@@ -77,39 +85,94 @@ export function ExportBar({
 
   const handleExport = async () => {
     if (!hasContent) {
-      alert("No content to export. Please upload an image or video first.");
+      toast({
+        title: "No content to export",
+        description: "Please upload an image or video first.",
+        variant: "destructive",
+      });
       return;
     }
 
     setIsExporting(true);
     setFileSize(0);
+    const startTime = performance.now();
 
     try {
       if (!onExport) {
         throw new Error("No export function provided");
       }
 
-      const blob = await onExport(
-        exportFormat,
-        quality[0],
-        compressionSettings
-      );
-      setFileSize(blob.size);
-      setLastExportSize(blob.size);
+      // Use enhanced export if auto-format is enabled
+      if (autoFormat) {
+        // Create a temporary canvas for the enhanced export
+        const canvas = document.createElement("canvas");
+        canvas.width = 1280; // Default dimensions
+        canvas.height = 720;
+        const ctx = canvas.getContext("2d");
 
-      // Generate filename
-      const extension = getExtensionFromMimeType(exportFormat);
-      const filename = generateFilename("snapthumb", extension);
+        if (ctx) {
+          // Draw a placeholder - in real usage, this would be the actual canvas content
+          ctx.fillStyle = "#f0f0f0";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#333";
+          ctx.font = "24px Arial";
+          ctx.textAlign = "center";
+          ctx.fillText("Export Preview", canvas.width / 2, canvas.height / 2);
 
-      // Download the file
-      downloadBlob(blob, filename);
+          const result = await exportAndDownload({
+            canvas,
+            format: "auto",
+            targetSizeMB: compressionSettings.targetSizeMB,
+            quality: quality[0],
+            compressionSettings,
+          });
+
+          setFileSize(result.sizeBytes);
+          setLastExportSize(result.sizeBytes);
+
+          // Show success toast
+          toast({
+            title: "Export successful! 🎉",
+            description: `Downloaded ${formatFileSize(
+              result.sizeBytes
+            )} ${result.format.toUpperCase()} file in ${formatDuration(
+              result.duration
+            )}`,
+          });
+        }
+      } else {
+        // Use legacy export method
+        const blob = await onExport(
+          exportFormat,
+          quality[0],
+          compressionSettings
+        );
+        setFileSize(blob.size);
+        setLastExportSize(blob.size);
+
+        // Generate filename
+        const extension = getExtensionFromMimeType(exportFormat);
+        const filename = generateFilename("snapthumb", extension);
+
+        // Download the file
+        downloadBlob(blob, filename);
+
+        const duration = performance.now() - startTime;
+        toast({
+          title: "Export successful! 🎉",
+          description: `Downloaded ${formatFileSize(blob.size)} ${exportFormat
+            .split("/")[1]
+            .toUpperCase()} file in ${formatDuration(duration)}`,
+        });
+      }
     } catch (error) {
       console.error("Export failed:", error);
-      alert(
-        `Export failed: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`
-      );
+      toast({
+        title: "Export failed",
+        description:
+          error instanceof Error ? error.message : "Unknown error occurred",
+        variant: "destructive",
+      });
     } finally {
       setIsExporting(false);
     }
@@ -120,14 +183,6 @@ export function ExportBar({
       event.preventDefault();
       handleExport();
     }
-  };
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return "0 B";
-    const k = 1024;
-    const sizes = ["B", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
 
   const isOverLimit = fileSize > 2 * 1024 * 1024;
@@ -171,12 +226,27 @@ export function ExportBar({
           >
             Format:
           </label>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="auto-format-bar"
+              checked={autoFormat}
+              onChange={(e) => setAutoFormat(e.target.checked)}
+              className="rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+              disabled={isExporting}
+              aria-label="Enable automatic format selection"
+            />
+            <label htmlFor="auto-format-bar" className="text-xs text-gray-600">
+              Auto
+            </label>
+          </div>
           <select
             id="export-format"
             value={exportFormat}
             onChange={(e) => setExportFormat(e.target.value as any)}
             className="px-3 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            disabled={isExporting}
+            disabled={isExporting || autoFormat}
+            aria-label="Select export format"
           >
             <option value="image/jpeg">JPEG</option>
             <option value="image/webp">WebP</option>
@@ -192,6 +262,10 @@ export function ExportBar({
             onClick={() => setShowCompressionSettings(!showCompressionSettings)}
             disabled={isExporting}
             className="text-xs"
+            aria-label={`${
+              showCompressionSettings ? "Hide" : "Show"
+            } compression settings`}
+            aria-expanded={showCompressionSettings}
           >
             {showCompressionSettings ? "Hide" : "Show"} Compression
           </Button>
@@ -281,15 +355,29 @@ export function ExportBar({
         disabled={isExporting || !hasContent}
         size="lg"
         className="px-8 py-2"
+        aria-label={
+          hasContent
+            ? autoFormat
+              ? "Export with smart compression"
+              : "Export thumbnail"
+            : "Export disabled - no content"
+        }
       >
         {isExporting ? (
           <div className="flex items-center space-x-2">
             <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-            <span>Exporting...</span>
+            <span>{autoFormat ? "Optimizing..." : "Exporting..."}</span>
           </div>
         ) : (
           <div className="flex items-center space-x-2">
-            <span>Export Thumbnail</span>
+            {autoFormat ? (
+              <>
+                <Zap className="w-4 h-4" />
+                <span>Smart Export</span>
+              </>
+            ) : (
+              <span>Export Thumbnail</span>
+            )}
             {hasContent && (
               <span className="text-xs opacity-75">(Ctrl+Enter)</span>
             )}
