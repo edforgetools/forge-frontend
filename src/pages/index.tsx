@@ -103,30 +103,32 @@ export default function IndexPage({ onStart }: IndexPageProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.6 }}
         >
-          <p className="mb-4">Drag & drop support • Keyboard shortcuts • Responsive design</p>
-          
+          <p className="mb-4">
+            Drag & drop support • Keyboard shortcuts • Responsive design
+          </p>
+
           {/* Navigation Links */}
           <div className="flex flex-wrap justify-center gap-6 mb-6">
             <button
-              onClick={() => window.location.href = '/about'}
+              onClick={() => (window.location.href = "/about")}
               className="text-gray-600 hover:text-blue-600 transition-colors"
             >
               About
             </button>
             <button
-              onClick={() => window.location.href = '/privacy'}
+              onClick={() => (window.location.href = "/privacy")}
               className="text-gray-600 hover:text-blue-600 transition-colors"
             >
               Privacy
             </button>
             <button
-              onClick={() => window.location.href = '/terms'}
+              onClick={() => (window.location.href = "/terms")}
               className="text-gray-600 hover:text-blue-600 transition-colors"
             >
               Terms
             </button>
           </div>
-          
+
           {/* Built with Forge Badge */}
           <div className="flex items-center justify-center">
             <a

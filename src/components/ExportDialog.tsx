@@ -133,7 +133,7 @@ export function ExportDialog({ children }: ExportDialogProps) {
       try {
         await sendHeatmapData();
       } catch (error) {
-        console.debug('Failed to send heatmap data:', error);
+        console.debug("Failed to send heatmap data:", error);
       }
 
       setIsOpen(false);

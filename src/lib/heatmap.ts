@@ -6,14 +6,14 @@
 interface HeatmapPoint {
   x: number;
   y: number;
-  type: 'move' | 'click';
+  type: "move" | "click";
   timestamp: number;
   canvasWidth: number;
   canvasHeight: number;
 }
 
 interface HeatmapData {
-  event: 'heatmap';
+  event: "heatmap";
   points: HeatmapPoint[];
   sessionId: string;
   timestamp: number;
@@ -46,12 +46,12 @@ class HeatmapTracker {
 
   private setupEventListeners(): void {
     // Track page unload
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener("beforeunload", () => {
       this.sendHeatmapData();
     });
 
     // Track page visibility change (mobile/tablet)
-    document.addEventListener('visibilitychange', () => {
+    document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         this.sendHeatmapData();
       }
@@ -61,141 +61,159 @@ class HeatmapTracker {
   public startTracking(canvasElement: HTMLCanvasElement): void {
     this.canvasElement = canvasElement;
     this.isTracking = true;
-    
+
     // Add event listeners to canvas
-    canvasElement.addEventListener('mousemove', this.handlePointerMove.bind(this));
-    canvasElement.addEventListener('click', this.handleClick.bind(this));
-    canvasElement.addEventListener('touchmove', this.handleTouchMove.bind(this));
-    canvasElement.addEventListener('touchend', this.handleTouchEnd.bind(this));
+    canvasElement.addEventListener(
+      "mousemove",
+      this.handlePointerMove.bind(this)
+    );
+    canvasElement.addEventListener("click", this.handleClick.bind(this));
+    canvasElement.addEventListener(
+      "touchmove",
+      this.handleTouchMove.bind(this)
+    );
+    canvasElement.addEventListener("touchend", this.handleTouchEnd.bind(this));
   }
 
   public stopTracking(): void {
     if (!this.canvasElement) return;
-    
+
     this.isTracking = false;
-    this.canvasElement.removeEventListener('mousemove', this.handlePointerMove.bind(this));
-    this.canvasElement.removeEventListener('click', this.handleClick.bind(this));
-    this.canvasElement.removeEventListener('touchmove', this.handleTouchMove.bind(this));
-    this.canvasElement.removeEventListener('touchend', this.handleTouchEnd.bind(this));
+    this.canvasElement.removeEventListener(
+      "mousemove",
+      this.handlePointerMove.bind(this)
+    );
+    this.canvasElement.removeEventListener(
+      "click",
+      this.handleClick.bind(this)
+    );
+    this.canvasElement.removeEventListener(
+      "touchmove",
+      this.handleTouchMove.bind(this)
+    );
+    this.canvasElement.removeEventListener(
+      "touchend",
+      this.handleTouchEnd.bind(this)
+    );
   }
 
   private handlePointerMove(event: MouseEvent): void {
     if (!this.isTracking) return;
-    
+
     const now = Date.now();
     if (now - this.lastMoveTime < this.moveThrottle) {
       return; // Throttle to 1Hz
     }
-    
+
     this.lastMoveTime = now;
-    this.addPoint(event, 'move');
+    this.addPoint(event, "move");
   }
 
   private handleClick(event: MouseEvent): void {
     if (!this.isTracking) return;
-    this.addPoint(event, 'click');
+    this.addPoint(event, "click");
   }
 
   private handleTouchMove(event: TouchEvent): void {
     if (!this.isTracking) return;
-    
+
     const now = Date.now();
     if (now - this.lastMoveTime < this.moveThrottle) {
       return; // Throttle to 1Hz
     }
-    
+
     this.lastMoveTime = now;
     if (event.touches.length > 0) {
       const touch = event.touches[0];
-      this.addPointFromTouch(touch, 'move');
+      this.addPointFromTouch(touch, "move");
     }
   }
 
   private handleTouchEnd(event: TouchEvent): void {
     if (!this.isTracking) return;
-    
+
     if (event.changedTouches.length > 0) {
       const touch = event.changedTouches[0];
-      this.addPointFromTouch(touch, 'click');
+      this.addPointFromTouch(touch, "click");
     }
   }
 
-  private addPoint(event: MouseEvent, type: 'move' | 'click'): void {
+  private addPoint(event: MouseEvent, type: "move" | "click"): void {
     if (!this.canvasElement) return;
-    
+
     const rect = this.canvasElement.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    
+
     // Normalize coordinates to canvas dimensions
     const canvasWidth = this.canvasElement.width;
     const canvasHeight = this.canvasElement.height;
-    
+
     const normalizedX = (x / rect.width) * canvasWidth;
     const normalizedY = (y / rect.height) * canvasHeight;
-    
+
     this.points.push({
       x: normalizedX,
       y: normalizedY,
       type,
       timestamp: Date.now(),
       canvasWidth,
-      canvasHeight
+      canvasHeight,
     });
   }
 
-  private addPointFromTouch(touch: Touch, type: 'move' | 'click'): void {
+  private addPointFromTouch(touch: Touch, type: "move" | "click"): void {
     if (!this.canvasElement) return;
-    
+
     const rect = this.canvasElement.getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
-    
+
     // Normalize coordinates to canvas dimensions
     const canvasWidth = this.canvasElement.width;
     const canvasHeight = this.canvasElement.height;
-    
+
     const normalizedX = (x / rect.width) * canvasWidth;
     const normalizedY = (y / rect.height) * canvasHeight;
-    
+
     this.points.push({
       x: normalizedX,
       y: normalizedY,
       type,
       timestamp: Date.now(),
       canvasWidth,
-      canvasHeight
+      canvasHeight,
     });
   }
 
   public async sendHeatmapData(): Promise<void> {
     if (this.points.length === 0) return;
-    
+
     const heatmapData: HeatmapData = {
-      event: 'heatmap',
+      event: "heatmap",
       points: [...this.points],
       sessionId: this.sessionId,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     try {
-      const response = await fetch('/telemetry', {
-        method: 'POST',
+      const response = await fetch("/telemetry", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify([heatmapData]),
       });
-      
+
       if (response.ok) {
         // Clear points after successful send
         this.points = [];
-        console.debug('📊 Heatmap data sent successfully');
+        console.debug("📊 Heatmap data sent successfully");
       } else {
-        console.debug('📊 Heatmap data send failed:', response.status);
+        console.debug("📊 Heatmap data send failed:", response.status);
       }
     } catch (error) {
-      console.debug('📊 Heatmap data send error:', error);
+      console.debug("📊 Heatmap data send error:", error);
     }
   }
 

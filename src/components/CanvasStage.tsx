@@ -311,7 +311,7 @@ export function CanvasStage() {
     if (canvas && hasContent) {
       startHeatmapTracking(canvas);
     }
-    
+
     return () => {
       stopHeatmapTracking();
     };

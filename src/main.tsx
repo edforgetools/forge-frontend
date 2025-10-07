@@ -1,13 +1,16 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
 import IndexPage from "./pages/index";
-import AppPage from "./pages/app";
 import TermsPage from "./pages/terms";
 import PrivacyPage from "./pages/privacy";
 import AboutPage from "./pages/about";
+import { EditorSkeleton } from "./components/EditorSkeleton";
 import "./styles/globals.css";
 import { Toaster } from "@/lib/ui/toaster";
 import { Analytics } from "@vercel/analytics/react";
+
+// Lazy load the Editor (AppPage) to reduce initial bundle size
+const AppPage = lazy(() => import("./pages/app"));
 
 // Register service worker for caching
 if ("serviceWorker" in navigator) {
@@ -25,9 +28,9 @@ if ("serviceWorker" in navigator) {
 
 // Simple routing without react-router-dom for now
 function App() {
-  const [currentPage, setCurrentPage] = React.useState<"index" | "app" | "terms" | "privacy" | "about">(
-    "index"
-  );
+  const [currentPage, setCurrentPage] = React.useState<
+    "index" | "app" | "terms" | "privacy" | "about"
+  >("index");
 
   // Handle URL-based routing
   React.useEffect(() => {
@@ -53,7 +56,11 @@ function App() {
   };
 
   if (currentPage === "app") {
-    return <AppPage onBack={() => navigateTo("index")} />;
+    return (
+      <Suspense fallback={<EditorSkeleton />}>
+        <AppPage onBack={() => navigateTo("index")} />
+      </Suspense>
+    );
   }
 
   if (currentPage === "terms") {
