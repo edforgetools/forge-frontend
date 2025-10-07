@@ -57,7 +57,7 @@ jobs:
         run: |
           echo "Starting preview server..."
           # Try starting the server with more explicit options
-          pnpm run preview -- --port 4173 --host 0.0.0.0 &
+          pnpm run preview -- --port 4173 --host 127.0.0.1 &
           SERVER_PID=$!
           echo "Server PID: $SERVER_PID"
 
@@ -67,7 +67,8 @@ jobs:
           echo "Waiting for server to start..."
           # Try multiple approaches to check if server is ready
           for i in {1..30}; do
-            if curl -f http://127.0.0.1:4173 > /dev/null 2>&1; then
+            # Try both localhost and 127.0.0.1 since vite might bind differently
+            if curl -f http://localhost:4173 > /dev/null 2>&1 || curl -f http://127.0.0.1:4173 > /dev/null 2>&1; then
               echo "Server is ready after $((i*2)) seconds!"
               break
             fi
@@ -77,6 +78,8 @@ jobs:
               echo "Server failed to start after 60 seconds"
               echo "Checking if server process is still running..."
               ps aux | grep preview || echo "No preview process found"
+              echo "Trying to check what's listening on port 4173..."
+              netstat -tlnp | grep 4173 || echo "Nothing listening on port 4173"
               exit 1
             fi
           done
