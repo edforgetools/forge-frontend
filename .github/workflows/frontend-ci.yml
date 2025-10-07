@@ -111,10 +111,10 @@ jobs:
           # ensure tests use the local server
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
 
-      # lighthouse on built dist (temporarily disabled due to strict assertions)
-      # - name: Run Lighthouse CI
-      #   run: |
-      #     echo "Running Lighthouse CI..."
-      #     npx @lhci/cli autorun --collect.staticDistDir=dist
-      #     echo "Lighthouse CI completed successfully!"
-      #   timeout-minutes: 5
+      # lighthouse on built dist
+      - name: Run Lighthouse CI
+        run: |
+          echo "Running Lighthouse CI..."
+          npx @lhci/cli autorun --collect.staticDistDir=dist --config=lighthouserc.json
+          echo "Lighthouse CI completed successfully!"
+        timeout-minutes: 5
