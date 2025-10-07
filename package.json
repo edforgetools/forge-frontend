@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --port 4173",
     "typecheck": "tsc -b",
     "test": "playwright test",
     "test:ci": "playwright test --reporter=github",
@@ -19,7 +19,8 @@
     "ci:full": "pnpm build && pnpm test:ci && pnpm size-limit && pnpm lighthouse",
     "bump:patch": "node scripts/bump-version.js patch",
     "bump:minor": "node scripts/bump-version.js minor",
-    "bump:major": "node scripts/bump-version.js major"
+    "bump:major": "node scripts/bump-version.js major",
+    "test:e2e": "playwright test"
   },
   "keywords": [],
   "author": "",

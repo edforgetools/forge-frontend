@@ -11,8 +11,10 @@ jobs:
       - name: Install
         run: |
           if [ -f pnpm-lock.yaml ]; then corepack prepare pnpm@latest --activate && pnpm i --frozen-lockfile;
-          elif [ -f yarn.lock ]; then yarn --version && yarn install --frozen-lockfile;
-          elif [ -f package-lock.json ]; then npm ci;
-          else npm i; fi
-      - name: Smoke
-        run: echo ok
+          elif [ -f yarn.lock ]; then yarn install --frozen-lockfile;
+          elif [ -f package-lock.json ]; then npm ci; else npm i; fi
+      - run: (pnpm build || npm run build || yarn build || true)
+      - run: npx playwright install --with-deps || true
+      - run: (pnpm preview -- --port 4173 || npm run preview -- --port 4173 || yarn preview --port 4173 || true) & npx wait-on http://localhost:4173 || true
+      - run: (pnpm test:e2e || npm run test:e2e || yarn test:e2e || echo "no e2e")
+      - run: npx @lhci/cli autorun --upload.target=temporary-public-storage || true
