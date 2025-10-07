@@ -1,12 +1,25 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import { useCanvasStore } from "@/state/canvasStore";
+import { TextOverlay } from "./TextOverlay";
 
 export function CanvasStage() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  const { image, videoSrc, overlays, selectedId, crop, select, updateOverlay } = useCanvasStore();
+  const {
+    image,
+    videoSrc,
+    overlays,
+    selectedId,
+    crop,
+    aspect,
+    zoom,
+    showGrid,
+    showSafeZone,
+    select,
+    updateOverlay,
+  } = useCanvasStore();
 
   // Animation frame ref for smooth redraws
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -49,19 +62,39 @@ export function CanvasStage() {
       );
     }
 
-    // Draw overlays
+    // Draw logo overlays (text overlays are rendered as separate components)
     overlays
-      .filter((overlay) => !overlay.hidden)
+      .filter((overlay) => !overlay.hidden && overlay.type === "logo")
       .sort((a, b) => a.z - b.z)
       .forEach((overlay) => {
         drawOverlay(ctx, overlay, selectedId === overlay.id);
       });
 
+    // Draw grid if enabled
+    if (showGrid) {
+      drawGrid(ctx);
+    }
+
+    // Draw safe zone if enabled
+    if (showSafeZone) {
+      drawSafeZone(ctx);
+    }
+
     // Draw crop overlay if active
     if (crop.active) {
       drawCropOverlay(ctx);
     }
-  }, [image, videoSrc, overlays, selectedId, crop]);
+  }, [
+    image,
+    videoSrc,
+    overlays,
+    selectedId,
+    crop,
+    aspect,
+    zoom,
+    showGrid,
+    showSafeZone,
+  ]);
 
   const drawOverlay = (
     ctx: CanvasRenderingContext2D,
@@ -87,21 +120,6 @@ export function CanvasStage() {
         );
       };
       img.src = overlay.src;
-    } else if (overlay.type === "text") {
-      const textOverlay = overlay as any;
-      ctx.fillStyle = textOverlay.color;
-      ctx.font = `${textOverlay.weight} ${textOverlay.size}px ${textOverlay.font}`;
-      ctx.textAlign = textOverlay.align as CanvasTextAlign;
-      ctx.textBaseline = "middle";
-
-      if (textOverlay.shadow) {
-        ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
-        ctx.shadowBlur = 2;
-        ctx.shadowOffsetX = 1;
-        ctx.shadowOffsetY = 1;
-      }
-
-      ctx.fillText(textOverlay.text, 0, 0);
     }
 
     // Draw selection outline
@@ -116,15 +134,83 @@ export function CanvasStage() {
     ctx.restore();
   };
 
+  const drawGrid = (ctx: CanvasRenderingContext2D) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    ctx.save();
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
+    ctx.lineWidth = 1;
+
+    const gridSize = 20;
+    const scaledGridSize = gridSize * zoom;
+
+    // Draw vertical lines
+    for (let x = 0; x <= canvas.width; x += scaledGridSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+
+    // Draw horizontal lines
+    for (let y = 0; y <= canvas.height; y += scaledGridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  };
+
+  const drawSafeZone = (ctx: CanvasRenderingContext2D) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const safeZoneWidth = canvas.width * 0.9;
+    const safeZoneHeight = canvas.height * 0.9;
+
+    ctx.save();
+    ctx.strokeStyle = "#10b981";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.strokeRect(
+      centerX - safeZoneWidth / 2,
+      centerY - safeZoneHeight / 2,
+      safeZoneWidth,
+      safeZoneHeight
+    );
+    ctx.setLineDash([]);
+    ctx.restore();
+  };
+
   const drawCropOverlay = (ctx: CanvasRenderingContext2D) => {
-    // Draw 16:9 aspect ratio guide
+    // Draw aspect ratio guide based on current aspect
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const guideWidth = canvas.width * 0.8;
-    const guideHeight = guideWidth * (9 / 16);
+
+    // Calculate guide height based on current aspect ratio
+    let guideHeight: number;
+    switch (aspect) {
+      case "16:9":
+        guideHeight = guideWidth * (9 / 16);
+        break;
+      case "1:1":
+        guideHeight = guideWidth;
+        break;
+      case "9:16":
+        guideHeight = guideWidth * (16 / 9);
+        break;
+      default:
+        guideHeight = guideWidth * (9 / 16);
+    }
 
     ctx.save();
     ctx.strokeStyle = "#ef4444";
@@ -195,56 +281,8 @@ export function CanvasStage() {
     setIsDragging(false);
   };
 
-  const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!selectedId) return;
-
-    const overlay = overlays.find((o) => o.id === selectedId);
-    if (overlay?.type === "text") {
-      // Enable inline text editing
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      // Create a temporary input for text editing
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = (overlay as any).text;
-      input.style.position = "absolute";
-      input.style.left = `${rect.left + x}px`;
-      input.style.top = `${rect.top + y}px`;
-      input.style.fontSize = `${(overlay as any).size}px`;
-      input.style.fontFamily = (overlay as any).font;
-      input.style.color = (overlay as any).color;
-      input.style.background = "transparent";
-      input.style.border = "none";
-      input.style.outline = "none";
-
-      document.body.appendChild(input);
-      input.focus();
-      input.select();
-
-      const handleInputKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "Enter" || e.key === "Escape") {
-          if (e.key === "Enter") {
-            updateOverlay(selectedId, { text: input.value });
-          }
-          document.body.removeChild(input);
-          document.removeEventListener("keydown", handleInputKeyDown);
-        }
-      };
-
-      const handleInputBlur = () => {
-        updateOverlay(selectedId, { text: input.value });
-        document.body.removeChild(input);
-        document.removeEventListener("keydown", handleInputKeyDown);
-      };
-
-      input.addEventListener("blur", handleInputBlur);
-      document.addEventListener("keydown", handleInputKeyDown);
-    }
+  const handleDoubleClick = () => {
+    // Double-click handling is now managed by individual overlay components
   };
 
   // Redraw on state changes
@@ -267,20 +305,55 @@ export function CanvasStage() {
   const hasContent = image || videoSrc;
 
   return (
-    <div className="flex flex-col items-center space-y-4">
-      <div className="relative">
-        <canvas
-          ref={canvasRef}
-          className="border border-gray-300 rounded-lg shadow-sm bg-gray-50"
-          style={{ width: "100%", maxWidth: "800px", height: "auto" }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onDoubleClick={handleDoubleClick}
-        />
+    <div
+      className="flex flex-col items-center justify-center min-h-full"
+      data-testid="canvas-stage"
+    >
+      <div className="relative bg-gray-100 rounded-2xl shadow-lg p-6">
+        <div
+          className="border border-gray-200 rounded-xl shadow-sm bg-white overflow-hidden relative"
+          style={{
+            transform: `scale(${zoom})`,
+            transformOrigin: "center",
+            maxWidth: `${800 / zoom}px`,
+            maxHeight: `${600 / zoom}px`,
+          }}
+        >
+          <canvas
+            ref={canvasRef}
+            className="block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            style={{
+              width: "100%",
+              height: "auto",
+              maxWidth: "800px",
+            }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onDoubleClick={handleDoubleClick}
+            tabIndex={13}
+            role="img"
+            aria-label="Canvas for editing images and overlays"
+            aria-describedby="canvas-description"
+          />
+
+          {/* Render text overlays as separate components */}
+          {overlays
+            .filter((overlay) => !overlay.hidden && overlay.type === "text")
+            .sort((a, b) => a.z - b.z)
+            .map((overlay) => (
+              <TextOverlay
+                key={overlay.id}
+                overlay={overlay as any}
+                isSelected={selectedId === overlay.id}
+                onUpdate={(updates) => updateOverlay(overlay.id, updates)}
+                onSelect={() => select(overlay.id)}
+              />
+            ))}
+        </div>
 
         {!hasContent && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg">
+          <div className="absolute inset-6 flex items-center justify-center bg-white rounded-xl">
             <div className="text-center text-gray-500">
               <div className="text-lg font-medium mb-2">No content loaded</div>
               <div className="text-sm">
@@ -293,8 +366,13 @@ export function CanvasStage() {
 
       {/* Canvas info */}
       {hasContent && (
-        <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded">
-          Canvas: {Math.round(crop.w)} × {Math.round(crop.h)} • 16:9 aspect
+        <div
+          id="canvas-description"
+          className="mt-4 text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200"
+          role="status"
+          aria-live="polite"
+        >
+          Canvas: {Math.round(crop.w)} × {Math.round(crop.h)} • {aspect} aspect
           ratio
         </div>
       )}

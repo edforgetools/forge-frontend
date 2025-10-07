@@ -18,9 +18,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Download, AlertTriangle, CheckCircle } from "lucide-react";
+import { Download, AlertTriangle, CheckCircle, Zap } from "lucide-react";
 import { useCanvasStore, canvasActions } from "@/state/canvasStore";
-import { estimateSize } from "@/lib/estimateSize";
+import {
+  getEstimatedSize,
+  exportAndDownload,
+  formatFileSize,
+  formatDuration,
+} from "@/lib/export";
 import { useToast } from "@/hooks/use-toast";
 
 interface ExportDialogProps {
@@ -31,6 +36,7 @@ export function ExportDialog({ children }: ExportDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [estimatedSize, setEstimatedSize] = useState<number>(0);
   const [isExporting, setIsExporting] = useState(false);
+  const [autoFormat, setAutoFormat] = useState<boolean>(true);
   const { toast } = useToast();
 
   const { image, videoSrc, crop, prefs } = useCanvasStore();
@@ -41,10 +47,11 @@ export function ExportDialog({ children }: ExportDialogProps) {
     if (hasContent && isOpen) {
       const updateEstimate = async () => {
         try {
-          const size = await estimateSize({
+          const format = autoFormat ? "webp" : prefs.format; // Use WebP for auto estimation
+          const size = await getEstimatedSize({
             width: prefs.width,
             height: prefs.height,
-            format: prefs.format,
+            format: format as "jpeg" | "webp" | "png",
             quality: prefs.quality,
           });
           setEstimatedSize(size);
@@ -61,12 +68,15 @@ export function ExportDialog({ children }: ExportDialogProps) {
     prefs.height,
     prefs.format,
     prefs.quality,
+    autoFormat,
   ]);
 
   const handleExport = async () => {
     if (!hasContent) return;
 
     setIsExporting(true);
+    const startTime = performance.now();
+
     try {
       // Create a canvas for export
       const canvas = document.createElement("canvas");
@@ -100,48 +110,22 @@ export function ExportDialog({ children }: ExportDialogProps) {
         );
       }
 
-      // Convert to blob
-      const mimeType = `image/${prefs.format}`;
-      const quality = prefs.format === "png" ? undefined : prefs.quality;
-
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob(
-          (blob) => {
-            if (blob) resolve(blob);
-          },
-          mimeType,
-          quality
-        );
+      // Use enhanced export with auto-format selection and compression
+      const result = await exportAndDownload({
+        canvas,
+        format: autoFormat ? "auto" : prefs.format,
+        targetSizeMB: prefs.keepUnderMB,
+        quality: prefs.quality,
       });
 
-      // Check size constraint
-      const actualSize = blob.size / (1024 * 1024); // Convert to MB
-      if (actualSize > prefs.keepUnderMB) {
-        toast({
-          title: "File too large",
-          description: `Export is ${actualSize.toFixed(2)}MB, but limit is ${
-            prefs.keepUnderMB
-          }MB. Try reducing quality or dimensions.`,
-          variant: "destructive",
-        });
-        return;
-      }
+      const duration = performance.now() - startTime;
 
-      // Download file
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `snapthumb-${Date.now()}.${prefs.format}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
+      // Show success toast with duration and size
       toast({
-        title: "Export successful",
-        description: `Downloaded ${actualSize.toFixed(
-          2
-        )}MB ${prefs.format.toUpperCase()} file`,
+        title: "Export successful! 🎉",
+        description: `Downloaded ${formatFileSize(
+          result.sizeBytes
+        )} ${result.format.toUpperCase()} file in ${formatDuration(duration)}`,
       });
 
       setIsOpen(false);
@@ -175,22 +159,58 @@ export function ExportDialog({ children }: ExportDialogProps) {
         <div className="space-y-6">
           {/* Format Selection */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Format</Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-sm font-medium">Format</Label>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="auto-format"
+                  checked={autoFormat}
+                  onChange={(e) => setAutoFormat(e.target.checked)}
+                  className="rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                  aria-label="Enable automatic format selection"
+                />
+                <Label htmlFor="auto-format" className="text-xs text-gray-600">
+                  Auto-select best
+                </Label>
+              </div>
+            </div>
             <Select
-              value={prefs.format}
-              onValueChange={(value: "jpeg" | "png" | "webp") =>
-                handlePrefsChange({ format: value })
-              }
+              value={autoFormat ? "auto" : prefs.format}
+              onValueChange={(value: "auto" | "jpeg" | "png" | "webp") => {
+                if (value === "auto") {
+                  setAutoFormat(true);
+                } else {
+                  setAutoFormat(false);
+                  handlePrefsChange({ format: value });
+                }
+              }}
+              disabled={autoFormat}
             >
-              <SelectTrigger>
+              <SelectTrigger aria-label="Select export format">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="jpeg">JPEG</SelectItem>
-                <SelectItem value="png">PNG</SelectItem>
-                <SelectItem value="webp">WebP</SelectItem>
+                <SelectItem value="auto">
+                  <div className="flex items-center space-x-2">
+                    <Zap className="w-4 h-4 text-yellow-500" />
+                    <span>Auto (Recommended)</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="jpeg">JPEG (Compatible)</SelectItem>
+                <SelectItem value="png">PNG (Lossless)</SelectItem>
+                <SelectItem value="webp">WebP (Modern)</SelectItem>
               </SelectContent>
             </Select>
+            {autoFormat && (
+              <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                <div className="font-medium">Auto-format enabled</div>
+                <div>
+                  Will automatically choose the best format based on your image
+                  content and browser support.
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Dimensions */}
@@ -204,6 +224,9 @@ export function ExportDialog({ children }: ExportDialogProps) {
                   handlePrefsChange({ width: Number(e.target.value) })
                 }
                 className="h-8"
+                aria-label="Export width in pixels"
+                min="1"
+                max="4096"
               />
             </div>
             <div className="space-y-2">
@@ -215,6 +238,9 @@ export function ExportDialog({ children }: ExportDialogProps) {
                   handlePrefsChange({ height: Number(e.target.value) })
                 }
                 className="h-8"
+                aria-label="Export height in pixels"
+                min="1"
+                max="4096"
               />
             </div>
           </div>
@@ -244,7 +270,7 @@ export function ExportDialog({ children }: ExportDialogProps) {
           {/* Size Estimation */}
           <Card>
             <CardContent className="p-4">
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Estimated Size</span>
                   <div className="flex items-center space-x-1">
@@ -260,6 +286,11 @@ export function ExportDialog({ children }: ExportDialogProps) {
                 </div>
                 <div className="text-xs text-gray-500">
                   Limit: {prefs.keepUnderMB} MB
+                  {autoFormat && (
+                    <span className="ml-2 text-blue-600">
+                      • Auto-compression enabled
+                    </span>
+                  )}
                 </div>
 
                 {/* Size indicator bar */}
@@ -275,6 +306,22 @@ export function ExportDialog({ children }: ExportDialogProps) {
                 {!isSizeValid && (
                   <div className="text-xs text-amber-600">
                     ⚠️ File will exceed size limit
+                    {autoFormat && (
+                      <div className="mt-1 text-blue-600">
+                        Auto-compression will reduce quality to fit under{" "}
+                        {prefs.keepUnderMB}MB
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {autoFormat && isSizeValid && (
+                  <div className="text-xs text-green-600 bg-green-50 p-2 rounded">
+                    <div className="font-medium">✅ Optimized export ready</div>
+                    <div>
+                      Auto-format will ensure the best quality within size
+                      limits
+                    </div>
                   </div>
                 )}
               </div>
@@ -300,19 +347,40 @@ export function ExportDialog({ children }: ExportDialogProps) {
             onClick={handleExport}
             disabled={!hasContent || isExporting}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            aria-label={
+              hasContent
+                ? autoFormat
+                  ? "Export with smart compression"
+                  : "Export thumbnail"
+                : "Export disabled - no content"
+            }
           >
             {isExporting ? (
               <>
                 <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
-                Exporting...
+                Optimizing & Exporting...
               </>
             ) : (
               <>
                 <Download className="w-4 h-4 mr-2" />
-                Export {prefs.format.toUpperCase()}
+                {autoFormat ? (
+                  <>
+                    <Zap className="w-4 h-4 mr-1" />
+                    Smart Export
+                  </>
+                ) : (
+                  `Export ${prefs.format.toUpperCase()}`
+                )}
               </>
             )}
           </Button>
+
+          {autoFormat && (
+            <div className="text-xs text-center text-gray-500">
+              Smart export will auto-select the best format and compress to fit
+              under {prefs.keepUnderMB}MB
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

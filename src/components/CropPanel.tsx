@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -29,25 +28,17 @@ export function CropPanel() {
 
   if (!hasContent) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Crop Settings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center text-gray-500 py-4">
-            Upload an image or video to enable cropping
-          </div>
-        </CardContent>
-      </Card>
+      <div className="p-6">
+        <div className="text-center text-gray-500 py-4">
+          Upload an image or video to enable cropping
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Crop Settings</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="p-6">
+      <div className="space-y-4">
         {/* Auto-crop toggle */}
         <div className="flex items-center space-x-2">
           <Checkbox
@@ -188,14 +179,18 @@ export function CropPanel() {
             Reset to auto-crop
           </button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
-function calculateAutoCrop(
-  image: HTMLImageElement | ImageBitmap
-): { x: number; y: number; w: number; h: number; active: boolean } {
+function calculateAutoCrop(image: HTMLImageElement | ImageBitmap): {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  active: boolean;
+} {
   const imgWidth = image.width;
   const imgHeight = image.height;
   const targetRatio = 16 / 9;

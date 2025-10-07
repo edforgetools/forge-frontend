@@ -57,7 +57,7 @@ export default function IndexPage({ onStart }: IndexPageProps) {
         >
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
             <Video className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-2">Video Frames</h3>
+            <h2 className="font-semibold text-gray-900 mb-2">Video Frames</h2>
             <p className="text-sm text-gray-600">
               Extract frames from any video at any timestamp
             </p>
@@ -65,7 +65,7 @@ export default function IndexPage({ onStart }: IndexPageProps) {
 
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
             <Camera className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-2">Smart Cropping</h3>
+            <h2 className="font-semibold text-gray-900 mb-2">Smart Cropping</h2>
             <p className="text-sm text-gray-600">
               Auto-crop to perfect 16:9 aspect ratio
             </p>
@@ -73,7 +73,7 @@ export default function IndexPage({ onStart }: IndexPageProps) {
 
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
             <Download className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-gray-900 mb-2">Export Ready</h3>
+            <h2 className="font-semibold text-gray-900 mb-2">Export Ready</h2>
             <p className="text-sm text-gray-600">
               Optimized files under 2MB for all platforms
             </p>
