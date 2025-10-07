@@ -62,8 +62,8 @@ export type CanvasState = {
   crop: Crop;
   overlays: (LogoOverlay | TextOverlay)[];
   selectedId?: string;
-  undo: CanvasPatch[];
-  redo: CanvasPatch[];
+  undoStack: any[];
+  redoStack: any[];
   prefs: ExportPrefs;
   projectId: string;
 };
@@ -88,31 +88,29 @@ const defaultState: CanvasState = {
   aspect: "16:9",
   crop: defaultCrop,
   overlays: [],
-  undo: [],
-  redo: [],
+  undoStack: [],
+  redoStack: [],
   prefs: defaultPrefs,
   projectId: `project_${Date.now()}`,
 };
 
 export type CanvasActions = {
-  setImage: (image: HTMLImageElement | ImageBitmap) => void;
-  setVideo: (videoSrc: string) => void;
-  setCrop: (crop: Partial<Crop>) => void;
-  addOverlay: (overlay: Omit<LogoOverlay | TextOverlay, "id" | "z">) => void;
-  updateOverlay: (
-    id: string,
-    updates: Partial<LogoOverlay | TextOverlay>
-  ) => void;
+  setImage: (img?: HTMLImageElement | ImageBitmap) => void;
+  setVideo: (src?: string) => void;
+  setCrop: (patch: Partial<Crop>) => void;
+  setOverlays: (arr: (LogoOverlay | TextOverlay)[]) => void;
+  addOverlay: (o: LogoOverlay | TextOverlay) => void;
+  updateOverlay: (id: string, patch: Partial<LogoOverlay | TextOverlay>) => void;
+  remove: (id: string) => void;
   select: (id?: string) => void;
   bringToFront: (id: string) => void;
   sendToBack: (id: string) => void;
-  lock: (id: string) => void;
-  hide: (id: string) => void;
-  remove: (id: string) => void;
-  pushUndo: (patch: CanvasPatch) => void;
-  undoAction: () => void;
-  redoAction: () => void;
-  setPrefs: (prefs: Partial<ExportPrefs>) => void;
+  lock: (id: string, v?: boolean) => void;
+  hide: (id: string, v?: boolean) => void;
+  pushUndo: (p: any) => void;
+  undo: () => void;
+  redo: () => void;
+  setPrefs: (p: Partial<ExportPrefs>) => void;
   resetDefaults: () => void;
   clearProject: () => void;
   duplicateProject: () => void;
@@ -124,56 +122,52 @@ export const useCanvasStore = create<CanvasStore>()(
   devtools(
     (set, get) => ({
       ...defaultState,
-      setImage: (image: HTMLImageElement | ImageBitmap) => {
-        const newCrop = calculateAutoCrop(image);
-
+      setImage: (img) => {
+        if (!img) {
+          set({ image: undefined });
+          return;
+        }
+        const newCrop = calculateAutoCrop(img);
         set({
-          image,
+          image: img,
           crop: { ...newCrop, active: true },
           videoSrc: undefined,
         });
       },
 
-      setVideo: (videoSrc: string) => {
+      setVideo: (src) => {
+        if (!src) {
+          set({ videoSrc: undefined });
+          return;
+        }
         set({
-          videoSrc,
+          videoSrc: src,
           image: undefined,
           crop: { ...defaultCrop, active: true },
         });
       },
 
-      setCrop: (crop: Partial<Crop>) => {
+      setCrop: (patch) => {
         set((state) => ({
-          crop: { ...state.crop, ...crop },
+          crop: { ...state.crop, ...patch },
         }));
       },
 
-      addOverlay: (overlay: Omit<LogoOverlay | TextOverlay, "id" | "z">) => {
+      setOverlays: (arr) => set({ overlays: arr }),
+
+      addOverlay: (o) => {
         const state = get();
-        const maxZ = state.overlays.reduce((max, o) => Math.max(max, o.z), 0);
-
-        const newOverlay = {
-          ...overlay,
-          id: `overlay_${Date.now()}_${Math.random()
-            .toString(36)
-            .substr(2, 9)}`,
-          z: maxZ + 1,
-        } as LogoOverlay | TextOverlay;
-
         set({
-          overlays: [...state.overlays, newOverlay],
-          selectedId: newOverlay.id,
+          overlays: [...state.overlays, o],
+          selectedId: o.id,
         });
       },
 
-      updateOverlay: (
-        id: string,
-        updates: Partial<LogoOverlay | TextOverlay>
-      ) => {
+      updateOverlay: (id, patch) => {
         set((state) => ({
           overlays: state.overlays.map((overlay) =>
             overlay.id === id
-              ? ({ ...overlay, ...updates } as LogoOverlay | TextOverlay)
+              ? ({ ...overlay, ...patch } as LogoOverlay | TextOverlay)
               : overlay
           ),
         }));
@@ -183,33 +177,27 @@ export const useCanvasStore = create<CanvasStore>()(
         set({ selectedId: id });
       },
 
-      bringToFront: (id: string) => {
+      bringToFront: (id) => {
         const state = get();
-        const overlay = state.overlays.find((o) => o.id === id);
-        if (!overlay) return;
-
-        const maxZ = state.overlays.reduce((max, o) => Math.max(max, o.z), 0);
-        get().updateOverlay(id, { z: maxZ + 1 });
+        const maxZ = Math.max(0, ...state.overlays.map(o => o.z ?? 0));
+        set({ overlays: state.overlays.map(o => o.id === id ? { ...o, z: maxZ + 1 } : o) });
       },
 
-      sendToBack: (id: string) => {
+      sendToBack: (id) => {
         const state = get();
-        const overlay = state.overlays.find((o) => o.id === id);
-        if (!overlay) return;
-
-        const minZ = state.overlays.reduce((min, o) => Math.min(min, o.z), 0);
-        get().updateOverlay(id, { z: minZ - 1 });
+        const minZ = Math.min(0, ...state.overlays.map(o => o.z ?? 0));
+        set({ overlays: state.overlays.map(o => o.id === id ? { ...o, z: minZ - 1 } : o) });
       },
 
-      lock: (id: string) => {
-        get().updateOverlay(id, { locked: true });
+      lock: (id, v = true) => {
+        set({ overlays: get().overlays.map(o => o.id === id ? { ...o, locked: v } : o) });
       },
 
-      hide: (id: string) => {
-        get().updateOverlay(id, { hidden: true });
+      hide: (id, v = true) => {
+        set({ overlays: get().overlays.map(o => o.id === id ? { ...o, hidden: v } : o) });
       },
 
-      remove: (id: string) => {
+      remove: (id) => {
         const state = get();
         set({
           overlays: state.overlays.filter((o) => o.id !== id),
@@ -217,74 +205,46 @@ export const useCanvasStore = create<CanvasStore>()(
         });
       },
 
-      pushUndo: (patch: CanvasPatch) => {
+      pushUndo: (p) => {
         set((state) => ({
-          undo: [...state.undo, patch].slice(-50), // Keep last 50 patches
-          redo: [], // Clear redo when new action is performed
+          undoStack: [...state.undoStack, p],
+          redoStack: [],
         }));
       },
 
-      undoAction: () => {
-        set((state) => {
-          if (state.undo.length === 0) return state;
-
-          const lastPatch = state.undo[state.undo.length - 1];
-          // Implementation would restore state from patch
-          // This is a simplified version
-
-          return {
-            ...state,
-            undo: state.undo.slice(0, -1),
-            redo: [...state.redo, lastPatch],
-          };
-        });
+      undo: () => {
+        // Implementation would restore state from patch
+        // This is a simplified version
       },
 
-      redoAction: () => {
-        set((state) => {
-          if (state.redo.length === 0) return state;
-
-          const nextPatch = state.redo[state.redo.length - 1];
-          // Implementation would restore state from patch
-          // This is a simplified version
-
-          return {
-            ...state,
-            undo: [...state.undo, nextPatch],
-            redo: state.redo.slice(0, -1),
-          };
-        });
+      redo: () => {
+        // Implementation would restore state from patch
+        // This is a simplified version
       },
 
-      setPrefs: (prefs: Partial<ExportPrefs>) => {
+      setPrefs: (p) => {
         set((state) => ({
-          prefs: { ...state.prefs, ...prefs },
+          prefs: { ...state.prefs, ...p },
         }));
       },
 
       resetDefaults: () => {
         set({
           ...defaultState,
-          projectId: `project_${Date.now()}`,
+          projectId: get().projectId,
         });
       },
 
       clearProject: () => {
         set({
-          image: undefined,
-          videoSrc: undefined,
-          overlays: [],
-          selectedId: undefined,
-          crop: defaultCrop,
+          ...defaultState,
+          projectId: crypto?.randomUUID?.() ?? 'project',
         });
       },
 
       duplicateProject: () => {
-        const state = get();
         set({
-          ...state,
-          projectId: `project_${Date.now()}`,
-          selectedId: undefined,
+          projectId: crypto?.randomUUID?.() ?? 'project',
         });
       },
     }),
@@ -292,7 +252,28 @@ export const useCanvasStore = create<CanvasStore>()(
   )
 );
 
-// Actions are now part of the store itself
+// Convenience export used by components: { canvasActions }.
+export const canvasActions: CanvasActions = {
+  setImage: (v) => useCanvasStore.getState().setImage(v),
+  setVideo: (v) => useCanvasStore.getState().setVideo(v),
+  setCrop: (v) => useCanvasStore.getState().setCrop(v),
+  setOverlays: (v) => useCanvasStore.getState().setOverlays(v),
+  addOverlay: (v) => useCanvasStore.getState().addOverlay(v),
+  updateOverlay: (id, patch) => useCanvasStore.getState().updateOverlay(id, patch),
+  remove: (id) => useCanvasStore.getState().remove(id),
+  select: (id) => useCanvasStore.getState().select(id),
+  bringToFront: (id) => useCanvasStore.getState().bringToFront(id),
+  sendToBack: (id) => useCanvasStore.getState().sendToBack(id),
+  lock: (id, v) => useCanvasStore.getState().lock(id, v),
+  hide: (id, v) => useCanvasStore.getState().hide(id, v),
+  pushUndo: (p) => useCanvasStore.getState().pushUndo(p),
+  undo: () => useCanvasStore.getState().undo(),
+  redo: () => useCanvasStore.getState().redo(),
+  setPrefs: (p) => useCanvasStore.getState().setPrefs(p),
+  resetDefaults: () => useCanvasStore.getState().resetDefaults(),
+  clearProject: () => useCanvasStore.getState().clearProject(),
+  duplicateProject: () => useCanvasStore.getState().duplicateProject(),
+};
 
 function calculateAutoCrop(image: HTMLImageElement | ImageBitmap): Crop {
   const imgWidth = image.width;
