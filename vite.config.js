@@ -106,7 +106,8 @@ export default defineConfig({
                     if (id.includes("src/components/Overlay")) {
                         return "overlay-components";
                     }
-                    if (id.includes("src/components") && !id.includes("src/components/ui")) {
+                    if (id.includes("src/components") &&
+                        !id.includes("src/components/ui")) {
                         return "components";
                     }
                     if (id.includes("src/hooks")) {

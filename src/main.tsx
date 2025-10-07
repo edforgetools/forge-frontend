@@ -1,16 +1,19 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import IndexPage from "./pages/index";
-import TermsPage from "./pages/terms";
-import PrivacyPage from "./pages/privacy";
-import AboutPage from "./pages/about";
+import IndexPageStatic from "./pages/index-static";
 import { EditorSkeleton } from "./components/EditorSkeleton";
 import "./styles/globals.css";
-import { Toaster } from "@/lib/ui/toaster";
-import { Analytics } from "@vercel/analytics/react";
 
-// Lazy load the Editor (AppPage) to reduce initial bundle size
+// Lazy load non-critical pages and components
+const IndexPage = lazy(() => import("./pages/index"));
+const TermsPage = lazy(() => import("./pages/terms"));
+const PrivacyPage = lazy(() => import("./pages/privacy"));
+const AboutPage = lazy(() => import("./pages/about"));
 const AppPage = lazy(() => import("./pages/app"));
+const Toaster = lazy(() => import("@/lib/ui/toaster").then(m => ({ default: m.Toaster })));
+const Analytics = lazy(() => import("@vercel/analytics/react").then(m => ({ default: m.Analytics })));
+
+// AppPage is already declared above
 
 // Register service worker for caching
 if ("serviceWorker" in navigator) {
@@ -28,12 +31,13 @@ if ("serviceWorker" in navigator) {
 
 // Simple routing without react-router-dom for now
 function App() {
-  const [currentPage, setCurrentPage] = React.useState<
+  const [currentPage, setCurrentPage] = useState<
     "index" | "app" | "terms" | "privacy" | "about"
   >("index");
+  const [useAnimatedIndex, setUseAnimatedIndex] = useState(false);
 
   // Handle URL-based routing
-  React.useEffect(() => {
+  useEffect(() => {
     const path = window.location.pathname;
     if (path === "/terms") {
       setCurrentPage("terms");
@@ -47,6 +51,16 @@ function App() {
       setCurrentPage("index");
     }
   }, []);
+
+  // Upgrade to animated version after initial load
+  useEffect(() => {
+    if (currentPage === "index") {
+      const timer = setTimeout(() => {
+        setUseAnimatedIndex(true);
+      }, 100); // Small delay to ensure static version renders first
+      return () => clearTimeout(timer);
+    }
+  }, [currentPage]);
 
   // Update URL when page changes
   const navigateTo = (page: typeof currentPage) => {
@@ -64,24 +78,53 @@ function App() {
   }
 
   if (currentPage === "terms") {
-    return <TermsPage onBack={() => navigateTo("index")} />;
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+        <TermsPage onBack={() => navigateTo("index")} />
+      </Suspense>
+    );
   }
 
   if (currentPage === "privacy") {
-    return <PrivacyPage onBack={() => navigateTo("index")} />;
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+        <PrivacyPage onBack={() => navigateTo("index")} />
+      </Suspense>
+    );
   }
 
   if (currentPage === "about") {
-    return <AboutPage onBack={() => navigateTo("index")} />;
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+        <AboutPage onBack={() => navigateTo("index")} />
+      </Suspense>
+    );
   }
 
-  return <IndexPage onStart={() => navigateTo("app")} />;
+  // Use static version initially for faster FCP, then upgrade to animated
+  if (currentPage === "index") {
+    if (useAnimatedIndex) {
+      return (
+        <Suspense fallback={<IndexPageStatic onStart={() => navigateTo("app")} />}>
+          <IndexPage onStart={() => navigateTo("app")} />
+        </Suspense>
+      );
+    }
+    return <IndexPageStatic onStart={() => navigateTo("app")} />;
+  }
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />
-    <Toaster />
-    <Analytics />
+    <Suspense fallback={null}>
+      <Toaster />
+    </Suspense>
+    {/* Only load analytics in production */}
+    {process.env.NODE_ENV === "production" && (
+      <Suspense fallback={null}>
+        <Analytics />
+      </Suspense>
+    )}
   </React.StrictMode>
 );
