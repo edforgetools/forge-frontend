@@ -99,8 +99,11 @@ export type CanvasActions = {
   setVideo: (src?: string) => void;
   setCrop: (patch: Partial<Crop>) => void;
   setOverlays: (arr: (LogoOverlay | TextOverlay)[]) => void;
-  addOverlay: (o: LogoOverlay | TextOverlay) => void;
-  updateOverlay: (id: string, patch: Partial<LogoOverlay | TextOverlay>) => void;
+  addOverlay: (overlay: Omit<LogoOverlay | TextOverlay, "id" | "z">) => void;
+  updateOverlay: (
+    id: string,
+    patch: Partial<LogoOverlay | TextOverlay>
+  ) => void;
   remove: (id: string) => void;
   select: (id?: string) => void;
   bringToFront: (id: string) => void;
@@ -155,11 +158,21 @@ export const useCanvasStore = create<CanvasStore>()(
 
       setOverlays: (arr) => set({ overlays: arr }),
 
-      addOverlay: (o) => {
+      addOverlay: (overlay) => {
         const state = get();
+        const maxZ = state.overlays.reduce((max, o) => Math.max(max, o.z), 0);
+
+        const newOverlay = {
+          ...overlay,
+          id: `overlay_${Date.now()}_${Math.random()
+            .toString(36)
+            .substr(2, 9)}`,
+          z: maxZ + 1,
+        } as LogoOverlay | TextOverlay;
+
         set({
-          overlays: [...state.overlays, o],
-          selectedId: o.id,
+          overlays: [...state.overlays, newOverlay],
+          selectedId: newOverlay.id,
         });
       },
 
@@ -179,22 +192,38 @@ export const useCanvasStore = create<CanvasStore>()(
 
       bringToFront: (id) => {
         const state = get();
-        const maxZ = Math.max(0, ...state.overlays.map(o => o.z ?? 0));
-        set({ overlays: state.overlays.map(o => o.id === id ? { ...o, z: maxZ + 1 } : o) });
+        const maxZ = Math.max(0, ...state.overlays.map((o) => o.z ?? 0));
+        set({
+          overlays: state.overlays.map((o) =>
+            o.id === id ? { ...o, z: maxZ + 1 } : o
+          ),
+        });
       },
 
       sendToBack: (id) => {
         const state = get();
-        const minZ = Math.min(0, ...state.overlays.map(o => o.z ?? 0));
-        set({ overlays: state.overlays.map(o => o.id === id ? { ...o, z: minZ - 1 } : o) });
+        const minZ = Math.min(0, ...state.overlays.map((o) => o.z ?? 0));
+        set({
+          overlays: state.overlays.map((o) =>
+            o.id === id ? { ...o, z: minZ - 1 } : o
+          ),
+        });
       },
 
       lock: (id, v = true) => {
-        set({ overlays: get().overlays.map(o => o.id === id ? { ...o, locked: v } : o) });
+        set({
+          overlays: get().overlays.map((o) =>
+            o.id === id ? { ...o, locked: v } : o
+          ),
+        });
       },
 
       hide: (id, v = true) => {
-        set({ overlays: get().overlays.map(o => o.id === id ? { ...o, hidden: v } : o) });
+        set({
+          overlays: get().overlays.map((o) =>
+            o.id === id ? { ...o, hidden: v } : o
+          ),
+        });
       },
 
       remove: (id) => {
@@ -238,13 +267,13 @@ export const useCanvasStore = create<CanvasStore>()(
       clearProject: () => {
         set({
           ...defaultState,
-          projectId: crypto?.randomUUID?.() ?? 'project',
+          projectId: crypto?.randomUUID?.() ?? "project",
         });
       },
 
       duplicateProject: () => {
         set({
-          projectId: crypto?.randomUUID?.() ?? 'project',
+          projectId: crypto?.randomUUID?.() ?? "project",
         });
       },
     }),
@@ -258,8 +287,9 @@ export const canvasActions: CanvasActions = {
   setVideo: (v) => useCanvasStore.getState().setVideo(v),
   setCrop: (v) => useCanvasStore.getState().setCrop(v),
   setOverlays: (v) => useCanvasStore.getState().setOverlays(v),
-  addOverlay: (v) => useCanvasStore.getState().addOverlay(v),
-  updateOverlay: (id, patch) => useCanvasStore.getState().updateOverlay(id, patch),
+  addOverlay: (overlay) => useCanvasStore.getState().addOverlay(overlay),
+  updateOverlay: (id, patch) =>
+    useCanvasStore.getState().updateOverlay(id, patch),
   remove: (id) => useCanvasStore.getState().remove(id),
   select: (id) => useCanvasStore.getState().select(id),
   bringToFront: (id) => useCanvasStore.getState().bringToFront(id),
