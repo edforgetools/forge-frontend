@@ -36,12 +36,36 @@ jobs:
       - name: Install wait-on
         run: pnpm add -D wait-on
         timeout-minutes: 2
-        
+
       - name: Start preview server
         run: |
-          pnpm run preview -- --port 4173 &
-          npx wait-on http://127.0.0.1:4173
-        timeout-minutes: 3
+          echo "Starting preview server..."
+          # Try starting the server with more explicit options
+          pnpm run preview -- --port 4173 --host 0.0.0.0 &
+          SERVER_PID=$!
+          echo "Server PID: $SERVER_PID"
+          
+          # Wait a bit for the server to initialize
+          sleep 5
+          
+          echo "Waiting for server to start..."
+          # Try multiple approaches to check if server is ready
+          for i in {1..30}; do
+            if curl -f http://127.0.0.1:4173 > /dev/null 2>&1; then
+              echo "Server is ready after $((i*2)) seconds!"
+              break
+            fi
+            echo "Attempt $i: Server not ready yet, waiting..."
+            sleep 2
+            if [ $i -eq 30 ]; then
+              echo "Server failed to start after 60 seconds"
+              echo "Checking if server process is still running..."
+              ps aux | grep preview || echo "No preview process found"
+              exit 1
+            fi
+          done
+          echo "Server health check passed!"
+        timeout-minutes: 5
 
       # playwright with caching and optimization
       - name: Cache Playwright browsers
