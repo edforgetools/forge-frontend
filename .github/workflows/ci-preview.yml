@@ -6,33 +6,33 @@ on:
   workflow_dispatch:
     inputs:
       preview_url:
-        description: 'Preview URL to test'
+        description: "Preview URL to test"
         required: true
-        default: ''
+        default: ""
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          
+          node-version: "20"
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9.15.9
-          
+
       - name: Get pnpm store directory
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-          
+
       - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
@@ -40,21 +40,21 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-            
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
+
       - name: Build application
         run: pnpm build
-        
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
-        
+
       - name: Run Playwright tests on preview
         run: npx playwright test --project=chromium basic.spec.ts upload-and-export.spec.ts
         env:
           PREVIEW_URL: ${{ github.event.inputs.preview_url || 'http://localhost:4173' }}
-          
+
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
@@ -62,7 +62,7 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
-          
+
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
@@ -74,26 +74,26 @@ jobs:
   lighthouse:
     runs-on: ubuntu-latest
     needs: test
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          
+          node-version: "20"
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9.15.9
-          
+
       - name: Get pnpm store directory
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-          
+
       - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
@@ -101,23 +101,23 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-            
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
+
       - name: Build application
         run: pnpm build
-        
+
       - name: Start preview server
         run: |
           pnpm preview --port 4173 &
           npx wait-on http://localhost:4173
-          
+
       - name: Run Lighthouse CI
         run: npx @lhci/cli autorun --upload.target=temporary-public-storage
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-          
+
       - name: Upload Lighthouse results
         uses: actions/upload-artifact@v4
         if: always()
@@ -129,26 +129,26 @@ jobs:
   export-sample:
     runs-on: ubuntu-latest
     needs: test
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          
+          node-version: "20"
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9.15.9
-          
+
       - name: Get pnpm store directory
         shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-          
+
       - name: Setup pnpm cache
         uses: actions/cache@v4
         with:
@@ -156,16 +156,16 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-            
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
+
       - name: Build application
         run: pnpm build
-        
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
-        
+
       - name: Generate sample thumbnail
         run: |
           npx playwright test --project=chromium upload-and-export.spec.ts --headed
@@ -174,7 +174,7 @@ jobs:
           # This would normally capture the exported thumbnail, but for demo purposes
           # we'll create a placeholder
           echo "Sample thumbnail exported" > sample-exports/thumbnail-info.txt
-          
+
       - name: Upload sample thumbnail
         uses: actions/upload-artifact@v4
         with:

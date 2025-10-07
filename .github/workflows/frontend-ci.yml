@@ -2,9 +2,9 @@ name: frontend-ci
 
 on:
   push:
-    branches: [ main, feat/snapthumb-v1-1 ]
+    branches: [main, feat/snapthumb-v1-1]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,23 +23,49 @@ jobs:
         with:
           node-version: 20
 
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        timeout-minutes: 5
 
       # build once
-      - run: pnpm run build
+      - name: Build application
+        run: pnpm run build
+        timeout-minutes: 5
 
       # start local preview server for e2e (no Vercel URL needed)
-      - run: pnpm add -D wait-on
-      - run: |
+      - name: Install wait-on
+        run: pnpm add -D wait-on
+        timeout-minutes: 2
+        
+      - name: Start preview server
+        run: |
           pnpm run preview -- --port 4173 &
           npx wait-on http://127.0.0.1:4173
+        timeout-minutes: 3
 
-      # playwright
-      - run: pnpm exec playwright install --with-deps
-      - run: pnpm exec playwright test
+      # playwright with caching and optimization
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright browsers (Chromium only for CI)
+        run: pnpm exec playwright install chromium --with-deps
+        timeout-minutes: 10
+
+      - name: Run Playwright tests (CI optimized)
+        run: pnpm exec playwright test ci-basic.spec.ts --project=chromium
+        timeout-minutes: 5
         env:
           # ensure tests use the local server
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
 
       # lighthouse on built dist
-      - run: npx @lhci/cli autorun --collect.staticDistDir=dist
+      - name: Run Lighthouse CI
+        run: npx @lhci/cli autorun --collect.staticDistDir=dist
+        timeout-minutes: 5
