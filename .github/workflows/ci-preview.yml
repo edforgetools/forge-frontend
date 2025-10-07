@@ -224,12 +224,45 @@ jobs:
 
       - name: Generate sample thumbnail
         run: |
-          npx playwright test --project=chromium upload-and-export.spec.ts --headed
+          echo "Starting preview server for sample generation..."
+          # Start server directly with vite
+          npx vite preview --port 4173 --host 127.0.0.1 &
+          SERVER_PID=$!
+          echo "Server PID: $SERVER_PID"
+
+          # Wait for server to start
+          echo "Waiting for server to start..."
+          for i in {1..30}; do
+            if curl -f http://127.0.0.1:4173 > /dev/null 2>&1; then
+              echo "Server is ready after $((i*2)) seconds!"
+              break
+            fi
+            echo "Attempt $i: Server not ready yet, waiting..."
+            sleep 2
+            if [ $i -eq 30 ]; then
+              echo "Server failed to start after 60 seconds"
+              exit 1
+            fi
+          done
+
+          echo "Server health check passed!"
+          echo "Running sample thumbnail generation tests..."
+          
+          # Run tests in headless mode (CI doesn't have display server)
+          npx playwright test --project=chromium upload-and-export.spec.ts
+          echo "Sample thumbnail tests completed successfully!"
+
           # Create a sample thumbnail export for demonstration
           mkdir -p sample-exports
           # This would normally capture the exported thumbnail, but for demo purposes
           # we'll create a placeholder
           echo "Sample thumbnail exported" > sample-exports/thumbnail-info.txt
+
+          # Clean up server
+          echo "Stopping server..."
+          kill $SERVER_PID || echo "Server already stopped"
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
 
       - name: Upload sample thumbnail
         uses: actions/upload-artifact@v4
