@@ -11,40 +11,40 @@ export function StickyFooter() {
   const is16to9 = Math.abs(aspectRatio - 16 / 9) < 0.01;
 
   return (
-    <div className="bg-white border-t border-gray-200 px-4 py-3 flex-shrink-0">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="text-sm text-gray-600">
-            <span className="font-medium">16:9</span>
-            {!is16to9 && <span className="text-amber-600 ml-1">⚠️</span>}
-          </div>
-          <div className="text-sm text-gray-600">
-            <span className="font-medium">
-              {Math.round(crop.w)} × {Math.round(crop.h)}
-            </span>
-          </div>
-          {hasContent && (
-            <div className="text-xs text-gray-500">
-              {image ? "Image" : "Video"} loaded
-            </div>
-          )}
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4">
+      <div className="flex items-center space-x-4">
+        <div className="text-sm text-gray-600">
+          <span className="font-medium">16:9</span>
+          {!is16to9 && <span className="text-amber-600 ml-1">⚠️</span>}
         </div>
+        <div className="text-sm text-gray-600">
+          <span className="font-medium">
+            {Math.round(crop.w)} × {Math.round(crop.h)}
+          </span>
+        </div>
+        {hasContent && (
+          <div className="text-xs text-gray-500">
+            {image ? "Image" : "Video"} loaded
+          </div>
+        )}
+      </div>
 
-        <div className="flex items-center space-x-2">
-          <ExportDialog>
-            <Button
-              disabled={!hasContent}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export
-            </Button>
-          </ExportDialog>
-        </div>
+      <div className="mt-3">
+        <ExportDialog>
+          <Button
+            disabled={!hasContent}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white h-10 rounded-xl"
+            aria-label={hasContent ? 'Export thumbnail - Open export settings' : 'Export disabled - upload content first'}
+            tabIndex={14}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export
+          </Button>
+        </ExportDialog>
       </div>
 
       {!hasContent && (
-        <div className="mt-2 text-xs text-gray-500">
+        <div className="mt-2 text-xs text-gray-500 text-center">
           Upload content to enable export
         </div>
       )}

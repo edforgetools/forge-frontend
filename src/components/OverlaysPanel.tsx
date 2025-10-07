@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -125,11 +124,8 @@ export function OverlaysPanel() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Overlays</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="p-6">
+      <div className="space-y-4">
         {/* Add overlay buttons */}
         <div className="grid grid-cols-2 gap-2">
           <Button
@@ -137,6 +133,7 @@ export function OverlaysPanel() {
             size="sm"
             onClick={handleAddLogo}
             className="justify-start"
+            aria-label="Add logo overlay to canvas"
           >
             <Image className="w-4 h-4 mr-2" />
             Add Logo
@@ -146,6 +143,7 @@ export function OverlaysPanel() {
             size="sm"
             onClick={handleAddText}
             className="justify-start"
+            aria-label="Add text overlay to canvas"
           >
             <Type className="w-4 h-4 mr-2" />
             Add Text
@@ -198,8 +196,9 @@ export function OverlaysPanel() {
                           e.stopPropagation();
                           handleToggleVisibility(overlay.id);
                         }}
-                        className="p-1 hover:bg-gray-200 rounded"
+                        className="p-1 hover:bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                         data-testid="toggle-visibility"
+                        aria-label={`${overlay.hidden ? 'Show' : 'Hide'} ${overlay.type === 'text' ? 'text' : 'logo'} overlay`}
                       >
                         {overlay.hidden ? (
                           <EyeOff className="w-3 h-3 text-gray-500" />
@@ -212,8 +211,9 @@ export function OverlaysPanel() {
                           e.stopPropagation();
                           handleToggleLock(overlay.id);
                         }}
-                        className="p-1 hover:bg-gray-200 rounded"
+                        className="p-1 hover:bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                         data-testid="toggle-lock"
+                        aria-label={`${overlay.locked ? 'Unlock' : 'Lock'} ${overlay.type === 'text' ? 'text' : 'logo'} overlay`}
                       >
                         {overlay.locked ? (
                           <Lock className="w-3 h-3 text-gray-500" />
@@ -226,8 +226,9 @@ export function OverlaysPanel() {
                           e.stopPropagation();
                           handleOverlayDelete(overlay.id);
                         }}
-                        className="p-1 hover:bg-red-100 rounded text-red-500"
+                        className="p-1 hover:bg-red-100 rounded text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
                         data-testid="delete-overlay"
+                        aria-label={`Delete ${overlay.type === 'text' ? 'text' : 'logo'} overlay`}
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -248,15 +249,17 @@ export function OverlaysPanel() {
               <div className="flex items-center space-x-1">
                 <button
                   onClick={() => handleZOrderChange(selectedOverlay.id, "down")}
-                  className="p-1 hover:bg-gray-200 rounded"
+                  className="p-1 hover:bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                   title="Send to back"
+                  aria-label="Send overlay to back"
                 >
                   <Move className="w-3 h-3 text-gray-500 rotate-180" />
                 </button>
                 <button
                   onClick={() => handleZOrderChange(selectedOverlay.id, "up")}
-                  className="p-1 hover:bg-gray-200 rounded"
+                  className="p-1 hover:bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                   title="Bring to front"
+                  aria-label="Bring overlay to front"
                 >
                   <Move className="w-3 h-3 text-gray-500" />
                 </button>
@@ -401,7 +404,7 @@ export function OverlaysPanel() {
             )}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
