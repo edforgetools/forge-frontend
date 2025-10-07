@@ -22,6 +22,6 @@ test.describe("CI Basic Smoke Tests", () => {
 
     // Check app page loaded
     await expect(page.locator("h1")).toContainText("Snapthumb Editor");
-    await expect(page.locator("text=Upload")).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Upload' })).toBeVisible();
   });
 });
