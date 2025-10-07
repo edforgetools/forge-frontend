@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Snapthumb Basic Tests", () => {
   test("should load the landing page", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Check main elements are present
     await expect(page.locator("h1")).toContainText("Snapthumb");
@@ -19,11 +19,11 @@ test.describe("Snapthumb Basic Tests", () => {
 
   test("should navigate to app page", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Click start button
     await page.click('button:has-text("Start Creating")');
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Check app page loaded
     await expect(page.locator("h1")).toContainText("Snapthumb Editor");

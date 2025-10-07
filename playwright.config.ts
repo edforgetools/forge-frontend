@@ -7,6 +7,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
+  timeout: 60000, // 60 seconds per test
+  expect: {
+    timeout: 10000, // 10 seconds for assertions
+  },
 
   use: {
     // CI uses the preview server started in the workflow

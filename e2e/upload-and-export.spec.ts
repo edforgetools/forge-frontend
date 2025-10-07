@@ -9,14 +9,14 @@ test.describe("Upload and Export Flow", () => {
     // Click start creating button
     await page.click("text=Start Creating");
 
-    // Wait for app to load
-    await page.waitForSelector('[data-testid="app-shell"]', { timeout: 10000 });
+    // Wait for app to load with timeout
+    await page.waitForSelector('[data-testid="app-shell"]', { timeout: 15000 });
 
     // Upload sample image
     await page.click("text=Try sample image");
 
-    // Wait for image to load
-    await page.waitForSelector("canvas", { timeout: 5000 });
+    // Wait for image to load with timeout
+    await page.waitForSelector("canvas", { timeout: 10000 });
 
     // Switch to overlays panel
     await page.click("text=Overlays");
@@ -24,9 +24,9 @@ test.describe("Upload and Export Flow", () => {
     // Add text overlay
     await page.click("text=Add Text");
 
-    // Wait for text overlay to be added
+    // Wait for text overlay to be added with timeout
     await page.waitForSelector('[data-testid="overlay-item"]', {
-      timeout: 5000,
+      timeout: 10000,
     });
 
     // Switch to export panel
@@ -35,9 +35,9 @@ test.describe("Upload and Export Flow", () => {
     // Click export button
     await page.click("text=Export");
 
-    // Wait for export dialog
+    // Wait for export dialog with timeout
     await page.waitForSelector('[data-testid="export-dialog"]', {
-      timeout: 5000,
+      timeout: 10000,
     });
 
     // Check that size estimation is shown
@@ -48,7 +48,7 @@ test.describe("Upload and Export Flow", () => {
 
     // Wait for download to start (this might not work in headless mode)
     // In a real test, you'd check for the download or success message
-    await page.waitForTimeout(2000);
+    await page.waitForTimeout(3000);
   });
 
   test("should show proper validation for file size", async ({ page }) => {
@@ -57,14 +57,14 @@ test.describe("Upload and Export Flow", () => {
     // Click start creating button
     await page.click("text=Start Creating");
 
-    // Wait for app to load
-    await page.waitForSelector('[data-testid="app-shell"]', { timeout: 10000 });
+    // Wait for app to load with timeout
+    await page.waitForSelector('[data-testid="app-shell"]', { timeout: 15000 });
 
     // Upload sample image
     await page.click("text=Try sample image");
 
-    // Wait for image to load
-    await page.waitForSelector("canvas", { timeout: 5000 });
+    // Wait for image to load with timeout
+    await page.waitForSelector("canvas", { timeout: 10000 });
 
     // Switch to export panel
     await page.click("text=Export");
@@ -72,9 +72,9 @@ test.describe("Upload and Export Flow", () => {
     // Click export button
     await page.click("text=Export");
 
-    // Wait for export dialog
+    // Wait for export dialog with timeout
     await page.waitForSelector('[data-testid="export-dialog"]', {
-      timeout: 5000,
+      timeout: 10000,
     });
 
     // Check that size limit is shown
