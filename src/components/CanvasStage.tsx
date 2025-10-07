@@ -1,15 +1,15 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { useCanvasStore, canvasActions } from "@/state/canvasStore";
+import { useCanvasStore } from "@/state/canvasStore";
 
 export function CanvasStage() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  const { image, videoSrc, overlays, selectedId, crop } = useCanvasStore();
+  const { image, videoSrc, overlays, selectedId, crop, select, updateOverlay } = useCanvasStore();
 
   // Animation frame ref for smooth redraws
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
 
   const redraw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -164,11 +164,11 @@ export function CanvasStage() {
       });
 
     if (clickedOverlay) {
-      canvasActions.select(clickedOverlay.id);
+      select(clickedOverlay.id);
       setIsDragging(true);
       setDragStart({ x: x - clickedOverlay.x, y: y - clickedOverlay.y });
     } else {
-      canvasActions.select(undefined);
+      select(undefined);
     }
   };
 
@@ -184,7 +184,7 @@ export function CanvasStage() {
 
     const overlay = overlays.find((o) => o.id === selectedId);
     if (overlay && !overlay.locked) {
-      canvasActions.updateOverlay(selectedId, {
+      updateOverlay(selectedId, {
         x: x - dragStart.x,
         y: y - dragStart.y,
       });
@@ -229,7 +229,7 @@ export function CanvasStage() {
       const handleInputKeyDown = (e: KeyboardEvent) => {
         if (e.key === "Enter" || e.key === "Escape") {
           if (e.key === "Enter") {
-            canvasActions.updateOverlay(selectedId, { text: input.value });
+            updateOverlay(selectedId, { text: input.value });
           }
           document.body.removeChild(input);
           document.removeEventListener("keydown", handleInputKeyDown);
@@ -237,7 +237,7 @@ export function CanvasStage() {
       };
 
       const handleInputBlur = () => {
-        canvasActions.updateOverlay(selectedId, { text: input.value });
+        updateOverlay(selectedId, { text: input.value });
         document.body.removeChild(input);
         document.removeEventListener("keydown", handleInputKeyDown);
       };

@@ -4,10 +4,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useCanvasStore, canvasActions } from "@/state/canvasStore";
+import { useCanvasStore } from "@/state/canvasStore";
 
 export function CropPanel() {
-  const { crop, image, videoSrc } = useCanvasStore();
+  const { crop, image, videoSrc, setCrop } = useCanvasStore();
   const [autoCrop, setAutoCrop] = useState(true);
 
   const hasContent = image || videoSrc;
@@ -15,16 +15,16 @@ export function CropPanel() {
   useEffect(() => {
     if (hasContent && autoCrop && !crop.active) {
       // Auto-enable crop when content is loaded
-      canvasActions.setCrop({ active: true });
+      setCrop({ active: true });
     }
-  }, [hasContent, autoCrop, crop.active]);
+  }, [hasContent, autoCrop, crop.active, setCrop]);
 
   const handleCropChange = (field: keyof typeof crop, value: number) => {
-    canvasActions.setCrop({ [field]: value });
+    setCrop({ [field]: value });
   };
 
   const handleSliderChange = (field: keyof typeof crop, values: number[]) => {
-    canvasActions.setCrop({ [field]: values[0] });
+    setCrop({ [field]: values[0] });
   };
 
   if (!hasContent) {
@@ -179,8 +179,8 @@ export function CropPanel() {
           <button
             onClick={() => {
               if (image) {
-                const newCrop = calculateAutoCrop(image, "16:9");
-                canvasActions.setCrop(newCrop);
+                const newCrop = calculateAutoCrop(image);
+                setCrop(newCrop);
               }
             }}
             className="text-xs text-blue-600 hover:text-blue-800 underline"
@@ -194,8 +194,7 @@ export function CropPanel() {
 }
 
 function calculateAutoCrop(
-  image: HTMLImageElement | ImageBitmap,
-  aspect: "16:9"
+  image: HTMLImageElement | ImageBitmap
 ): { x: number; y: number; w: number; h: number; active: boolean } {
   const imgWidth = image.width;
   const imgHeight = image.height;
