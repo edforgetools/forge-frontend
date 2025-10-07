@@ -11,6 +11,7 @@ import {
 import { compressCanvasWithSSIM } from "./compression";
 import type { CompressionSettings } from "@/components/CompressionSelector";
 import { estimateSize } from "./estimateSize";
+import { sendTelemetry } from "./telemetry";
 
 export interface ExportOptions {
   canvas: HTMLCanvasElement;
@@ -241,6 +242,17 @@ export async function exportCanvas(
       underLimit: result.sizeBytes <= targetSizeMB * 1024 * 1024,
     });
 
+    // Send custom telemetry
+    sendTelemetry("onExport", {
+      duration: Math.round(result.duration),
+      bytes: result.sizeBytes,
+      format: result.format,
+      quality: Math.round(result.quality * 100),
+      iterations: result.iterations,
+      targetSizeMB,
+      underLimit: result.sizeBytes <= targetSizeMB * 1024 * 1024,
+    });
+
     return result;
   } catch (error) {
     const duration = performance.now() - startTime;
@@ -250,6 +262,15 @@ export async function exportCanvas(
       format: selectedFormat,
       duration: Math.round(duration),
       error: error instanceof Error ? error.message : "Unknown error",
+    });
+
+    // Send custom error telemetry
+    sendTelemetry("onExport", {
+      duration: Math.round(duration),
+      bytes: 0,
+      format: selectedFormat,
+      error: error instanceof Error ? error.message : "Unknown error",
+      success: false,
     });
 
     throw error;

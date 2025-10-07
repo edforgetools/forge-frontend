@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { track } from "@vercel/analytics";
+import { sendTelemetry } from "@/lib/telemetry";
 
 export type OverlayBase = {
   id: string;
@@ -204,6 +205,12 @@ export const useCanvasStore = create<CanvasStore>()(
           overlayId: newOverlay.id,
         });
 
+        // Send custom telemetry
+        sendTelemetry("onOverlayAdd", {
+          type: overlay.type,
+          overlayId: newOverlay.id,
+        });
+
         set({
           overlays: [...state.overlays, newOverlay],
           selectedId: newOverlay.id,
@@ -234,6 +241,15 @@ export const useCanvasStore = create<CanvasStore>()(
           track("text_overlay_edit", {
             overlayId: id,
             properties: Object.keys(patch).join(","),
+          });
+        }
+
+        // Send custom telemetry for overlay edits
+        if (overlay) {
+          sendTelemetry("onOverlayEdit", {
+            type: overlay.type,
+            overlayId: id,
+            properties: Object.keys(patch),
           });
         }
 
@@ -446,6 +462,14 @@ export const useCanvasStore = create<CanvasStore>()(
         const state = get();
         const newCrop = calculateCropForRatio(state.image, ratio);
         const dimensions = getDimensionsForRatio(ratio);
+        
+        // Send telemetry for ratio change
+        sendTelemetry("onRatioChange", {
+          ratio,
+          previousRatio: state.aspect,
+          dimensions,
+        });
+        
         set({
           aspect: ratio,
           crop: { ...newCrop, active: true },
