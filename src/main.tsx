@@ -125,6 +125,7 @@ function App() {
 
   // Use static version initially for faster FCP, then upgrade to animated
   if (currentPage === "index") {
+    console.log("Rendering index page, useAnimatedIndex:", useAnimatedIndex);
     if (useAnimatedIndex) {
       return (
         <Suspense
@@ -136,6 +137,9 @@ function App() {
     }
     return <IndexPageStatic onStart={() => navigateTo("app")} />;
   }
+
+  // Default fallback
+  return <div>Loading...</div>;
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
