@@ -8,5 +8,11 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: '20' }
       - run: corepack enable
-      - run: npm ci
-      - run: npm run -s build || echo "build step not present"
+      - name: Install
+        run: |
+          if [ -f pnpm-lock.yaml ]; then corepack prepare pnpm@latest --activate && pnpm i --frozen-lockfile;
+          elif [ -f yarn.lock ]; then yarn --version && yarn install --frozen-lockfile;
+          elif [ -f package-lock.json ]; then npm ci;
+          else npm i; fi
+      - name: Smoke
+        run: echo ok
