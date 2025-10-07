@@ -24,17 +24,33 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          echo "Installing dependencies..."
+          pnpm install --frozen-lockfile
+          echo "Dependencies installed successfully!"
         timeout-minutes: 5
 
       # build once
       - name: Build application
-        run: pnpm run build
+        run: |
+          echo "Building application..."
+          pnpm run build
+          echo "Build completed successfully!"
         timeout-minutes: 5
 
       # start local preview server for e2e (no Vercel URL needed)
+      - name: Verify build output
+        run: |
+          echo "Verifying build output..."
+          ls -la dist/
+          echo "Build output verified!"
+        timeout-minutes: 1
+
       - name: Install wait-on
-        run: pnpm add -D wait-on
+        run: |
+          echo "Installing wait-on..."
+          pnpm add -D wait-on
+          echo "wait-on installed successfully!"
         timeout-minutes: 2
 
       - name: Start preview server
@@ -44,10 +60,10 @@ jobs:
           pnpm run preview -- --port 4173 --host 0.0.0.0 &
           SERVER_PID=$!
           echo "Server PID: $SERVER_PID"
-          
+
           # Wait a bit for the server to initialize
           sleep 5
-          
+
           echo "Waiting for server to start..."
           # Try multiple approaches to check if server is ready
           for i in {1..30}; do
@@ -79,11 +95,17 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install Playwright browsers (Chromium only for CI)
-        run: pnpm exec playwright install chromium --with-deps
+        run: |
+          echo "Installing Playwright browsers..."
+          pnpm exec playwright install chromium --with-deps
+          echo "Playwright browsers installed successfully!"
         timeout-minutes: 10
 
       - name: Run Playwright tests (CI optimized)
-        run: pnpm exec playwright test ci-basic.spec.ts --project=chromium
+        run: |
+          echo "Running Playwright tests..."
+          pnpm exec playwright test ci-basic.spec.ts --project=chromium
+          echo "Playwright tests completed successfully!"
         timeout-minutes: 5
         env:
           # ensure tests use the local server
@@ -91,5 +113,8 @@ jobs:
 
       # lighthouse on built dist
       - name: Run Lighthouse CI
-        run: npx @lhci/cli autorun --collect.staticDistDir=dist
+        run: |
+          echo "Running Lighthouse CI..."
+          npx @lhci/cli autorun --collect.staticDistDir=dist
+          echo "Lighthouse CI completed successfully!"
         timeout-minutes: 5
