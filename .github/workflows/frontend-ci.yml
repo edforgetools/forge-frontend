@@ -74,11 +74,11 @@ jobs:
       - name: Start server and run Playwright tests
         run: |
           echo "Starting preview server..."
-          # Start server in background
-          pnpm run preview -- --port 4173 --host 127.0.0.1 &
+          # Start server directly with vite to have full control over arguments
+          npx vite preview --port 4173 --host 127.0.0.1 &
           SERVER_PID=$!
           echo "Server PID: $SERVER_PID"
-          
+
           # Wait for server to start
           echo "Waiting for server to start..."
           for i in {1..30}; do
@@ -95,14 +95,14 @@ jobs:
               exit 1
             fi
           done
-          
+
           echo "Server health check passed!"
           echo "Running Playwright tests..."
-          
+
           # Run tests with server running
           pnpm exec playwright test ci-basic.spec.ts --project=chromium
           echo "Playwright tests completed successfully!"
-          
+
           # Clean up server
           echo "Stopping server..."
           kill $SERVER_PID || echo "Server already stopped"
