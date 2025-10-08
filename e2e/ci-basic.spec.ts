@@ -6,7 +6,7 @@ test.describe("CI Basic Smoke Tests", () => {
     await page.waitForLoadState("networkidle", { timeout: 15000 });
 
     // Check main elements are present
-    await expect(page.locator("h1")).toContainText("Snapthumb");
+    await expect(page.getByRole("heading", { name: "Snapthumb" }).first()).toBeVisible();
 
     await expect(page.locator('button:has-text("Start Creating")')).toBeVisible(
       { timeout: 10000 }
@@ -25,7 +25,7 @@ test.describe("CI Basic Smoke Tests", () => {
     await page.waitForLoadState("networkidle", { timeout: 15000 });
 
     // Check app page loaded
-    await expect(page.locator("h1")).toContainText("Snapthumb Editor");
+    await expect(page.getByRole("heading", { name: "Snapthumb Editor" })).toBeVisible();
     await expect(
       page.getByRole("button", {
         name: "Upload panel - Upload images or videos",
