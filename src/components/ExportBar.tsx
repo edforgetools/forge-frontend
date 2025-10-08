@@ -16,8 +16,9 @@ import {
   formatDuration,
 } from "@/lib/export";
 import { sessionDB } from "@/lib/db";
-import { Undo2, Redo2, Zap } from "lucide-react";
+import { Undo2, Redo2, Zap, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 interface ExportBarProps {
   onExport?: (
@@ -348,6 +349,19 @@ export function ExportBar({
           />
         </div>
       )}
+
+      {/* Upgrade to Pro Button */}
+      <UpgradeModal>
+        <Button
+          variant="outline"
+          size="lg"
+          className="px-6 py-2 border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300"
+          aria-label="Upgrade to Pro"
+        >
+          <Crown className="w-4 h-4 mr-2" />
+          Upgrade to Pro
+        </Button>
+      </UpgradeModal>
 
       {/* Export Button */}
       <Button

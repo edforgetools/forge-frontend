@@ -27,6 +27,7 @@ import {
   formatDuration,
 } from "@/lib/export";
 import { useToast } from "@/hooks/use-toast";
+import { sendHeatmapData } from "@/lib/heatmap";
 
 interface ExportDialogProps {
   children: React.ReactNode;
@@ -127,6 +128,13 @@ export function ExportDialog({ children }: ExportDialogProps) {
           result.sizeBytes
         )} ${result.format.toUpperCase()} file in ${formatDuration(duration)}`,
       });
+
+      // Send heatmap data on successful export
+      try {
+        await sendHeatmapData();
+      } catch (error) {
+        console.debug("Failed to send heatmap data:", error);
+      }
 
       setIsOpen(false);
     } catch (error) {

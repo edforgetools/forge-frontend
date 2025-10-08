@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Play, Camera, Video, Download, ExternalLink } from "lucide-react";
 
@@ -9,52 +8,25 @@ interface IndexPageProps {
 export default function IndexPage({ onStart }: IndexPageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 flex items-center justify-center p-4">
-      <motion.div
-        className="max-w-2xl mx-auto text-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      >
+      <div className="max-w-2xl mx-auto text-center">
         {/* Logo/Icon */}
-        <motion.div
-          className="mb-8"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-        >
+        <div className="mb-8">
           <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Camera className="w-10 h-10 text-white" />
           </div>
-        </motion.div>
+        </div>
 
         {/* Main Heading */}
-        <motion.h1
-          className="text-5xl font-bold text-gray-900 mb-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-        >
-          Snapthumb
-        </motion.h1>
+        <h1 className="text-5xl font-bold text-gray-900 mb-6">Snapthumb</h1>
 
         {/* Subtitle */}
-        <motion.p
-          className="text-xl text-gray-600 mb-12 max-w-lg mx-auto"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-        >
+        <p className="text-xl text-gray-600 mb-12 max-w-lg mx-auto">
           Create perfect thumbnails from your videos and images with our
           intuitive editor
-        </motion.p>
+        </p>
 
         {/* Features */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
             <Video className="w-8 h-8 text-blue-600 mx-auto mb-3" />
             <h2 className="font-semibold text-gray-900 mb-2">Video Frames</h2>
@@ -78,14 +50,10 @@ export default function IndexPage({ onStart }: IndexPageProps) {
               Optimized files under 2MB for all platforms
             </p>
           </div>
-        </motion.div>
+        </div>
 
         {/* CTA Button */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
-        >
+        <div>
           <Button
             onClick={onStart}
             size="lg"
@@ -94,15 +62,10 @@ export default function IndexPage({ onStart }: IndexPageProps) {
             <Play className="w-5 h-5 mr-2" />
             Start Creating
           </Button>
-        </motion.div>
+        </div>
 
         {/* Footer */}
-        <motion.div
-          className="mt-16 text-sm text-gray-500"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
-        >
+        <div className="mt-16 text-sm text-gray-500">
           <p className="mb-4">
             Drag & drop support • Keyboard shortcuts • Responsive design
           </p>
@@ -142,8 +105,8 @@ export default function IndexPage({ onStart }: IndexPageProps) {
               <ExternalLink className="w-3 h-3" />
             </a>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }

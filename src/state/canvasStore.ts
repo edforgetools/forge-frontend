@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { track } from "@vercel/analytics";
+import { sendTelemetry } from "@/lib/telemetry";
 
 export type OverlayBase = {
   id: string;
@@ -74,6 +75,8 @@ export type CanvasState = {
   zoom: number;
   showGrid: boolean;
   showSafeZone: boolean;
+  // Pro tier state
+  isPro: boolean;
 };
 
 const defaultCrop: Crop = {
@@ -104,6 +107,8 @@ const defaultState: CanvasState = {
   zoom: 1,
   showGrid: false,
   showSafeZone: false,
+  // Pro tier defaults
+  isPro: false,
 };
 
 export type CanvasActions = {
@@ -137,6 +142,8 @@ export type CanvasActions = {
   resetView: () => void;
   toggleGrid: () => void;
   toggleSafeZone: () => void;
+  // Pro tier actions
+  setIsPro: (isPro: boolean) => void;
 };
 
 export type CanvasStore = CanvasState & CanvasActions;
@@ -204,6 +211,12 @@ export const useCanvasStore = create<CanvasStore>()(
           overlayId: newOverlay.id,
         });
 
+        // Send custom telemetry
+        sendTelemetry("onOverlayAdd", {
+          type: overlay.type,
+          overlayId: newOverlay.id,
+        });
+
         set({
           overlays: [...state.overlays, newOverlay],
           selectedId: newOverlay.id,
@@ -234,6 +247,15 @@ export const useCanvasStore = create<CanvasStore>()(
           track("text_overlay_edit", {
             overlayId: id,
             properties: Object.keys(patch).join(","),
+          });
+        }
+
+        // Send custom telemetry for overlay edits
+        if (overlay) {
+          sendTelemetry("onOverlayEdit", {
+            type: overlay.type,
+            overlayId: id,
+            properties: Object.keys(patch),
           });
         }
 
@@ -446,6 +468,14 @@ export const useCanvasStore = create<CanvasStore>()(
         const state = get();
         const newCrop = calculateCropForRatio(state.image, ratio);
         const dimensions = getDimensionsForRatio(ratio);
+
+        // Send telemetry for ratio change
+        sendTelemetry("onRatioChange", {
+          ratio,
+          previousRatio: state.aspect,
+          dimensions,
+        });
+
         set({
           aspect: ratio,
           crop: { ...newCrop, active: true },
@@ -482,6 +512,11 @@ export const useCanvasStore = create<CanvasStore>()(
       toggleSafeZone: () => {
         set((state) => ({ showSafeZone: !state.showSafeZone }));
       },
+
+      // Pro tier actions
+      setIsPro: (isPro) => {
+        set({ isPro });
+      },
     }),
     { name: "canvas-store" }
   )
@@ -517,6 +552,8 @@ export const canvasActions: CanvasActions = {
   resetView: () => useCanvasStore.getState().resetView(),
   toggleGrid: () => useCanvasStore.getState().toggleGrid(),
   toggleSafeZone: () => useCanvasStore.getState().toggleSafeZone(),
+  // Pro tier actions
+  setIsPro: (isPro) => useCanvasStore.getState().setIsPro(isPro),
 };
 
 function calculateAutoCrop(image: HTMLImageElement | ImageBitmap): Crop {
