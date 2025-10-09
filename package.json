@@ -56,7 +56,6 @@
     "@supabase/supabase-js": "^2.74.0",
     "@vercel/analytics": "^1.5.0",
     "clsx": "^2.1.1",
-    "forge-sdk": "^1.0.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-dropzone": "^14.3.8",
