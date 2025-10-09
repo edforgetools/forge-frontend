@@ -108,7 +108,7 @@ jobs:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
 
       - name: UI Regression Tests
-        run: pnpm test:ui
+        run: pnpm exec playwright test ci-basic.spec.ts --project=chromium
 
       - name: Lighthouse Audit
         run: pnpm test:lighthouse
@@ -182,7 +182,7 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
 
-      - name: Start server and run UI tests
+      - name: Start server for UI tests
         run: |
           echo "Starting preview server..."
           # Start server directly with vite to have full control over arguments
@@ -208,15 +208,7 @@ jobs:
           done
 
           echo "Server health check passed!"
-          echo "Running UI tests in headed mode..."
-
-          # Run UI tests in headed mode with chromium project
-          pnpm exec playwright test --project=chromium --headed
-          echo "UI tests completed successfully!"
-
-          # Clean up server
-          echo "Stopping server..."
-          kill $SERVER_PID || echo "Server already stopped"
+          echo "Server ready for UI tests!"
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
 

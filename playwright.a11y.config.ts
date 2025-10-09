@@ -13,6 +13,7 @@ export default defineConfig({
       name: "desktop",
       use: {
         ...devices["Desktop Chrome"],
+        headless: true,
         viewport: { width: 1440, height: 900 },
       },
     },
@@ -20,6 +21,7 @@ export default defineConfig({
       name: "mobile",
       use: {
         ...devices["iPhone 12"],
+        headless: true,
         viewport: { width: 375, height: 667 },
       },
     },
