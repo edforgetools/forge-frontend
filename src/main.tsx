@@ -57,9 +57,5 @@ const node = (
 );
 
 root.render(
-  import.meta.env.DEV ? (
-    <React.StrictMode>{node}</React.StrictMode>
-  ) : (
-    node
-  )
+  import.meta.env.DEV ? <React.StrictMode>{node}</React.StrictMode> : node
 );

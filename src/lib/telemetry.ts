@@ -35,8 +35,7 @@ const debounce = <T extends (...args: any[]) => void>(
 };
 
 // Check if we're in development mode
-const isDev =
-  import.meta.env.DEV;
+const isDev = import.meta.env.DEV;
 
 // Create debounced telemetry sender
 const createDebouncedSender = () => {
