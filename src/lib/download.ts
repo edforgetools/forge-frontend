@@ -82,7 +82,6 @@ export function downloadMultipleFiles(
 ): void {
   // TODO: Implement ZIP creation and download
   // TODO: Use a library like JSZip for client-side ZIP creation
-  console.log("Multiple file download not yet implemented:", files);
 
   // For now, download files individually
   files.forEach(({ blob, filename }) => {

@@ -52,7 +52,7 @@ export function ForgeVersionBanner() {
 
   if (isLoading) {
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
         <div className="flex items-center space-x-2">
           <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
           <span className="text-sm text-blue-800">
@@ -65,7 +65,7 @@ export function ForgeVersionBanner() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
         <div className="flex items-center space-x-2">
           <XCircle className="h-4 w-4 text-red-600" />
           <span className="text-sm text-red-800">
@@ -78,7 +78,7 @@ export function ForgeVersionBanner() {
 
   if (isConnected && versionInfo) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <CheckCircle className="h-4 w-4 text-green-600" />

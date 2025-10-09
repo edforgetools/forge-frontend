@@ -97,12 +97,6 @@ export async function compressCanvasWithSSIM(
     return compressPNGWithSSIM(canvas, targetSizeBytes, settings);
   }
 
-  console.log(
-    `Starting compression: target ${
-      settings.targetSizeMB
-    }MB, SSIM ≥${Math.round(settings.ssimThreshold * 100)}%`
-  );
-
   while (quality >= minQuality && iterations < maxIterations) {
     const blob = await new Promise<Blob | null>((resolve) => {
       canvas.toBlob(resolve, format, quality);
@@ -132,13 +126,6 @@ export async function compressCanvasWithSSIM(
 
       // Check SSIM threshold
       if (ssim >= settings.ssimThreshold) {
-        console.log(
-          `Compression successful: ${format} at ${(quality * 100).toFixed(
-            1
-          )}% quality, ${(blob.size / 1024 / 1024).toFixed(2)}MB, SSIM: ${(
-            ssim * 100
-          ).toFixed(1)}%`
-        );
         return result;
       } else {
         // Store as potential result if it's the best so far
@@ -154,19 +141,9 @@ export async function compressCanvasWithSSIM(
 
   // If we couldn't meet both size and SSIM requirements, try resizing
   if (!bestResult || bestResult.sizeBytes > targetSizeBytes) {
-    console.log(
-      `Quality reduction insufficient, attempting resize for ${format}`
-    );
     return compressWithResize(canvas, format, targetSizeBytes, settings);
   }
 
-  console.log(
-    `Using best available result: ${(bestResult.quality * 100).toFixed(
-      1
-    )}% quality, ${(bestResult.sizeBytes / 1024 / 1024).toFixed(2)}MB, SSIM: ${(
-      bestResult.ssim * 100
-    ).toFixed(1)}%`
-  );
   return bestResult;
 }
 

@@ -66,6 +66,9 @@ export default function Home() {
                   <Sparkles className="w-4 h-4" />
                   Snapthumb v1.2
                 </div>
+                <div className="text-sm text-muted-foreground mb-6">
+                  Powered by Forge Layer v0.2
+                </div>
               </div>
 
               {/* Main Heading */}
@@ -651,7 +654,7 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                Layer v0.2 Connected
+                Powered by Forge Layer v0.2
               </div>
               <a
                 href="https://forge.tools"
@@ -659,8 +662,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg text-muted-foreground hover:text-foreground transition-colors text-sm"
               >
-                <span>Built with</span>
-                <span className="font-semibold">Forge</span>
+                <span>Learn More</span>
                 <ExternalLink className="w-4 h-4" />
               </a>
             </div>

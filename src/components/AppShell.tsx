@@ -342,10 +342,9 @@ export function AppShell({ onBack }: AppShellProps) {
             <Card className="shadow-sm rounded-2xl">
               <CardContent className="p-6">
                 <ProjectManager
-                  onLoadProject={(projectData) => {
+                  onLoadProject={(_projectData) => {
                     // Load project data into canvas
                     // Note: loadProject method needs to be implemented in canvasStore
-                    console.log("Loading project:", projectData);
                     setActivePanel("upload");
                   }}
                   onSaveProject={() => {

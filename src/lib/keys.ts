@@ -47,12 +47,10 @@ class KeyRegistry {
     // Handle HMR cleanup - ensure cleanup before rebind
     if (import.meta.hot) {
       import.meta.hot.accept(() => {
-        console.log("🔄 Key Registry: HMR accept, cleaning up before rebind");
         this.cleanup();
       });
 
       import.meta.hot.dispose(() => {
-        console.log("🔄 Key Registry: HMR dispose, cleaning up all bindings");
         this.cleanup();
       });
     }
@@ -231,8 +229,6 @@ class KeyRegistry {
    * Ensures no duplicate listeners after HMR
    */
   cleanup(): void {
-    console.log("🧹 Key Registry: Cleaning up all listeners and bindings");
-
     // Remove document listener if it exists
     if (this.documentListener) {
       document.removeEventListener("keydown", this.documentListener);
@@ -243,8 +239,6 @@ class KeyRegistry {
     this.bindings.clear();
     this.listeners.clear();
     this.isInitialized = false;
-
-    console.log("✅ Key Registry: Cleanup completed");
   }
 
   /**
@@ -253,7 +247,6 @@ class KeyRegistry {
    */
   ensureCleanState(): void {
     if (this.isInitialized || this.bindings.size > 0) {
-      console.log("🧹 Key Registry: Ensuring clean state before rebind");
       this.cleanup();
     }
   }

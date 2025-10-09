@@ -287,7 +287,7 @@ export async function exportAndDownload(
 ): Promise<ExportResult> {
   const result = await exportCanvas(options);
 
-  // Generate filename
+  // Generate filename with correct format for Snapthumb
   const extension = getExtensionFromMimeType(`image/${result.format}`);
   const filename = generateFilename("snapthumb", extension);
 

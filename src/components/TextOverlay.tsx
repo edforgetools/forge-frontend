@@ -284,7 +284,7 @@ export function TextOverlay({ className }: TextOverlayProps) {
           </div>
 
           {/* Color Presets */}
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-2">
             {COLOR_PRESETS.map((color) => (
               <button
                 key={color}
@@ -499,7 +499,7 @@ export function TextOverlay({ className }: TextOverlayProps) {
                       {text.text}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
                     <span
                       className="text-xs px-1 py-0.5 rounded"
                       style={{

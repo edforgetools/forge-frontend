@@ -1,6 +1,12 @@
 {
   "rewrites": [
-    { "source": "/api/forge/(.*)", "destination": "https://forge-layer.onrender.com/forge/$1" },
-    { "source": "/api/health",     "destination": "https://forge-layer.onrender.com/health" }
+    {
+      "source": "/api/forge/(.*)",
+      "destination": "https://forge-layer.onrender.com/forge/$1"
+    },
+    {
+      "source": "/api/health",
+      "destination": "https://forge-layer.onrender.com/health"
+    }
   ]
 }
