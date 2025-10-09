@@ -1,10 +1,24 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
-import { useCanvasStore } from "@/state/canvasStore";
+import {
+  useCanvasStore,
+  TextOverlay as TextOverlayType,
+  LogoOverlay,
+} from "@/state/canvasStore";
 import { TextOverlay } from "./TextOverlay";
+import { CropOverlay } from "./CropOverlay";
+import { LayerHost } from "./LayerHost";
 import { startHeatmapTracking, stopHeatmapTracking } from "@/lib/heatmap";
+import { useViewportScale } from "@/hooks/useViewportScale";
+import { useSessionRestoreGuardEffect } from "@/state/session";
+import { modalActions } from "@/state/modalStore";
 
-export function CanvasStage() {
+interface CanvasStageProps {
+  onDragStateChange?: (isDragging: boolean) => void;
+}
+
+export function CanvasStage({ onDragStateChange }: CanvasStageProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
@@ -20,7 +34,36 @@ export function CanvasStage() {
     showSafeZone,
     select,
     updateOverlay,
+    setCrop,
   } = useCanvasStore();
+
+  // Layer selection hook available for future use
+  // const { selectedOverlay } = useLayerSelection();
+
+  // Get aspect ratio value for viewport scale calculation
+  const getAspectRatioValue = (aspect: string): number => {
+    switch (aspect) {
+      case "16:9":
+        return 16 / 9;
+      case "1:1":
+        return 1;
+      case "9:16":
+        return 9 / 16;
+      default:
+        return 16 / 9;
+    }
+  };
+
+  // Use viewport scale hook
+  const { viewportScale } = useViewportScale(containerRef, {
+    targetAspectRatio: getAspectRatioValue(aspect),
+    zoom,
+    minZoom: 0.5,
+    maxZoom: 2,
+  });
+
+  // Session restore guard
+  const { checkAndSaveViewport } = useSessionRestoreGuardEffect();
 
   // Animation frame ref for smooth redraws
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -35,13 +78,25 @@ export function CanvasStage() {
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Set canvas size to match crop area
-    canvas.width = crop.w;
-    canvas.height = crop.h;
+    // Set canvas size to match crop area with proper pixel ratio
+    const pixelRatio = window.devicePixelRatio || 1;
+    const logicalWidth = crop.w;
+    const logicalHeight = crop.h;
+
+    // Set logical size for CSS
+    canvas.style.width = `${logicalWidth}px`;
+    canvas.style.height = `${logicalHeight}px`;
+
+    // Set actual canvas size for high DPI displays
+    canvas.width = logicalWidth * pixelRatio;
+    canvas.height = logicalHeight * pixelRatio;
+
+    // Scale context to match device pixel ratio for crisp rendering
+    ctx.scale(pixelRatio, pixelRatio);
 
     // Draw background
     ctx.fillStyle = "#f3f4f6";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, logicalWidth, logicalHeight);
 
     // Draw image if available
     if (image) {
@@ -58,8 +113,8 @@ export function CanvasStage() {
         sourceHeight,
         0,
         0,
-        canvas.width,
-        canvas.height
+        logicalWidth,
+        logicalHeight
       );
     }
 
@@ -73,17 +128,17 @@ export function CanvasStage() {
 
     // Draw grid if enabled
     if (showGrid) {
-      drawGrid(ctx);
+      drawGrid(ctx, logicalWidth, logicalHeight);
     }
 
     // Draw safe zone if enabled
     if (showSafeZone) {
-      drawSafeZone(ctx);
+      drawSafeZone(ctx, logicalWidth, logicalHeight);
     }
 
     // Draw crop overlay if active
     if (crop.active) {
-      drawCropOverlay(ctx);
+      drawCropOverlay(ctx, logicalWidth, logicalHeight);
     }
   }, [
     image,
@@ -99,7 +154,7 @@ export function CanvasStage() {
 
   const drawOverlay = (
     ctx: CanvasRenderingContext2D,
-    overlay: any,
+    overlay: TextOverlayType | LogoOverlay,
     isSelected: boolean
   ) => {
     ctx.save();
@@ -123,19 +178,42 @@ export function CanvasStage() {
       img.src = overlay.src;
     }
 
-    // Draw selection outline
+    // Draw selection outline with improved styling
     if (isSelected) {
+      ctx.save();
       ctx.strokeStyle = "#3b82f6";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([5, 5]);
-      ctx.strokeRect(-overlay.w / 2, -overlay.h / 2, overlay.w, overlay.h);
+      ctx.lineWidth = 3;
       ctx.setLineDash([]);
+
+      // Draw main outline
+      ctx.strokeRect(
+        -overlay.w / 2 - 2,
+        -overlay.h / 2 - 2,
+        overlay.w + 4,
+        overlay.h + 4
+      );
+
+      // Draw inner highlight
+      ctx.strokeStyle = "rgba(59, 130, 246, 0.3)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(
+        -overlay.w / 2 - 1,
+        -overlay.h / 2 - 1,
+        overlay.w + 2,
+        overlay.h + 2
+      );
+
+      ctx.restore();
     }
 
     ctx.restore();
   };
 
-  const drawGrid = (ctx: CanvasRenderingContext2D) => {
+  const drawGrid = (
+    ctx: CanvasRenderingContext2D,
+    logicalWidth: number,
+    logicalHeight: number
+  ) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -147,32 +225,36 @@ export function CanvasStage() {
     const scaledGridSize = gridSize * zoom;
 
     // Draw vertical lines
-    for (let x = 0; x <= canvas.width; x += scaledGridSize) {
+    for (let x = 0; x <= logicalWidth; x += scaledGridSize) {
       ctx.beginPath();
       ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
+      ctx.lineTo(x, logicalHeight);
       ctx.stroke();
     }
 
     // Draw horizontal lines
-    for (let y = 0; y <= canvas.height; y += scaledGridSize) {
+    for (let y = 0; y <= logicalHeight; y += scaledGridSize) {
       ctx.beginPath();
       ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
+      ctx.lineTo(logicalWidth, y);
       ctx.stroke();
     }
 
     ctx.restore();
   };
 
-  const drawSafeZone = (ctx: CanvasRenderingContext2D) => {
+  const drawSafeZone = (
+    ctx: CanvasRenderingContext2D,
+    logicalWidth: number,
+    logicalHeight: number
+  ) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const safeZoneWidth = canvas.width * 0.9;
-    const safeZoneHeight = canvas.height * 0.9;
+    const centerX = logicalWidth / 2;
+    const centerY = logicalHeight / 2;
+    const safeZoneWidth = logicalWidth * 0.9;
+    const safeZoneHeight = logicalHeight * 0.9;
 
     ctx.save();
     ctx.strokeStyle = "#10b981";
@@ -188,14 +270,18 @@ export function CanvasStage() {
     ctx.restore();
   };
 
-  const drawCropOverlay = (ctx: CanvasRenderingContext2D) => {
+  const drawCropOverlay = (
+    ctx: CanvasRenderingContext2D,
+    logicalWidth: number,
+    logicalHeight: number
+  ) => {
     // Draw aspect ratio guide based on current aspect
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const guideWidth = canvas.width * 0.8;
+    const centerX = logicalWidth / 2;
+    const centerY = logicalHeight / 2;
+    const guideWidth = logicalWidth * 0.8;
 
     // Calculate guide height based on current aspect ratio
     let guideHeight: number;
@@ -317,56 +403,174 @@ export function CanvasStage() {
     };
   }, [hasContent]);
 
+  // Session restore guard - check viewport on mount and when viewport changes
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const checkViewport = async () => {
+      const rect = container.getBoundingClientRect();
+      const viewportDimensions = {
+        width: rect.width,
+        height: rect.height,
+      };
+
+      // Only check if we have meaningful dimensions
+      if (viewportDimensions.width > 0 && viewportDimensions.height > 0) {
+        await checkAndSaveViewport(viewportDimensions);
+      }
+    };
+
+    // Check on mount
+    checkViewport();
+
+    // Set up ResizeObserver to check when viewport changes
+    const resizeObserver = new ResizeObserver(() => {
+      checkViewport();
+    });
+
+    resizeObserver.observe(container);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [checkAndSaveViewport]);
+
+  // Canvas-focused keyboard shortcuts
+  const handleCanvasKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLCanvasElement>) => {
+      // Only handle ? key when canvas is focused
+      if (event.key === "?") {
+        event.preventDefault();
+        modalActions.openShortcuts();
+      }
+    },
+    []
+  );
+
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-full"
+      className="canvas w-full h-full flex items-center justify-center"
       data-testid="canvas-stage"
     >
-      <div className="relative bg-gray-100 rounded-2xl shadow-lg p-6">
+      <div className="relative bg-gray-100 rounded-2xl shadow-lg p-4 md:p-6 w-full max-w-4xl h-full">
         <div
-          className="border border-gray-200 rounded-xl shadow-sm bg-white overflow-hidden relative"
+          ref={containerRef}
+          className="border border-gray-200 rounded-xl shadow-sm bg-white overflow-hidden relative mx-auto h-full flex items-center justify-center"
           style={{
-            transform: `scale(${zoom})`,
-            transformOrigin: "center",
-            maxWidth: `${800 / zoom}px`,
-            maxHeight: `${600 / zoom}px`,
+            position: "relative",
+            width: "100%",
+            height: "100%",
           }}
         >
+          {/* Letterbox areas */}
+          {viewportScale.letterboxTop > 0 && (
+            <div
+              className="absolute top-0 left-0 bg-gray-800"
+              style={{
+                width: "100%",
+                height: `${viewportScale.letterboxTop}px`,
+              }}
+            />
+          )}
+          {viewportScale.letterboxBottom > 0 && (
+            <div
+              className="absolute bottom-0 left-0 bg-gray-800"
+              style={{
+                width: "100%",
+                height: `${viewportScale.letterboxBottom}px`,
+              }}
+            />
+          )}
+          {viewportScale.letterboxLeft > 0 && (
+            <div
+              className="absolute top-0 left-0 bg-gray-800"
+              style={{
+                width: `${viewportScale.letterboxLeft}px`,
+                height: "100%",
+              }}
+            />
+          )}
+          {viewportScale.letterboxRight > 0 && (
+            <div
+              className="absolute top-0 right-0 bg-gray-800"
+              style={{
+                width: `${viewportScale.letterboxRight}px`,
+                height: "100%",
+              }}
+            />
+          )}
+
           <canvas
             ref={canvasRef}
             className="block focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             style={{
-              width: "100%",
-              height: "auto",
-              maxWidth: "800px",
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              marginTop: `-${(crop.h * viewportScale.scale) / 2}px`,
+              marginLeft: `-${(crop.w * viewportScale.scale) / 2}px`,
+              maxWidth: "100%",
+              maxHeight: "100%",
             }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onDoubleClick={handleDoubleClick}
+            onKeyDown={handleCanvasKeyDown}
             tabIndex={13}
             role="img"
             aria-label="Canvas for editing images and overlays"
-            aria-describedby="canvas-description"
+            aria-describedby="canvas-description shortcuts-hint"
           />
 
-          {/* Render text overlays as separate components */}
-          {overlays
-            .filter((overlay) => !overlay.hidden && overlay.type === "text")
-            .sort((a, b) => a.z - b.z)
-            .map((overlay) => (
-              <TextOverlay
-                key={overlay.id}
-                overlay={overlay as any}
-                isSelected={selectedId === overlay.id}
-                onUpdate={(updates) => updateOverlay(overlay.id, updates)}
-                onSelect={() => select(overlay.id)}
-              />
-            ))}
+          {/* Render text overlays as separate components with LayerHost */}
+          <LayerHost
+            onDragStart={() => {
+              setIsDragging(true);
+              onDragStateChange?.(true);
+            }}
+            onDragEnd={() => {
+              setIsDragging(false);
+              onDragStateChange?.(false);
+            }}
+            className="absolute inset-0"
+          >
+            {overlays
+              .filter((overlay) => !overlay.hidden && overlay.type === "text")
+              .sort((a, b) => a.z - b.z)
+              .map((overlay) => (
+                <TextOverlay
+                  key={overlay.id}
+                  overlay={overlay as TextOverlayType}
+                  isSelected={selectedId === overlay.id}
+                  onUpdate={(updates: Partial<TextOverlayType>) =>
+                    updateOverlay(overlay.id, updates)
+                  }
+                  onSelect={() => select(overlay.id)}
+                />
+              ))}
+          </LayerHost>
+
+          {/* Crop Overlay */}
+          <CropOverlay
+            cropArea={{
+              x: crop.x,
+              y: crop.y,
+              width: crop.w,
+              height: crop.h,
+            }}
+            canvasWidth={crop.w}
+            canvasHeight={crop.h}
+            isVisible={crop.active}
+            onCropChange={(newCrop) => {
+              setCrop(newCrop);
+            }}
+          />
         </div>
 
         {!hasContent && (
-          <div className="absolute inset-6 flex items-center justify-center bg-white rounded-xl">
+          <div className="absolute inset-4 md:inset-6 flex items-center justify-center bg-white rounded-xl">
             <div className="text-center text-gray-500">
               <div className="text-lg font-medium mb-2">No content loaded</div>
               <div className="text-sm">
@@ -377,11 +581,11 @@ export function CanvasStage() {
         )}
       </div>
 
-      {/* Canvas info */}
+      {/* Canvas info - Hidden on mobile to save space */}
       {hasContent && (
         <div
           id="canvas-description"
-          className="mt-4 text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200"
+          className="hidden md:block mt-4 text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200"
           role="status"
           aria-live="polite"
         >
@@ -389,6 +593,11 @@ export function CanvasStage() {
           ratio
         </div>
       )}
+
+      {/* Hidden hint for screen readers about shortcuts */}
+      <div id="shortcuts-hint" className="sr-only" aria-hidden="true">
+        Press the question mark key (?) to open keyboard shortcuts help
+      </div>
     </div>
   );
 }

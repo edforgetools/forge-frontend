@@ -17,24 +17,24 @@ interface UpgradeModalProps {
 
 const proBenefits = [
   {
-    icon: <Download className="w-6 h-6 text-blue-600" />,
+    icon: <Download className="w-5 h-5 text-blue-600" />,
     title: "HD Export",
     description:
       "Export your thumbnails in high definition up to 4K resolution",
   },
   {
-    icon: <Shield className="w-6 h-6 text-green-600" />,
+    icon: <Shield className="w-5 h-5 text-green-600" />,
     title: "Watermark Removal",
     description: "Remove watermarks and create clean, professional thumbnails",
   },
   {
-    icon: <Cloud className="w-6 h-6 text-purple-600" />,
+    icon: <Cloud className="w-5 h-5 text-purple-600" />,
     title: "Cloud Save",
     description:
       "Save your projects in the cloud and access them from anywhere",
   },
   {
-    icon: <Zap className="w-6 h-6 text-yellow-600" />,
+    icon: <Zap className="w-5 h-5 text-yellow-600" />,
     title: "Advanced Features",
     description: "Unlock premium tools and advanced editing capabilities",
   },
@@ -54,7 +54,7 @@ export function UpgradeModal({ children }: UpgradeModalProps) {
   if (isPro) {
     return (
       <div className="flex items-center space-x-2 text-green-600">
-        <CheckCircle className="w-4 h-4" />
+        <CheckCircle className="w-[18px] h-[18px]" />
         <span className="text-sm font-medium">Pro Active</span>
       </div>
     );

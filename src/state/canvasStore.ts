@@ -115,6 +115,7 @@ export type CanvasActions = {
   setImage: (img?: HTMLImageElement | ImageBitmap) => void;
   setVideo: (src?: string) => void;
   setCrop: (patch: Partial<Crop>) => void;
+  toggleCrop: () => void;
   setOverlays: (arr: (LogoOverlay | TextOverlay)[]) => void;
   addOverlay: (overlay: Omit<LogoOverlay | TextOverlay, "id" | "z">) => void;
   updateOverlay: (
@@ -137,6 +138,7 @@ export type CanvasActions = {
   // New toolbar actions
   setAspectRatio: (ratio: AspectRatio) => void;
   setZoom: (zoom: number) => void;
+  setZoomPreset: (preset: number) => void;
   zoomIn: () => void;
   zoomOut: () => void;
   resetView: () => void;
@@ -180,6 +182,12 @@ export const useCanvasStore = create<CanvasStore>()(
       setCrop: (patch) => {
         set((state) => ({
           crop: { ...state.crop, ...patch },
+        }));
+      },
+
+      toggleCrop: () => {
+        set((state) => ({
+          crop: { ...state.crop, active: !state.crop.active },
         }));
       },
 
@@ -488,17 +496,26 @@ export const useCanvasStore = create<CanvasStore>()(
       },
 
       setZoom: (zoom) => {
-        set({ zoom: Math.max(0.1, Math.min(5, zoom)) });
+        set({ zoom: Math.max(0.5, Math.min(2, zoom)) });
+      },
+
+      setZoomPreset: (preset) => {
+        const validPresets = [0.5, 0.75, 1, 1.5, 2];
+        if (validPresets.includes(preset)) {
+          set({ zoom: preset });
+        }
       },
 
       zoomIn: () => {
         const state = get();
-        set({ zoom: Math.min(5, state.zoom * 1.2) });
+        const newZoom = Math.min(2, state.zoom * 1.2);
+        set({ zoom: newZoom });
       },
 
       zoomOut: () => {
         const state = get();
-        set({ zoom: Math.max(0.1, state.zoom / 1.2) });
+        const newZoom = Math.max(0.5, state.zoom / 1.2);
+        set({ zoom: newZoom });
       },
 
       resetView: () => {
@@ -527,6 +544,7 @@ export const canvasActions: CanvasActions = {
   setImage: (v) => useCanvasStore.getState().setImage(v),
   setVideo: (v) => useCanvasStore.getState().setVideo(v),
   setCrop: (v) => useCanvasStore.getState().setCrop(v),
+  toggleCrop: () => useCanvasStore.getState().toggleCrop(),
   setOverlays: (v) => useCanvasStore.getState().setOverlays(v),
   addOverlay: (overlay) => useCanvasStore.getState().addOverlay(overlay),
   updateOverlay: (id, patch) =>
@@ -547,6 +565,7 @@ export const canvasActions: CanvasActions = {
   // New toolbar actions
   setAspectRatio: (ratio) => useCanvasStore.getState().setAspectRatio(ratio),
   setZoom: (zoom) => useCanvasStore.getState().setZoom(zoom),
+  setZoomPreset: (preset) => useCanvasStore.getState().setZoomPreset(preset),
   zoomIn: () => useCanvasStore.getState().zoomIn(),
   zoomOut: () => useCanvasStore.getState().zoomOut(),
   resetView: () => useCanvasStore.getState().resetView(),

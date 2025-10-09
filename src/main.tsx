@@ -1,23 +1,22 @@
-import React, { Suspense, lazy, useState, useEffect } from "react";
+import React, { Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
-import IndexPageStatic from "./pages/index-static";
-import { EditorSkeleton } from "./components/EditorSkeleton";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App";
 import "./styles/globals.css";
+import "./styles/layers.css";
+import {
+  runPortalRootValidation,
+  enableDevelopmentValidation,
+} from "./lib/sanity";
+import { computeScrollbarWidth, ensurePortalRoot } from "./lib/dom";
 
-// Lazy load non-critical pages and components
-const IndexPage = lazy(() => import("./pages/index"));
-const TermsPage = lazy(() => import("./pages/terms"));
-const PrivacyPage = lazy(() => import("./pages/privacy"));
-const AboutPage = lazy(() => import("./pages/about"));
-const AppPage = lazy(() => import("./pages/app"));
+// Lazy load non-critical components
 const Toaster = lazy(() =>
   import("@/lib/ui/toaster").then((m) => ({ default: m.Toaster }))
 );
 const Analytics = lazy(() =>
   import("@vercel/analytics/react").then((m) => ({ default: m.Analytics }))
 );
-
-// AppPage is already declared above
 
 // Register service worker for caching
 if ("serviceWorker" in navigator) {
@@ -33,116 +32,21 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// Simple routing without react-router-dom for now
-function App() {
-  const [currentPage, setCurrentPage] = useState<
-    "index" | "app" | "terms" | "privacy" | "about"
-  >("index");
-  const [useAnimatedIndex, setUseAnimatedIndex] = useState(false);
+// Run portal/root validation at boot
+runPortalRootValidation();
 
-  // Handle URL-based routing
-  useEffect(() => {
-    const path = window.location.pathname;
-    if (path === "/terms") {
-      setCurrentPage("terms");
-    } else if (path === "/privacy") {
-      setCurrentPage("privacy");
-    } else if (path === "/about") {
-      setCurrentPage("about");
-    } else if (path === "/app") {
-      setCurrentPage("app");
-    } else {
-      setCurrentPage("index");
-    }
-  }, []);
+// Enable development validation for hot reloading scenarios
+enableDevelopmentValidation();
 
-  // Upgrade to animated version after initial load
-  useEffect(() => {
-    if (currentPage === "index") {
-      const timer = setTimeout(() => {
-        setUseAnimatedIndex(true);
-      }, 100); // Small delay to ensure static version renders first
-      return () => clearTimeout(timer);
-    }
-  }, [currentPage]);
+// Compute scrollbar width on load
+computeScrollbarWidth();
 
-  // Update URL when page changes
-  const navigateTo = (page: typeof currentPage) => {
-    setCurrentPage(page);
-    const path = page === "index" ? "/" : `/${page}`;
-    window.history.pushState({}, "", path);
-  };
+// Ensure portal root exists (fallback for missing portal-root)
+ensurePortalRoot();
 
-  if (currentPage === "app") {
-    return (
-      <Suspense fallback={<EditorSkeleton />}>
-        <AppPage onBack={() => navigateTo("index")} />
-      </Suspense>
-    );
-  }
-
-  if (currentPage === "terms") {
-    return (
-      <Suspense
-        fallback={
-          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            Loading...
-          </div>
-        }
-      >
-        <TermsPage onBack={() => navigateTo("index")} />
-      </Suspense>
-    );
-  }
-
-  if (currentPage === "privacy") {
-    return (
-      <Suspense
-        fallback={
-          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            Loading...
-          </div>
-        }
-      >
-        <PrivacyPage onBack={() => navigateTo("index")} />
-      </Suspense>
-    );
-  }
-
-  if (currentPage === "about") {
-    return (
-      <Suspense
-        fallback={
-          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            Loading...
-          </div>
-        }
-      >
-        <AboutPage onBack={() => navigateTo("index")} />
-      </Suspense>
-    );
-  }
-
-  // Use static version initially for faster FCP, then upgrade to animated
-  if (currentPage === "index") {
-    if (useAnimatedIndex) {
-      return (
-        <Suspense
-          fallback={<IndexPageStatic onStart={() => navigateTo("app")} />}
-        >
-          <IndexPage onStart={() => navigateTo("app")} />
-        </Suspense>
-      );
-    }
-    return <IndexPageStatic onStart={() => navigateTo("app")} />;
-  }
-
-  // Default fallback
-  return <div>Loading...</div>;
-}
-
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+const root = ReactDOM.createRoot(document.getElementById("root")!);
+const node = (
+  <BrowserRouter>
     <App />
     <Suspense fallback={null}>
       <Toaster />
@@ -153,5 +57,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Analytics />
       </Suspense>
     )}
-  </React.StrictMode>
+  </BrowserRouter>
+);
+
+root.render(
+  process.env.NODE_ENV === "development" ? (
+    <React.StrictMode>{node}</React.StrictMode>
+  ) : (
+    node
+  )
 );

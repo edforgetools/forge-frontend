@@ -101,7 +101,7 @@ export function TextOverlay({
       fontSize: `${overlay.size}px`,
       fontWeight: overlay.weight,
       color: overlay.color,
-      textAlign: overlay.align as any,
+      textAlign: overlay.align as "left" | "center" | "right",
       textShadow: overlay.shadow ? "1px 1px 2px rgba(0, 0, 0, 0.5)" : "none",
       lineHeight: "1.2",
       minHeight: "1em",
@@ -124,8 +124,10 @@ export function TextOverlay({
       height: `${overlay.h}px`,
       transform: `rotate(${overlay.rot}deg)`,
       opacity: overlay.opacity,
-      cursor: isEditing ? "text" : "move",
+      cursor: isEditing ? "text" : "pointer",
       userSelect: isEditing ? "text" : "none",
+      pointerEvents: "auto",
+      zIndex: overlay.z,
     };
   };
 
@@ -136,12 +138,13 @@ export function TextOverlay({
         onClick={onSelect}
         onDoubleClick={handleDoubleClick}
         className={`${isSelected ? "ring-2 ring-blue-500 ring-offset-2" : ""} ${
-          isEditing ? "cursor-text" : "cursor-move"
-        } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+          isEditing ? "cursor-text" : "cursor-pointer"
+        } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-150`}
         tabIndex={0}
         role="textbox"
         aria-label={`Text overlay: ${overlay.text}`}
         aria-describedby={`text-overlay-${overlay.id}-description`}
+        data-layer-id={overlay.id}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();

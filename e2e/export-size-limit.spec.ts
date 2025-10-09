@@ -21,8 +21,8 @@ test.describe("Snapthumb Export Size Limit", () => {
 
     // Set quality to maximum to test size optimization
     const qualitySlider = page.locator('[role="slider"]');
-    await qualitySlider.evaluate((el: any) => {
-      el.value = 1;
+    await qualitySlider.evaluate((el: HTMLInputElement) => {
+      el.value = "1";
       el.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
@@ -120,8 +120,8 @@ test.describe("Snapthumb Export Size Limit", () => {
 
     // Export with maximum quality to test optimization
     const qualitySlider = page.locator('[role="slider"]');
-    await qualitySlider.evaluate((el: any) => {
-      el.value = 1;
+    await qualitySlider.evaluate((el: HTMLInputElement) => {
+      el.value = "1";
       el.dispatchEvent(new Event("input", { bubbles: true }));
     });
 

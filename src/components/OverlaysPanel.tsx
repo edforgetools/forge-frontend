@@ -37,6 +37,7 @@ export function OverlaysPanel() {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
+    input.setAttribute("data-testid", "logo-upload-input");
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
@@ -135,7 +136,7 @@ export function OverlaysPanel() {
             className="justify-start"
             aria-label="Add logo overlay to canvas"
           >
-            <Image className="w-4 h-4 mr-2" />
+            <Image className="w-[18px] h-[18px] mr-2" />
             Add Logo
           </Button>
           <Button
@@ -145,7 +146,7 @@ export function OverlaysPanel() {
             className="justify-start"
             aria-label="Add text overlay to canvas"
           >
-            <Type className="w-4 h-4 mr-2" />
+            <Type className="w-[18px] h-[18px] mr-2" />
             Add Text
           </Button>
         </div>
@@ -173,9 +174,9 @@ export function OverlaysPanel() {
                   >
                     <div className="flex items-center space-x-2 flex-1 min-w-0">
                       {overlay.type === "logo" ? (
-                        <Image className="w-4 h-4 text-gray-600 flex-shrink-0" />
+                        <Image className="w-[18px] h-[18px] text-gray-600 flex-shrink-0" />
                       ) : (
-                        <Type className="w-4 h-4 text-gray-600 flex-shrink-0" />
+                        <Type className="w-[18px] h-[18px] text-gray-600 flex-shrink-0" />
                       )}
                       <span className="text-sm truncate">
                         {overlay.type === "text"
@@ -183,10 +184,10 @@ export function OverlaysPanel() {
                           : "Logo"}
                       </span>
                       {overlay.locked && (
-                        <Lock className="w-3 h-3 text-gray-400" />
+                        <Lock className="w-[18px] h-[18px] text-gray-400" />
                       )}
                       {overlay.hidden && (
-                        <EyeOff className="w-3 h-3 text-gray-400" />
+                        <EyeOff className="w-[18px] h-[18px] text-gray-400" />
                       )}
                     </div>
 
@@ -198,12 +199,14 @@ export function OverlaysPanel() {
                         }}
                         className="p-1 hover:bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                         data-testid="toggle-visibility"
-                        aria-label={`${overlay.hidden ? 'Show' : 'Hide'} ${overlay.type === 'text' ? 'text' : 'logo'} overlay`}
+                        aria-label={`${overlay.hidden ? "Show" : "Hide"} ${
+                          overlay.type === "text" ? "text" : "logo"
+                        } overlay`}
                       >
                         {overlay.hidden ? (
-                          <EyeOff className="w-3 h-3 text-gray-500" />
+                          <EyeOff className="w-[18px] h-[18px] text-gray-500" />
                         ) : (
-                          <Eye className="w-3 h-3 text-gray-500" />
+                          <Eye className="w-[18px] h-[18px] text-gray-500" />
                         )}
                       </button>
                       <button
@@ -213,12 +216,14 @@ export function OverlaysPanel() {
                         }}
                         className="p-1 hover:bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1"
                         data-testid="toggle-lock"
-                        aria-label={`${overlay.locked ? 'Unlock' : 'Lock'} ${overlay.type === 'text' ? 'text' : 'logo'} overlay`}
+                        aria-label={`${overlay.locked ? "Unlock" : "Lock"} ${
+                          overlay.type === "text" ? "text" : "logo"
+                        } overlay`}
                       >
                         {overlay.locked ? (
-                          <Lock className="w-3 h-3 text-gray-500" />
+                          <Lock className="w-[18px] h-[18px] text-gray-500" />
                         ) : (
-                          <Unlock className="w-3 h-3 text-gray-500" />
+                          <Unlock className="w-[18px] h-[18px] text-gray-500" />
                         )}
                       </button>
                       <button
@@ -228,9 +233,11 @@ export function OverlaysPanel() {
                         }}
                         className="p-1 hover:bg-red-100 rounded text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
                         data-testid="delete-overlay"
-                        aria-label={`Delete ${overlay.type === 'text' ? 'text' : 'logo'} overlay`}
+                        aria-label={`Delete ${
+                          overlay.type === "text" ? "text" : "logo"
+                        } overlay`}
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-[18px] h-[18px]" />
                       </button>
                     </div>
                   </div>
@@ -253,7 +260,7 @@ export function OverlaysPanel() {
                   title="Send to back"
                   aria-label="Send overlay to back"
                 >
-                  <Move className="w-3 h-3 text-gray-500 rotate-180" />
+                  <Move className="w-[18px] h-[18px] text-gray-500 rotate-180" />
                 </button>
                 <button
                   onClick={() => handleZOrderChange(selectedOverlay.id, "up")}
@@ -261,7 +268,7 @@ export function OverlaysPanel() {
                   title="Bring to front"
                   aria-label="Bring overlay to front"
                 >
-                  <Move className="w-3 h-3 text-gray-500" />
+                  <Move className="w-[18px] h-[18px] text-gray-500" />
                 </button>
               </div>
             </div>

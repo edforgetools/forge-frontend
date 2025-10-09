@@ -7,22 +7,24 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-interface TermsPageProps {
-  onBack: () => void;
-}
+export default function TermsPage() {
+  const navigate = useNavigate();
 
-export default function TermsPage({ onBack }: TermsPageProps) {
+  const handleBack = () => {
+    navigate("/");
+  };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 p-4">
+    <div className="h-[100dvh] bg-gradient-to-br from-blue-50 via-white to-indigo-100 p-4">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <Button
             variant="ghost"
-            onClick={onBack}
+            onClick={handleBack}
             className="mb-4 text-blue-600 hover:text-blue-700"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-[18px] h-[18px] mr-2" />
             Back to Snapthumb
           </Button>
         </div>

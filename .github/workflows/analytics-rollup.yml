@@ -1,0 +1,41 @@
+name: Daily Analytics Rollup
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  analytics-rollup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Daily Analytics Rollup
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{"query": "SELECT public.run_daily_analytics_rollup();"}' \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/rpc/run_daily_analytics_rollup"
+
+  # Alternative: Use Supabase CLI (if you prefer)
+  analytics-rollup-cli:
+    runs-on: ubuntu-latest
+    if: false # Set to true if you want to use Supabase CLI instead
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Run analytics rollup
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          echo "SELECT public.run_daily_analytics_rollup();" | supabase db reset --db-url "$SUPABASE_URL" --service-role-key "$SUPABASE_SERVICE_ROLE_KEY"

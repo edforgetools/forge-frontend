@@ -25,15 +25,15 @@ test.describe("Upload and Export Flow", () => {
     await page.click("text=Add Text");
 
     // Wait for text overlay to be added with timeout
-    await page.waitForSelector('[data-testid="overlay-item"]', {
+    await page.waitForSelector("text=Your text here", {
       timeout: 10000,
     });
 
     // Switch to export panel
     await page.click("text=Export");
 
-    // Click export button
-    await page.click("text=Export");
+    // Click export button in the sticky footer
+    await page.click('button:has-text("Export")');
 
     // Wait for export dialog with timeout
     await page.waitForSelector('[data-testid="export-dialog"]', {
