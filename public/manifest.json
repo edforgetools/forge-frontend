@@ -1,0 +1,16 @@
+{
+  "name": "Snapthumb - Create Perfect Thumbnails",
+  "short_name": "Snapthumb",
+  "description": "Create perfect 16:9 thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "/vite.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

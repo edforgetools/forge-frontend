@@ -11,6 +11,7 @@ import {
 import { compressCanvasWithSSIM } from "./compression";
 import type { CompressionSettings } from "@/components/CompressionSelector";
 import { estimateSize } from "./estimateSize";
+import { sendTelemetry } from "./telemetry";
 
 export interface ExportOptions {
   canvas: HTMLCanvasElement;
@@ -77,7 +78,7 @@ function hasTransparentPixels(canvas: HTMLCanvasElement): boolean {
 
   // Sample every 100th pixel for performance
   for (let i = 3; i < data.length; i += 400) {
-    if (data[i] < 255) {
+    if ((data[i] ?? 255) < 255) {
       // Alpha channel < 255 means transparency
       return true;
     }
@@ -101,7 +102,8 @@ function estimateImageComplexity(canvas: HTMLCanvasElement): number {
 
   // Sample every 20th pixel for performance
   for (let i = 0; i < data.length; i += 80) {
-    const pixel = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    const pixel =
+      ((data[i] ?? 0) + (data[i + 1] ?? 0) + (data[i + 2] ?? 0)) / 3;
     mean += pixel;
   }
 
@@ -109,7 +111,8 @@ function estimateImageComplexity(canvas: HTMLCanvasElement): number {
   mean /= sampleCount;
 
   for (let i = 0; i < data.length; i += 80) {
-    const pixel = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    const pixel =
+      ((data[i] ?? 0) + (data[i + 1] ?? 0) + (data[i + 2] ?? 0)) / 3;
     variance += Math.pow(pixel - mean, 2);
   }
 
@@ -241,6 +244,17 @@ export async function exportCanvas(
       underLimit: result.sizeBytes <= targetSizeMB * 1024 * 1024,
     });
 
+    // Send custom telemetry
+    sendTelemetry("onExport", {
+      duration: Math.round(result.duration),
+      bytes: result.sizeBytes,
+      format: result.format,
+      quality: Math.round(result.quality * 100),
+      iterations: result.iterations,
+      targetSizeMB,
+      underLimit: result.sizeBytes <= targetSizeMB * 1024 * 1024,
+    });
+
     return result;
   } catch (error) {
     const duration = performance.now() - startTime;
@@ -250,6 +264,15 @@ export async function exportCanvas(
       format: selectedFormat,
       duration: Math.round(duration),
       error: error instanceof Error ? error.message : "Unknown error",
+    });
+
+    // Send custom error telemetry
+    sendTelemetry("onExport", {
+      duration: Math.round(duration),
+      bytes: 0,
+      format: selectedFormat,
+      error: error instanceof Error ? error.message : "Unknown error",
+      success: false,
     });
 
     throw error;

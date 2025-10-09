@@ -1,8 +1,8 @@
-name: frontend-ci
+name: Frontend CI
 
 on:
   push:
-    branches: [main, feat/snapthumb-v1-1]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -11,65 +11,63 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        with: { version: 9.15.9 }
-
-      - uses: actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: 20
+          version: 10.18.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: |
-          echo "Installing dependencies..."
-          pnpm install --frozen-lockfile
-          echo "Dependencies installed successfully!"
-        timeout-minutes: 5
+        run: pnpm i --frozen-lockfile
 
-      # build once
-      - name: Build application
-        run: |
-          echo "Building application..."
-          pnpm run build
-          echo "Build completed successfully!"
-        timeout-minutes: 5
+      - name: Lint
+        run: pnpm lint
 
-      # start local preview server for e2e (no Vercel URL needed)
-      - name: Verify build output
-        run: |
-          echo "Verifying build output..."
-          ls -la dist/
-          echo "Build output verified!"
-        timeout-minutes: 1
+      - name: Type check
+        run: pnpm typecheck
 
-      - name: Install wait-on
-        run: |
-          echo "Installing wait-on..."
-          pnpm add -D wait-on
-          echo "wait-on installed successfully!"
-        timeout-minutes: 2
+      - name: Build
+        run: pnpm build
 
-      # playwright with caching and optimization
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: playwright-cache
+  unit:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
+          version: 10.18.1
 
-      - name: Install Playwright browsers (Chromium only for CI)
-        run: |
-          echo "Installing Playwright browsers..."
-          pnpm exec playwright install chromium --with-deps
-          echo "Playwright browsers installed successfully!"
-        timeout-minutes: 10
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
 
       - name: Start server and run Playwright tests
         run: |
@@ -99,22 +97,137 @@ jobs:
           echo "Server health check passed!"
           echo "Running Playwright tests..."
 
-          # Run tests with server running
+          # Run tests with server running - use ci-basic.spec.ts for CI reliability
           pnpm exec playwright test ci-basic.spec.ts --project=chromium
           echo "Playwright tests completed successfully!"
 
           # Clean up server
           echo "Stopping server..."
           kill $SERVER_PID || echo "Server already stopped"
-        timeout-minutes: 10
         env:
-          # ensure tests use the local server
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
 
-      # lighthouse on built dist
+      - name: UI Regression Tests
+        run: pnpm exec playwright test ci-basic.spec.ts --project=chromium
+
+      - name: Lighthouse Audit
+        run: pnpm test:lighthouse
+
       - name: Run Lighthouse CI
         run: |
+          echo "Starting preview server for Lighthouse..."
+          # Start server directly with vite
+          npx vite preview --port 4173 --host 127.0.0.1 &
+          SERVER_PID=$!
+          echo "Server PID: $SERVER_PID"
+
+          # Wait for server to start
+          echo "Waiting for server to start..."
+          for i in {1..30}; do
+            if curl -f http://127.0.0.1:4173 > /dev/null 2>&1; then
+              echo "Server is ready after $((i*2)) seconds!"
+              break
+            fi
+            echo "Attempt $i: Server not ready yet, waiting..."
+            sleep 2
+            if [ $i -eq 30 ]; then
+              echo "Server failed to start after 60 seconds"
+              exit 1
+            fi
+          done
+
           echo "Running Lighthouse CI..."
-          npx @lhci/cli autorun --collect.staticDistDir=dist --config=lighthouserc.json
+          npx @lhci/cli autorun --collect.staticDistDir=dist --config=lighthouserc.json --upload.target=temporary-public-storage
           echo "Lighthouse CI completed successfully!"
-        timeout-minutes: 5
+
+          # Clean up server
+          echo "Stopping server..."
+          kill $SERVER_PID || echo "Server already stopped"
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  ui:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            playwright-
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Start server for UI tests
+        run: |
+          echo "Starting preview server..."
+          # Start server directly with vite to have full control over arguments
+          npx vite preview --port 4173 --host 127.0.0.1 &
+          SERVER_PID=$!
+          echo "Server PID: $SERVER_PID"
+
+          # Wait for server to start
+          echo "Waiting for server to start..."
+          for i in {1..30}; do
+            if curl -f http://127.0.0.1:4173 > /dev/null 2>&1; then
+              echo "Server is ready after $((i*2)) seconds!"
+              break
+            fi
+            echo "Attempt $i: Server not ready yet, waiting..."
+            sleep 2
+            if [ $i -eq 30 ]; then
+              echo "Server failed to start after 60 seconds"
+              echo "Checking if server process is still running..."
+              ps aux | grep preview || echo "No preview process found"
+              exit 1
+            fi
+          done
+
+          echo "Server health check passed!"
+          echo "Server ready for UI tests!"
+        env:
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
+
+      - name: Upload Playwright snapshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-snapshots
+          path: test-results/
+          retention-days: 30
+
+  deploy:
+    needs: [build, unit, ui]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        run: vercel --token=${{ secrets.VERCEL_TOKEN }} --prod --confirm --force

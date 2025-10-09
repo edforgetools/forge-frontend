@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogOverlay,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Keyboard, X } from "lucide-react";
@@ -36,12 +37,84 @@ const ShortcutsOverlay = React.memo(function ShortcutsOverlay({
   isOpen,
   onClose,
 }: ShortcutsOverlayProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
+  // Focus trap and escape key handling
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Store the previously focused element
+    previousActiveElement.current = document.activeElement as HTMLElement;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+
+      // Focus trap - only allow Tab navigation within dialog
+      if (event.key === "Tab") {
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+
+        const focusableElements = dialog.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0] as HTMLElement;
+        const lastElement = focusableElements[
+          focusableElements.length - 1
+        ] as HTMLElement;
+
+        if (event.shiftKey) {
+          // Shift + Tab
+          if (document.activeElement === firstElement) {
+            event.preventDefault();
+            lastElement?.focus();
+          }
+        } else {
+          // Tab
+          if (document.activeElement === lastElement) {
+            event.preventDefault();
+            firstElement?.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Focus the first focusable element when dialog opens
+    const dialog = dialogRef.current;
+    if (dialog) {
+      const firstFocusable = dialog.querySelector(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ) as HTMLElement;
+      firstFocusable?.focus();
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      // Restore focus to previously focused element
+      previousActiveElement.current?.focus();
+    };
+  }, [isOpen, onClose]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
+      {/* Proper overlay with click-through guard */}
+      <DialogOverlay
+        className="fixed inset-0 z-dialog bg-black/50 backdrop-blur-sm pointer-events-auto"
+        onClick={onClose}
+      />
       <DialogContent
-        className="max-w-md"
+        ref={dialogRef}
+        className="max-w-md pointer-events-auto"
         aria-labelledby="shortcuts-title"
         aria-describedby="shortcuts-description"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader>
           <DialogTitle id="shortcuts-title" className="flex items-center gap-2">
@@ -56,24 +129,24 @@ const ShortcutsOverlay = React.memo(function ShortcutsOverlay({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {shortcuts.map((shortcut, index) => (
             <div
               key={index}
-              className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg"
+              className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
             >
-              <div className="flex-1">
-                <div className="font-medium text-sm text-gray-900">
+              <div className="flex-1 mb-2 sm:mb-0 sm:mr-4">
+                <div className="font-medium text-sm text-gray-900 break-words">
                   {shortcut.action}
                 </div>
                 {shortcut.description && (
-                  <div className="text-xs text-gray-600 mt-1">
+                  <div className="text-xs text-gray-600 mt-1 break-words">
                     {shortcut.description}
                   </div>
                 )}
               </div>
-              <div className="ml-4">
-                <kbd className="px-2 py-1 text-xs font-mono bg-white border border-gray-300 rounded shadow-sm">
+              <div className="flex-shrink-0">
+                <kbd className="inline-flex items-center px-2.5 py-1.5 text-xs font-mono font-semibold bg-white border border-gray-300 rounded-full shadow-sm text-gray-700 whitespace-nowrap">
                   {shortcut.key}
                 </kbd>
               </div>

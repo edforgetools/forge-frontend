@@ -3,19 +3,67 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Snapthumb - Create Perfect 16:9 Thumbnails</title>
     <meta
       name="description"
       content="Create perfect 16:9 thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB."
     />
-    <title>Snapthumb - Create Perfect Thumbnails</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" href="/src/main.tsx" as="script" />
-    <link rel="modulepreload" href="/src/main.tsx" />
+
+    <!-- Critical CSS inlined for instant rendering -->
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        line-height: 1.5;
+        color: #1f2937;
+      }
+      #root {
+        height: 100dvh;
+        padding-top: env(safe-area-inset-top);
+      }
+      /* Loading spinner for better UX */
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100dvh;
+        background: linear-gradient(to bottom right, #eff6ff, #ffffff, #e0e7ff);
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #e5e7eb;
+        border-top: 4px solid #2563eb;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Loading fallback while React loads -->
+      <div class="loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
+    <div id="portal-root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

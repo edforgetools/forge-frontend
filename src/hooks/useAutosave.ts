@@ -114,14 +114,15 @@ export function useAutosave() {
       const savedProjects = getSavedProjects();
       if (savedProjects.length > 0) {
         const latestProject = savedProjects[0];
-        const timeSinceLastSave = Date.now() - latestProject.timestamp;
+        const timeSinceLastSave =
+          Date.now() - (latestProject?.timestamp ?? Date.now());
 
         // Only show restore toast if project was saved recently (within 1 hour)
         if (timeSinceLastSave < 60 * 60 * 1000) {
           toast({
             title: "Session restored",
             description: `Found previous work from ${new Date(
-              latestProject.timestamp
+              latestProject?.timestamp ?? Date.now()
             ).toLocaleTimeString()}. Your overlays and settings have been restored.`,
           });
         }

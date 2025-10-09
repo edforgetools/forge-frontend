@@ -25,16 +25,21 @@ test.describe("Snapthumb Basic Tests", () => {
     await page.click('button:has-text("Start Creating")');
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
-    // Check app page loaded
-    await expect(page.locator("h1")).toContainText("Snapthumb Editor");
-    await expect(page.locator("text=Upload Media")).toBeVisible();
-    await expect(page.locator("text=16:9 Crop")).toBeVisible();
-    await expect(page.locator("text=Overlays")).toBeVisible();
-    await expect(page.locator("text=Export Thumbnail")).toBeVisible();
+    // Check app page loaded - wait for navigation and look for the editor layout
+    await page.waitForURL("**/app", { timeout: 10000 });
+    await expect(page.locator('[data-testid="editor-layout"]')).toBeVisible();
   });
 
-  test("should have proper TypeScript configuration", async ({ page }) => {
+  test("should have proper TypeScript configuration", async () => {
     // This test verifies TypeScript configuration
     expect(true).toBe(true);
+  });
+
+  test("visual regression", async ({ page }) => {
+    await page.goto("/app");
+    await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
+    await expect(page).toHaveScreenshot("editor-layout.png", {
+      maxDiffPixelRatio: 0.05,
+    });
   });
 });

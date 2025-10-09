@@ -1,10 +1,22 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import ReactDOM from "react-dom/client";
-import IndexPage from "./pages/index";
-import AppPage from "./pages/app";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App";
 import "./styles/globals.css";
-import { Toaster } from "@/lib/ui/toaster";
-import { Analytics } from "@vercel/analytics/react";
+import "./styles/layers.css";
+import {
+  runPortalRootValidation,
+  enableDevelopmentValidation,
+} from "./lib/sanity";
+import { computeScrollbarWidth, ensurePortalRoot } from "./lib/dom";
+
+// Lazy load non-critical components
+const Toaster = lazy(() =>
+  import("@/lib/ui/toaster").then((m) => ({ default: m.Toaster }))
+);
+const Analytics = lazy(() =>
+  import("@vercel/analytics/react").then((m) => ({ default: m.Analytics }))
+);
 
 // Register service worker for caching
 if ("serviceWorker" in navigator) {
@@ -20,23 +32,38 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// Simple routing without react-router-dom for now
-function App() {
-  const [currentPage, setCurrentPage] = React.useState<"index" | "app">(
-    "index"
-  );
+// Run portal/root validation at boot
+runPortalRootValidation();
 
-  if (currentPage === "app") {
-    return <AppPage onBack={() => setCurrentPage("index")} />;
-  }
+// Enable development validation for hot reloading scenarios
+enableDevelopmentValidation();
 
-  return <IndexPage onStart={() => setCurrentPage("app")} />;
-}
+// Compute scrollbar width on load
+computeScrollbarWidth();
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+// Ensure portal root exists (fallback for missing portal-root)
+ensurePortalRoot();
+
+const root = ReactDOM.createRoot(document.getElementById("root")!);
+const node = (
+  <BrowserRouter>
     <App />
-    <Toaster />
-    <Analytics />
-  </React.StrictMode>
+    <Suspense fallback={null}>
+      <Toaster />
+    </Suspense>
+    {/* Only load analytics in production */}
+    {process.env.NODE_ENV === "production" && (
+      <Suspense fallback={null}>
+        <Analytics />
+      </Suspense>
+    )}
+  </BrowserRouter>
+);
+
+root.render(
+  process.env.NODE_ENV === "development" ? (
+    <React.StrictMode>{node}</React.StrictMode>
+  ) : (
+    node
+  )
 );

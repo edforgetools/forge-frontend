@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { track } from "@vercel/analytics";
+import { sendTelemetry } from "@/lib/telemetry";
 
 export type OverlayBase = {
   id: string;
@@ -74,6 +75,8 @@ export type CanvasState = {
   zoom: number;
   showGrid: boolean;
   showSafeZone: boolean;
+  // Pro tier state
+  isPro: boolean;
 };
 
 const defaultCrop: Crop = {
@@ -104,12 +107,15 @@ const defaultState: CanvasState = {
   zoom: 1,
   showGrid: false,
   showSafeZone: false,
+  // Pro tier defaults
+  isPro: false,
 };
 
 export type CanvasActions = {
   setImage: (img?: HTMLImageElement | ImageBitmap) => void;
   setVideo: (src?: string) => void;
   setCrop: (patch: Partial<Crop>) => void;
+  toggleCrop: () => void;
   setOverlays: (arr: (LogoOverlay | TextOverlay)[]) => void;
   addOverlay: (overlay: Omit<LogoOverlay | TextOverlay, "id" | "z">) => void;
   updateOverlay: (
@@ -132,11 +138,14 @@ export type CanvasActions = {
   // New toolbar actions
   setAspectRatio: (ratio: AspectRatio) => void;
   setZoom: (zoom: number) => void;
+  setZoomPreset: (preset: number) => void;
   zoomIn: () => void;
   zoomOut: () => void;
   resetView: () => void;
   toggleGrid: () => void;
   toggleSafeZone: () => void;
+  // Pro tier actions
+  setIsPro: (isPro: boolean) => void;
 };
 
 export type CanvasStore = CanvasState & CanvasActions;
@@ -176,6 +185,12 @@ export const useCanvasStore = create<CanvasStore>()(
         }));
       },
 
+      toggleCrop: () => {
+        set((state) => ({
+          crop: { ...state.crop, active: !state.crop.active },
+        }));
+      },
+
       setOverlays: (arr) => set({ overlays: arr }),
 
       addOverlay: (overlay) => {
@@ -200,6 +215,12 @@ export const useCanvasStore = create<CanvasStore>()(
 
         // Track telemetry
         track("overlay_add", {
+          type: overlay.type,
+          overlayId: newOverlay.id,
+        });
+
+        // Send custom telemetry
+        sendTelemetry("onOverlayAdd", {
           type: overlay.type,
           overlayId: newOverlay.id,
         });
@@ -234,6 +255,15 @@ export const useCanvasStore = create<CanvasStore>()(
           track("text_overlay_edit", {
             overlayId: id,
             properties: Object.keys(patch).join(","),
+          });
+        }
+
+        // Send custom telemetry for overlay edits
+        if (overlay) {
+          sendTelemetry("onOverlayEdit", {
+            type: overlay.type,
+            overlayId: id,
+            properties: Object.keys(patch),
           });
         }
 
@@ -333,8 +363,8 @@ export const useCanvasStore = create<CanvasStore>()(
               lastPatch.type === "overlay"
                 ? state.overlays
                 : lastPatch.type === "crop"
-                ? state.crop
-                : state.image,
+                  ? state.crop
+                  : state.image,
             timestamp: Date.now(),
           },
         ];
@@ -381,8 +411,8 @@ export const useCanvasStore = create<CanvasStore>()(
               nextPatch.type === "overlay"
                 ? state.overlays
                 : nextPatch.type === "crop"
-                ? state.crop
-                : state.image,
+                  ? state.crop
+                  : state.image,
             timestamp: Date.now(),
           },
         ];
@@ -446,6 +476,14 @@ export const useCanvasStore = create<CanvasStore>()(
         const state = get();
         const newCrop = calculateCropForRatio(state.image, ratio);
         const dimensions = getDimensionsForRatio(ratio);
+
+        // Send telemetry for ratio change
+        sendTelemetry("onRatioChange", {
+          ratio,
+          previousRatio: state.aspect,
+          dimensions,
+        });
+
         set({
           aspect: ratio,
           crop: { ...newCrop, active: true },
@@ -458,17 +496,26 @@ export const useCanvasStore = create<CanvasStore>()(
       },
 
       setZoom: (zoom) => {
-        set({ zoom: Math.max(0.1, Math.min(5, zoom)) });
+        set({ zoom: Math.max(0.5, Math.min(2, zoom)) });
+      },
+
+      setZoomPreset: (preset) => {
+        const validPresets = [0.5, 0.75, 1, 1.5, 2];
+        if (validPresets.includes(preset)) {
+          set({ zoom: preset });
+        }
       },
 
       zoomIn: () => {
         const state = get();
-        set({ zoom: Math.min(5, state.zoom * 1.2) });
+        const newZoom = Math.min(2, state.zoom * 1.2);
+        set({ zoom: newZoom });
       },
 
       zoomOut: () => {
         const state = get();
-        set({ zoom: Math.max(0.1, state.zoom / 1.2) });
+        const newZoom = Math.max(0.5, state.zoom / 1.2);
+        set({ zoom: newZoom });
       },
 
       resetView: () => {
@@ -482,6 +529,11 @@ export const useCanvasStore = create<CanvasStore>()(
       toggleSafeZone: () => {
         set((state) => ({ showSafeZone: !state.showSafeZone }));
       },
+
+      // Pro tier actions
+      setIsPro: (isPro) => {
+        set({ isPro });
+      },
     }),
     { name: "canvas-store" }
   )
@@ -492,6 +544,7 @@ export const canvasActions: CanvasActions = {
   setImage: (v) => useCanvasStore.getState().setImage(v),
   setVideo: (v) => useCanvasStore.getState().setVideo(v),
   setCrop: (v) => useCanvasStore.getState().setCrop(v),
+  toggleCrop: () => useCanvasStore.getState().toggleCrop(),
   setOverlays: (v) => useCanvasStore.getState().setOverlays(v),
   addOverlay: (overlay) => useCanvasStore.getState().addOverlay(overlay),
   updateOverlay: (id, patch) =>
@@ -512,11 +565,14 @@ export const canvasActions: CanvasActions = {
   // New toolbar actions
   setAspectRatio: (ratio) => useCanvasStore.getState().setAspectRatio(ratio),
   setZoom: (zoom) => useCanvasStore.getState().setZoom(zoom),
+  setZoomPreset: (preset) => useCanvasStore.getState().setZoomPreset(preset),
   zoomIn: () => useCanvasStore.getState().zoomIn(),
   zoomOut: () => useCanvasStore.getState().zoomOut(),
   resetView: () => useCanvasStore.getState().resetView(),
   toggleGrid: () => useCanvasStore.getState().toggleGrid(),
   toggleSafeZone: () => useCanvasStore.getState().toggleSafeZone(),
+  // Pro tier actions
+  setIsPro: (isPro) => useCanvasStore.getState().setIsPro(isPro),
 };
 
 function calculateAutoCrop(image: HTMLImageElement | ImageBitmap): Crop {

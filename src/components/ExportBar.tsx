@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   CompressionSelector,
   type CompressionSettings,
 } from "@/components/CompressionSelector";
@@ -16,8 +22,9 @@ import {
   formatDuration,
 } from "@/lib/export";
 import { sessionDB } from "@/lib/db";
-import { Undo2, Redo2, Zap } from "lucide-react";
+import { Undo2, Redo2, Zap, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { UpgradeModal } from "@/components/UpgradeModal";
 
 interface ExportBarProps {
   onExport?: (
@@ -30,6 +37,7 @@ interface ExportBarProps {
   onRedo?: () => void;
   canUndo?: boolean;
   canRedo?: boolean;
+  isDragging?: boolean;
 }
 
 export function ExportBar({
@@ -39,6 +47,7 @@ export function ExportBar({
   onRedo,
   canUndo = false,
   canRedo = false,
+  isDragging = false,
 }: ExportBarProps) {
   const [isExporting, setIsExporting] = useState(false);
   const [exportFormat, setExportFormat] = useState<
@@ -88,6 +97,16 @@ export function ExportBar({
       toast({
         title: "No content to export",
         description: "Please upload an image or video first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isDragging) {
+      // Block export when dragging layers
+      toast({
+        title: "Please finish dragging",
+        description: "Complete layer manipulation before exporting.",
         variant: "destructive",
       });
       return;
@@ -160,9 +179,9 @@ export function ExportBar({
         const duration = performance.now() - startTime;
         toast({
           title: "Export successful! 🎉",
-          description: `Downloaded ${formatFileSize(blob.size)} ${exportFormat
-            .split("/")[1]
-            .toUpperCase()} file in ${formatDuration(duration)}`,
+          description: `Downloaded ${formatFileSize(blob.size)} ${
+            exportFormat?.split("/")[1]?.toUpperCase() ?? "IMAGE"
+          } file in ${formatDuration(duration)}`,
         });
       }
     } catch (error) {
@@ -186,11 +205,13 @@ export function ExportBar({
   };
 
   const isOverLimit = fileSize > 2 * 1024 * 1024;
-  const qualityPercent = Math.round(quality[0] * 100);
+  const qualityPercent = Math.round((quality[0] ?? 0.8) * 100);
 
   return (
     <div
-      className="flex items-center justify-between p-4 bg-white border-t border-gray-200"
+      className={`flex items-center justify-between p-4 bg-white border-t border-gray-200 ${
+        isDragging ? "pointer-events-none opacity-50" : ""
+      }`}
       onKeyDown={handleKeyDown}
     >
       <div className="flex items-center space-x-6">
@@ -204,7 +225,7 @@ export function ExportBar({
             aria-label="Undo last action"
             title="Undo (⌘Z)"
           >
-            <Undo2 className="w-4 h-4" />
+            <Undo2 className="w-[18px] h-[18px]" />
           </Button>
           <Button
             variant="outline"
@@ -214,7 +235,7 @@ export function ExportBar({
             aria-label="Redo last undone action"
             title="Redo (⌘⇧Z)"
           >
-            <Redo2 className="w-4 h-4" />
+            <Redo2 className="w-[18px] h-[18px]" />
           </Button>
         </div>
 
@@ -243,7 +264,11 @@ export function ExportBar({
           <select
             id="export-format"
             value={exportFormat}
-            onChange={(e) => setExportFormat(e.target.value as any)}
+            onChange={(e) =>
+              setExportFormat(
+                e.target.value as "image/jpeg" | "image/webp" | "image/png"
+              )
+            }
             className="px-3 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             disabled={isExporting || autoFormat}
             aria-label="Select export format"
@@ -349,41 +374,66 @@ export function ExportBar({
         </div>
       )}
 
+      {/* Upgrade to Pro Button */}
+      <UpgradeModal>
+        <Button
+          variant="outline"
+          size="lg"
+          className="px-6 py-2 border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-300"
+          aria-label="Upgrade to Pro"
+        >
+          <Crown className="w-[18px] h-[18px] mr-2" />
+          Upgrade to Pro
+        </Button>
+      </UpgradeModal>
+
       {/* Export Button */}
-      <Button
-        onClick={handleExport}
-        disabled={isExporting || !hasContent}
-        size="lg"
-        className="px-8 py-2"
-        aria-label={
-          hasContent
-            ? autoFormat
-              ? "Export with smart compression"
-              : "Export thumbnail"
-            : "Export disabled - no content"
-        }
-      >
-        {isExporting ? (
-          <div className="flex items-center space-x-2">
-            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>
-            <span>{autoFormat ? "Optimizing..." : "Exporting..."}</span>
-          </div>
-        ) : (
-          <div className="flex items-center space-x-2">
-            {autoFormat ? (
-              <>
-                <Zap className="w-4 h-4" />
-                <span>Smart Export</span>
-              </>
-            ) : (
-              <span>Export Thumbnail</span>
-            )}
-            {hasContent && (
-              <span className="text-xs opacity-75">(Ctrl+Enter)</span>
-            )}
-          </div>
-        )}
-      </Button>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleExport}
+              disabled={isExporting || !hasContent}
+              size="lg"
+              className="px-8 py-2"
+              aria-disabled={!hasContent}
+              aria-label={
+                hasContent
+                  ? autoFormat
+                    ? "Export with smart compression"
+                    : "Export thumbnail"
+                  : "Export disabled - no content"
+              }
+            >
+              {isExporting ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin w-[18px] h-[18px] border-2 border-white border-t-transparent rounded-full"></div>
+                  <span>{autoFormat ? "Optimizing..." : "Exporting..."}</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  {autoFormat ? (
+                    <>
+                      <Zap className="w-[18px] h-[18px]" />
+                      <span>Smart Export</span>
+                    </>
+                  ) : (
+                    <span>Export Thumbnail</span>
+                  )}
+                  {hasContent && (
+                    <span className="text-xs opacity-75">(Ctrl+Enter)</span>
+                  )}
+                </div>
+              )}
+            </Button>
+          </TooltipTrigger>
+          {!hasContent && (
+            <TooltipContent>
+              <p>Upload content to enable export</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 }

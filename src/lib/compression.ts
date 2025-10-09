@@ -350,7 +350,8 @@ function estimateImageComplexity(canvas: HTMLCanvasElement): number {
 
   // Sample every 10th pixel for performance
   for (let i = 0; i < data.length; i += 40) {
-    const pixel = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    const pixel =
+      ((data[i] ?? 0) + (data[i + 1] ?? 0) + (data[i + 2] ?? 0)) / 3;
     mean += pixel;
   }
 
@@ -358,7 +359,8 @@ function estimateImageComplexity(canvas: HTMLCanvasElement): number {
   mean /= sampleCount;
 
   for (let i = 0; i < data.length; i += 40) {
-    const pixel = (data[i] + data[i + 1] + data[i + 2]) / 3;
+    const pixel =
+      ((data[i] ?? 0) + (data[i + 1] ?? 0) + (data[i + 2] ?? 0)) / 3;
     variance += Math.pow(pixel - mean, 2);
   }
 

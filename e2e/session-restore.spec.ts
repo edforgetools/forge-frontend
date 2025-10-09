@@ -121,7 +121,7 @@ test.describe("Session Restore", () => {
   }) => {
     // Mock IndexedDB as unavailable
     await page.addInitScript(() => {
-      // @ts-ignore
+      // @ts-expect-error - Mocking IndexedDB as unavailable for testing
       window.indexedDB = undefined;
     });
 
@@ -184,5 +184,39 @@ test.describe("Session Restore", () => {
 
     // Indicator should disappear after restore completes
     await expect(restoreIndicator).not.toBeVisible({ timeout: 5000 });
+  });
+
+  test("should restore viewport when canvas size differs by >25%", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // Navigate to the app page
+    await page.click('button:has-text("Start Creating")');
+    await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
+
+    // Use sample image to have content on canvas
+    await page.click("text=Try sample image");
+    await page.waitForSelector("canvas", { timeout: 10000 });
+
+    // Save initial viewport state by resizing window to a specific size
+    await page.setViewportSize({ width: 1200, height: 800 });
+    await page.waitForTimeout(1000); // Allow time for viewport to be saved
+
+    // Change viewport significantly (>25% difference)
+    await page.setViewportSize({ width: 800, height: 600 }); // 33% width reduction
+    await page.waitForTimeout(1000); // Allow time for session guard to trigger
+
+    // The session restore guard should have automatically reset zoom to 100%
+    // and centered the canvas. We can verify this by checking that the canvas
+    // is properly centered and at default zoom level.
+
+    // Check that canvas is visible and properly rendered
+    const canvas = page.locator('[data-testid="canvas-stage"] canvas');
+    await expect(canvas).toBeVisible();
+
+    // The viewport should be restored (zoom reset to 100%, canvas centered)
+    // This is verified by the canvas being visible and properly positioned
+    await expect(canvas).toHaveCSS("transform", /scale\(1\)/);
   });
 });

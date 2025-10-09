@@ -38,7 +38,7 @@ preview.stdout.on("data", (data) => {
       lighthouseOutput += data.toString();
     });
 
-    lighthouse.on("close", (code) => {
+    lighthouse.on("close", () => {
       try {
         const results = JSON.parse(lighthouseOutput);
         const scores = {

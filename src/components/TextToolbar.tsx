@@ -137,7 +137,7 @@ export function TextToolbar({ overlayId, onClose }: TextToolbarProps) {
         className="h-8 w-8 p-0 hover:bg-gray-100"
         aria-label="Close text toolbar"
       >
-        <X className="h-4 w-4" />
+        <X className="h-[18px] w-[18px]" />
       </Button>
 
       {/* Font Family */}
@@ -217,12 +217,16 @@ export function TextToolbar({ overlayId, onClose }: TextToolbarProps) {
                 textOverlay.align === alignment.value ? "default" : "ghost"
               }
               size="sm"
-              onClick={() => handleUpdate({ align: alignment.value as any })}
+              onClick={() =>
+                handleUpdate({
+                  align: alignment.value as "left" | "center" | "right",
+                })
+              }
               className="h-8 w-8 p-0"
               aria-label={`Align text ${alignment.label.toLowerCase()}`}
               aria-pressed={textOverlay.align === alignment.value}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-[18px] w-[18px]" />
             </Button>
           );
         })}
@@ -243,7 +247,7 @@ export function TextToolbar({ overlayId, onClose }: TextToolbarProps) {
       {/* Text Shadow */}
       <div className="flex items-center gap-2">
         <div className="h-4 w-4 text-gray-500 flex items-center justify-center">
-          <div className="w-3 h-3 rounded-full bg-gray-400 shadow-sm" />
+          <div className="w-[18px] h-[18px] rounded-full bg-gray-400 shadow-sm" />
         </div>
         <Checkbox
           checked={textOverlay.shadow}

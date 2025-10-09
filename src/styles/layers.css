@@ -1,0 +1,37 @@
+:root {
+  /* Z-index scale - normalized values */
+  --z-base: 0;
+  --z-header: 10;
+  --z-toolbar: 20;
+  --z-popover: 30;
+  --z-sheet: 40;
+  --z-dialog: 50;
+  --z-toast: 60;
+}
+
+.editor-shell {
+  position: relative;
+}
+
+/* Legacy class mappings for backward compatibility */
+.navbar {
+  z-index: var(--z-header);
+}
+
+.toolbar {
+  z-index: var(--z-toolbar);
+}
+
+.canvas {
+  z-index: var(--z-base);
+}
+
+.popover,
+.dropdown,
+.tooltip {
+  z-index: var(--z-popover);
+}
+
+.modal {
+  z-index: var(--z-dialog);
+}

@@ -82,7 +82,7 @@ export interface CanvasActions {
   applyHistoryCommand: (command: HistoryCommand) => void;
   createHistoryCommand: (
     type: string,
-    data: any,
+    data: unknown,
     description: string
   ) => HistoryCommand;
 }
@@ -343,7 +343,7 @@ export function useCanvas(): [CanvasState, CanvasActions] {
   }, []);
 
   const createHistoryCommand = useCallback(
-    (type: string, data: any, description: string): HistoryCommand => {
+    (type: string, data: unknown, description: string): HistoryCommand => {
       return {
         id: `canvas-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         type,
