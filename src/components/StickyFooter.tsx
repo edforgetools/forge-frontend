@@ -42,8 +42,8 @@ export function StickyFooter({ isDragging = false }: StickyFooterProps) {
               isDragging
                 ? "Export disabled - finish dragging layers first"
                 : hasContent
-                ? "Export thumbnail - Open export settings"
-                : "Export disabled - upload content first"
+                  ? "Export thumbnail - Open export settings"
+                  : "Export disabled - upload content first"
             }
             tabIndex={14}
           >

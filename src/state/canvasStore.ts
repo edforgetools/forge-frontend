@@ -363,8 +363,8 @@ export const useCanvasStore = create<CanvasStore>()(
               lastPatch.type === "overlay"
                 ? state.overlays
                 : lastPatch.type === "crop"
-                ? state.crop
-                : state.image,
+                  ? state.crop
+                  : state.image,
             timestamp: Date.now(),
           },
         ];
@@ -411,8 +411,8 @@ export const useCanvasStore = create<CanvasStore>()(
               nextPatch.type === "overlay"
                 ? state.overlays
                 : nextPatch.type === "crop"
-                ? state.crop
-                : state.image,
+                  ? state.crop
+                  : state.image,
             timestamp: Date.now(),
           },
         ];

@@ -153,8 +153,8 @@ export function LayerHost({
               cursor: isBeingDragged
                 ? "grabbing"
                 : isSelected
-                ? "grab"
-                : "pointer",
+                  ? "grab"
+                  : "pointer",
               userSelect: isBeingDragged ? "none" : "auto",
             },
             className: `${childProps.className || ""} ${

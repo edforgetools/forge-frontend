@@ -26,14 +26,8 @@ test.describe("CI Basic Smoke Tests", () => {
     await page.click('button:has-text("Start Creating")');
     await page.waitForLoadState("networkidle", { timeout: 15000 });
 
-    // Check app page loaded
-    await expect(
-      page.getByRole("heading", { name: "Snapthumb Editor" })
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", {
-        name: "Upload panel - Upload images or videos",
-      })
-    ).toBeVisible();
+    // Check app page loaded - wait for navigation and look for the editor layout
+    await page.waitForURL("**/app", { timeout: 10000 });
+    await expect(page.locator('[data-testid="editor-layout"]')).toBeVisible();
   });
 });

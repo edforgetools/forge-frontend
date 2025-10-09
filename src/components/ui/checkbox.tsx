@@ -148,8 +148,8 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             indeterminate
               ? "indeterminate"
               : isChecked
-              ? "checked"
-              : "unchecked"
+                ? "checked"
+                : "unchecked"
           }
           {...props}
         />
@@ -164,8 +164,8 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             indeterminate
               ? "indeterminate"
               : isChecked
-              ? "checked"
-              : "unchecked"
+                ? "checked"
+                : "unchecked"
           }
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {

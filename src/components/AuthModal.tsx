@@ -225,8 +225,8 @@ export function AuthModal({
               {mode === "signin"
                 ? "Sign In"
                 : mode === "signup"
-                ? "Sign Up"
-                : "Send Reset Email"}
+                  ? "Sign Up"
+                  : "Send Reset Email"}
             </Button>
           </form>
 
