@@ -7,8 +7,8 @@ test.describe("CI Basic Smoke Tests", () => {
 
     // Check main elements are present
     await expect(
-      page.getByRole("heading", { name: "Snapthumb" }).first()
-    ).toBeVisible();
+      page.locator('h1:has-text("Create Perfect")')
+    ).toBeVisible({ timeout: 10000 });
 
     await expect(page.locator('button:has-text("Start Creating")')).toBeVisible(
       { timeout: 10000 }
