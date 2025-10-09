@@ -1,3 +1,4 @@
+/* eslint-env node */
 import { createServer } from "http";
 import crypto from "crypto";
 
