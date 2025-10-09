@@ -224,7 +224,7 @@ jobs:
     needs: [build, unit, ui]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
