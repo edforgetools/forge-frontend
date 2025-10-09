@@ -63,7 +63,8 @@ const parseEnv = () => {
       const missingVars = error.issues.map((err) => {
         if (
           err.code === "invalid_type" &&
-          (err as Record<string, unknown>).received === "undefined"
+          "received" in err &&
+          err.received === "undefined"
         ) {
           return `${err.path.join(".")} is required but not set`;
         }
@@ -73,7 +74,7 @@ const parseEnv = () => {
       const errorMessage = new Error(
         `Environment validation failed:\n${missingVars.join("\n")}`
       );
-      (errorMessage as Record<string, unknown>).cause = error;
+      (errorMessage as Error & { cause?: unknown }).cause = error;
       throw errorMessage;
     }
     throw error;
