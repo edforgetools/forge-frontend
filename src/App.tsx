@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { Header } from "./components/Header";
 import { EditorSkeleton } from "./components/EditorSkeleton";
+import { ForgeVersionBanner } from "./components/ForgeVersionBanner";
 
 // Lazy load pages for better performance
 const Home = lazy(() => import("./pages/Home.tsx"));
@@ -31,6 +32,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <ForgeVersionBanner />
       <main className="flex-1">
         <Routes>
           <Route

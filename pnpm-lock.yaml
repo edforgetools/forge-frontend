@@ -56,6 +56,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      forge-sdk:
+        specifier: ^1.0.6
+        version: 1.0.6
       react:
         specifier: ^19.2.0
         version: 19.2.0
@@ -2273,6 +2276,9 @@ packages:
 
   flatted@3.3.3:
     resolution: {integrity: sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==}
+
+  forge-sdk@1.0.6:
+    resolution: {integrity: sha512-Q2vkDy4qN+H5J85cU8tmMVrc83BfJXj9Qkj+zWnkjFLoO05y/v3UBhY5BMBSyK2MJGX8Gke+/aJx0JGXL6zdBg==}
 
   forwarded-parse@2.1.2:
     resolution: {integrity: sha512-alTFZZQDKMporBH77856pXgzhEzaUVmLCDk+egLgIgHst3Tpndzz8MnKe+GzRJRfvVdn69HhpW7cmXzvtLvJAw==}
@@ -5982,6 +5988,8 @@ snapshots:
       keyv: 4.5.4
 
   flatted@3.3.3: {}
+
+  forge-sdk@1.0.6: {}
 
   forwarded-parse@2.1.2: {}
 
