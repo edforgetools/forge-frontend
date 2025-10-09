@@ -403,16 +403,22 @@ export default function Home() {
               <p className="text-sm text-muted-foreground mb-4 md:mb-0">
                 © 2024 Snapthumb. All rights reserved.
               </p>
-              <a
-                href="https://forge.tools"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg text-muted-foreground hover:text-foreground transition-colors text-sm"
-              >
-                <span>Built with</span>
-                <span className="font-semibold">Forge</span>
-                <ExternalLink className="w-4 h-4" />
-              </a>
+              <div className="flex items-center gap-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  Layer v0.2 Connected
+                </div>
+                <a
+                  href="https://forge.tools"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg text-muted-foreground hover:text-foreground transition-colors text-sm"
+                >
+                  <span>Built with</span>
+                  <span className="font-semibold">Forge</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </div>
         </footer>
@@ -642,16 +648,22 @@ export default function Home() {
             <p className="text-sm text-muted-foreground mb-4 md:mb-0">
               © 2024 Snapthumb. All rights reserved.
             </p>
-            <a
-              href="https://forge.tools"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg text-muted-foreground hover:text-foreground transition-colors text-sm"
-            >
-              <span>Built with</span>
-              <span className="font-semibold">Forge</span>
-              <ExternalLink className="w-4 h-4" />
-            </a>
+            <div className="flex items-center gap-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                Layer v0.2 Connected
+              </div>
+              <a
+                href="https://forge.tools"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 rounded-lg text-muted-foreground hover:text-foreground transition-colors text-sm"
+              >
+                <span>Built with</span>
+                <span className="font-semibold">Forge</span>
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
           </div>
         </div>
       </footer>
