@@ -3,7 +3,11 @@ import { Download } from "lucide-react";
 import { useCanvasStore } from "@/state/canvasStore";
 import { ExportDialog } from "./ExportDialog";
 
-export function StickyFooter() {
+interface StickyFooterProps {
+  isDragging?: boolean;
+}
+
+export function StickyFooter({ isDragging = false }: StickyFooterProps) {
   const { image, videoSrc, crop } = useCanvasStore();
 
   const hasContent = image || videoSrc;
@@ -30,15 +34,21 @@ export function StickyFooter() {
       </div>
 
       <div className="mt-3">
-        <ExportDialog>
+        <ExportDialog isDragging={isDragging}>
           <Button
-            disabled={!hasContent}
+            disabled={!hasContent || isDragging}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white h-10 rounded-xl"
-            aria-label={hasContent ? 'Export thumbnail - Open export settings' : 'Export disabled - upload content first'}
+            aria-label={
+              isDragging
+                ? "Export disabled - finish dragging layers first"
+                : hasContent
+                  ? "Export thumbnail - Open export settings"
+                  : "Export disabled - upload content first"
+            }
             tabIndex={14}
           >
-            <Download className="w-4 h-4 mr-2" />
-            Export
+            <Download className="w-[18px] h-[18px] mr-2" />
+            {isDragging ? "Dragging..." : "Export"}
           </Button>
         </ExportDialog>
       </div>

@@ -303,7 +303,8 @@ export function Cropper({
                 isCorrectAspectRatio ? "text-green-600" : "text-orange-600"
               }
             >
-              {currentAspectRatio.toFixed(2)} {isCorrectAspectRatio ? "✓" : "⚠"}
+              {currentAspectRatio.toFixed(2)}{" "}
+              {isCorrectAspectRatio ? "✓" : "⚠"}
             </span>
           </div>
         </div>

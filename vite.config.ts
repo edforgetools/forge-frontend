@@ -46,6 +46,16 @@ export default defineConfig({
     reportCompressedSize: true,
     // Optimize dependencies
     rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress TypeScript warnings during build
+        if (
+          warning.code === "PLUGIN_WARNING" &&
+          warning.plugin === "typescript"
+        ) {
+          return;
+        }
+        warn(warning);
+      },
       output: {
         manualChunks: (id) => {
           // Vendor chunks - more granular splitting

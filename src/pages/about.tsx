@@ -15,22 +15,24 @@ import {
   Zap,
   Globe,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-interface AboutPageProps {
-  onBack: () => void;
-}
+export default function AboutPage() {
+  const navigate = useNavigate();
 
-export default function AboutPage({ onBack }: AboutPageProps) {
+  const handleBack = () => {
+    navigate("/");
+  };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-100 p-4">
+    <div className="h-[100dvh] bg-gradient-to-br from-blue-50 via-white to-indigo-100 p-4">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <Button
             variant="ghost"
-            onClick={onBack}
+            onClick={handleBack}
             className="mb-4 text-blue-600 hover:text-blue-700"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-[18px] h-[18px] mr-2" />
             Back to Snapthumb
           </Button>
         </div>
@@ -59,7 +61,7 @@ export default function AboutPage({ onBack }: AboutPageProps) {
               <h2 className="text-xl font-semibold mb-3">Key Features</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-start space-x-3">
-                  <Video className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
+                  <Video className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-900">
                       Video Frame Extraction
@@ -71,7 +73,7 @@ export default function AboutPage({ onBack }: AboutPageProps) {
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <Camera className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
+                  <Camera className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-900">
                       Smart Cropping
@@ -83,7 +85,7 @@ export default function AboutPage({ onBack }: AboutPageProps) {
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <Download className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
+                  <Download className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-900">
                       Optimized Export
@@ -94,7 +96,7 @@ export default function AboutPage({ onBack }: AboutPageProps) {
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <Shield className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
+                  <Shield className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-900">
                       Privacy First
@@ -105,7 +107,7 @@ export default function AboutPage({ onBack }: AboutPageProps) {
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <Zap className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
+                  <Zap className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-900">
                       Lightning Fast
@@ -116,7 +118,7 @@ export default function AboutPage({ onBack }: AboutPageProps) {
                   </div>
                 </div>
                 <div className="flex items-start space-x-3">
-                  <Globe className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
+                  <Globe className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold text-gray-900">
                       Universal Support

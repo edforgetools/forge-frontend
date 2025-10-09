@@ -3,11 +3,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { useCanvasStore } from "@/state/canvasStore";
+import { Lock, Unlock, RotateCcw } from "lucide-react";
 
 export function CropPanel() {
   const { crop, image, videoSrc, setCrop } = useCanvasStore();
   const [autoCrop, setAutoCrop] = useState(true);
+  const [lockAspectRatio, setLockAspectRatio] = useState(true);
 
   const hasContent = image || videoSrc;
 
@@ -19,11 +22,39 @@ export function CropPanel() {
   }, [hasContent, autoCrop, crop.active, setCrop]);
 
   const handleCropChange = (field: keyof typeof crop, value: number) => {
-    setCrop({ [field]: value });
+    if (lockAspectRatio && (field === "w" || field === "h")) {
+      // Maintain 16:9 aspect ratio
+      const targetRatio = 16 / 9;
+      if (field === "w") {
+        const newHeight = value / targetRatio;
+        setCrop({ [field]: value, h: newHeight });
+      } else if (field === "h") {
+        const newWidth = value * targetRatio;
+        setCrop({ [field]: value, w: newWidth });
+      }
+    } else {
+      setCrop({ [field]: value });
+    }
   };
 
   const handleSliderChange = (field: keyof typeof crop, values: number[]) => {
-    setCrop({ [field]: values[0] });
+    handleCropChange(field, values[0] ?? 0);
+  };
+
+  const resetToAutoCrop = () => {
+    if (image) {
+      const newCrop = calculateAutoCrop(image);
+      setCrop(newCrop);
+    } else if (videoSrc) {
+      // Default crop for video
+      setCrop({
+        x: 0,
+        y: 0,
+        w: 1280,
+        h: 720,
+        active: true,
+      });
+    }
   };
 
   if (!hasContent) {
@@ -39,16 +70,42 @@ export function CropPanel() {
   return (
     <div className="p-6">
       <div className="space-y-4">
-        {/* Auto-crop toggle */}
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="auto-crop"
-            checked={autoCrop}
-            onCheckedChange={(checked) => setAutoCrop(checked as boolean)}
-          />
-          <Label htmlFor="auto-crop" className="text-sm font-medium">
-            Auto-crop on load
-          </Label>
+        {/* Header with controls */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="auto-crop"
+              checked={autoCrop}
+              onCheckedChange={(checked) => setAutoCrop(checked as boolean)}
+            />
+            <Label htmlFor="auto-crop" className="text-sm font-medium">
+              Auto-crop on load
+            </Label>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setLockAspectRatio(!lockAspectRatio)}
+              className="h-8 w-8 p-0"
+            >
+              {lockAspectRatio ? (
+                <Lock className="w-4 h-4" />
+              ) : (
+                <Unlock className="w-4 h-4" />
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={resetToAutoCrop}
+              className="h-8 px-2"
+            >
+              <RotateCcw className="w-4 h-4 mr-1" />
+              Reset
+            </Button>
+          </div>
         </div>
 
         {/* Crop dimensions */}
@@ -157,27 +214,52 @@ export function CropPanel() {
         </div>
 
         {/* Aspect ratio info */}
-        <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
-          <div className="font-medium">16:9 Aspect Ratio</div>
-          <div>Current: {(crop.w / crop.h).toFixed(2)}:1</div>
-          {Math.abs(crop.w / crop.h - 16 / 9) > 0.01 && (
-            <div className="text-amber-600">⚠️ Not exactly 16:9</div>
+        <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="font-medium">
+              {lockAspectRatio
+                ? "16:9 Aspect Ratio (Locked)"
+                : "Custom Aspect Ratio"}
+            </div>
+            <div className="text-xs">{(crop.w / crop.h).toFixed(2)}:1</div>
+          </div>
+          {lockAspectRatio && Math.abs(crop.w / crop.h - 16 / 9) > 0.01 && (
+            <div className="text-amber-600 mt-1">⚠️ Not exactly 16:9</div>
+          )}
+          {!lockAspectRatio && (
+            <div className="text-blue-600 mt-1">🔓 Free aspect ratio</div>
           )}
         </div>
 
-        {/* Reset button */}
-        <div className="pt-2">
-          <button
-            onClick={() => {
-              if (image) {
-                const newCrop = calculateAutoCrop(image);
-                setCrop(newCrop);
-              }
-            }}
-            className="text-xs text-blue-600 hover:text-blue-800 underline"
-          >
-            Reset to auto-crop
-          </button>
+        {/* Quick preset buttons */}
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-gray-900">Quick Presets</div>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const targetRatio = 16 / 9;
+                const newHeight = crop.w / targetRatio;
+                setCrop({ h: newHeight });
+              }}
+              className="text-xs"
+            >
+              16:9
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const targetRatio = 1;
+                const newHeight = crop.w / targetRatio;
+                setCrop({ h: newHeight });
+              }}
+              className="text-xs"
+            >
+              1:1
+            </Button>
+          </div>
         </div>
       </div>
     </div>

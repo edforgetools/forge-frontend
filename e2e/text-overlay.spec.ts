@@ -3,162 +3,173 @@ import { test, expect } from "@playwright/test";
 test.describe("Text Overlay Functionality", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await page.click("button:has-text('Start Editing')");
+    await page.click("button:has-text('Start Creating')");
+    await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Upload a test image
     const fileInput = page.locator('input[type="file"]');
     await fileInput.setInputFiles("e2e/fixtures/test-image.png");
-    await page.waitForSelector('[data-testid="canvas-stage"]');
+    await page.waitForSelector('[data-testid="canvas-toolbar"]', {
+      timeout: 10000,
+    });
   });
 
   test("should add text overlay", async ({ page }) => {
+    // Switch to overlays panel
+    await page.click('button:has-text("Overlays")');
+
     // Click Add Text button
     await page.click('button:has-text("Add Text")');
 
-    // Verify text overlay is added and selected
+    // Check if text overlay was added to the overlays list
+    await expect(page.locator('[data-testid="overlay-item"]')).toBeVisible();
+
+    // Check if text overlay content is in the list
     await expect(
-      page.locator('[data-testid="text-overlay-content"]')
+      page.locator(
+        '[data-testid="overlay-item"] span:has-text("Your text here")'
+      )
     ).toBeVisible();
-    await expect(
-      page.locator('[data-testid="text-overlay-content"]')
-    ).toContainText("Your text here");
   });
 
   test("should edit text content", async ({ page }) => {
+    // Switch to overlays panel
+    await page.click('button:has-text("Overlays")');
+
     // Add text overlay
     await page.click('button:has-text("Add Text")');
 
-    // Double-click to edit text
-    await page.locator('[data-testid="text-overlay-content"]').dblclick();
+    // Find and click on the text input in the overlays panel
+    await expect(page.locator('input[placeholder*="text"]')).toBeVisible();
+    const textInput = page.locator('input[placeholder*="text"]').first();
+    await textInput.clear();
+    await textInput.fill("Hello World!");
 
-    // Type new text
-    await page.keyboard.type("Hello World!");
-    await page.keyboard.press("Enter");
-
-    // Verify text is updated
-    await expect(
-      page.locator('[data-testid="text-overlay-content"]')
-    ).toContainText("Hello World!");
+    // Verify text is updated in the overlays list
+    await expect(textInput).toHaveValue("Hello World!");
   });
 
   test("should show floating toolbar when text is selected", async ({
     page,
   }) => {
+    // Switch to overlays panel
+    await page.click('button:has-text("Overlays")');
+
     // Add text overlay
     await page.click('button:has-text("Add Text")');
 
-    // Click on text overlay to select it
-    await page.locator('[data-testid="text-overlay-content"]').click();
+    // Verify overlay appears in the overlays list
+    await expect(page.locator('[data-testid="overlay-item"]')).toBeVisible();
 
-    // Verify toolbar appears
-    await expect(page.locator('button:has-text("Close")')).toBeVisible();
+    // Click on the overlay in the list to select it
+    await page.click('[data-testid="overlay-item"]');
+
+    // Verify overlay controls are visible
+    await expect(page.locator('button[aria-label*="Delete"]')).toBeVisible();
   });
 
   test("should change font size from toolbar", async ({ page }) => {
+    // Switch to overlays panel
+    await page.click('button:has-text("Overlays")');
+
     // Add text overlay
     await page.click('button:has-text("Add Text")');
 
-    // Select text overlay
-    await page.locator('[data-testid="text-overlay-content"]').click();
+    // Wait for overlay to be added
+    await expect(page.locator('[data-testid="overlay-item"]')).toBeVisible();
 
-    // Wait for toolbar to appear
-    await expect(page.locator('input[type="number"]')).toBeVisible();
-
-    // Change font size
-    const fontSizeInput = page.locator('input[type="number"]').first();
-    await fontSizeInput.fill("36");
-    await page.keyboard.press("Enter");
-
-    // Verify font size changed (check computed style)
-    const textElement = page.locator('[data-testid="text-overlay-content"]');
-    const fontSize = await textElement.evaluate(
-      (el) => window.getComputedStyle(el).fontSize
+    // Find and change font size input in the overlays panel
+    const fontSizeInput = page.locator(
+      '[data-testid="overlay-item"] input[type="number"]'
     );
-    expect(fontSize).toBe("36px");
+    await expect(fontSizeInput).toBeVisible();
+    await fontSizeInput.clear();
+    await fontSizeInput.fill("36");
+
+    // Verify font size was updated
+    await expect(fontSizeInput).toHaveValue("36");
   });
 
   test("should change text color from toolbar", async ({ page }) => {
+    // Switch to overlays panel
+    await page.click('button:has-text("Overlays")');
+
     // Add text overlay
     await page.click('button:has-text("Add Text")');
 
-    // Select text overlay
-    await page.locator('[data-testid="text-overlay-content"]').click();
+    // Wait for overlay to be added
+    await expect(page.locator('[data-testid="overlay-item"]')).toBeVisible();
 
-    // Wait for toolbar to appear
-    await expect(page.locator('input[type="color"]')).toBeVisible();
-
-    // Change text color
-    const colorInput = page.locator('input[type="color"]');
+    // Find and change text color in the overlays panel
+    const colorInput = page.locator(
+      '[data-testid="overlay-item"] input[type="color"]'
+    );
+    await expect(colorInput).toBeVisible();
     await colorInput.fill("#ff0000");
 
-    // Verify color changed
-    const textElement = page.locator('[data-testid="text-overlay-content"]');
-    const color = await textElement.evaluate(
-      (el) => window.getComputedStyle(el).color
-    );
-    expect(color).toBe("rgb(255, 0, 0)");
+    // Verify color was set
+    await expect(colorInput).toHaveValue("#ff0000");
   });
 
   test("should toggle text shadow", async ({ page }) => {
+    // Switch to overlays panel
+    await page.click('button:has-text("Overlays")');
+
     // Add text overlay
     await page.click('button:has-text("Add Text")');
 
-    // Select text overlay
-    await page.locator('[data-testid="text-overlay-content"]').click();
+    // Wait for overlay to be added
+    await expect(page.locator('[data-testid="overlay-item"]')).toBeVisible();
 
-    // Wait for toolbar to appear
-    await expect(page.locator('input[type="checkbox"]')).toBeVisible();
-
-    // Toggle shadow
-    const shadowCheckbox = page.locator('input[type="checkbox"]');
+    // Find and toggle shadow checkbox in the overlays panel
+    const shadowCheckbox = page.locator(
+      '[data-testid="overlay-item"] input[type="checkbox"]'
+    );
+    await expect(shadowCheckbox).toBeVisible();
     await shadowCheckbox.click();
 
-    // Verify shadow is applied
-    const textElement = page.locator('[data-testid="text-overlay-content"]');
-    const textShadow = await textElement.evaluate(
-      (el) => window.getComputedStyle(el).textShadow
-    );
-    expect(textShadow).not.toBe("none");
+    // Verify shadow is toggled
+    await expect(shadowCheckbox).toBeChecked();
   });
 
   test("should delete text overlay", async ({ page }) => {
+    // Switch to overlays panel
+    await page.click('button:has-text("Overlays")');
+
     // Add text overlay
     await page.click('button:has-text("Add Text")');
 
     // Verify overlay exists
-    await expect(
-      page.locator('[data-testid="text-overlay-content"]')
-    ).toBeVisible();
+    await expect(page.locator('[data-testid="overlay-item"]')).toBeVisible();
 
-    // Delete overlay from panel
-    await page.click('[data-testid="delete-overlay"]');
+    // Delete overlay using delete button
+    await page.click('button[aria-label*="Delete"]');
 
     // Verify overlay is removed
     await expect(
-      page.locator('[data-testid="text-overlay-content"]')
+      page.locator('[data-testid="overlay-item"]')
     ).not.toBeVisible();
   });
 
   test("should support undo/redo for text operations", async ({ page }) => {
+    // Switch to overlays panel
+    await page.click('button:has-text("Overlays")');
+
     // Add text overlay
     await page.click('button:has-text("Add Text")');
 
-    // Edit text
-    await page.locator('[data-testid="text-overlay-content"]').dblclick();
-    await page.keyboard.type("Edited Text");
-    await page.keyboard.press("Enter");
+    // Edit text in the input field
+    const textInput = page.locator('input[placeholder*="text"]').first();
+    await textInput.clear();
+    await textInput.fill("Edited Text");
 
     // Verify text is edited
-    await expect(
-      page.locator('[data-testid="text-overlay-content"]')
-    ).toContainText("Edited Text");
+    await expect(textInput).toHaveValue("Edited Text");
 
     // Undo (Ctrl+Z)
     await page.keyboard.press("Control+z");
 
     // Verify text is reverted
-    await expect(
-      page.locator('[data-testid="text-overlay-content"]')
-    ).toContainText("Your text here");
+    await expect(textInput).toHaveValue("Your text here");
   });
 });

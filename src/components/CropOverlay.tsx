@@ -85,7 +85,7 @@ export function CropOverlay({
   };
 
   return (
-    <div className="absolute inset-0 pointer-events-none">
+    <div className="relative w-full h-full pointer-events-none">
       {/* Dark overlay outside crop area */}
       <div className="absolute inset-0 bg-black bg-opacity-50">
         {/* Crop area cutout */}

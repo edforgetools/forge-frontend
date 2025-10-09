@@ -250,6 +250,40 @@ export function validateImageFile(file: File): {
 }
 
 /**
+ * Validate video file (re-exported from video.ts for convenience)
+ */
+export function validateVideoFile(file: File): {
+  valid: boolean;
+  error?: string;
+} {
+  const maxSizeBytes = 200 * 1024 * 1024; // 200MB limit for graceful failure
+  const allowedTypes = [
+    "video/mp4",
+    "video/webm",
+    "video/ogg",
+    "video/quicktime",
+  ];
+
+  if (file.size > maxSizeBytes) {
+    return {
+      valid: false,
+      error: `File size ${(file.size / 1024 / 1024).toFixed(
+        1
+      )}MB exceeds 200MB limit`,
+    };
+  }
+
+  if (!allowedTypes.includes(file.type)) {
+    return {
+      valid: false,
+      error: `Unsupported file type: ${file.type}`,
+    };
+  }
+
+  return { valid: true };
+}
+
+/**
  * Create image element from file
  */
 export function createImageFromFile(file: File): Promise<HTMLImageElement> {

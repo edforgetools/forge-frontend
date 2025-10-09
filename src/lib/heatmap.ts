@@ -124,7 +124,7 @@ class HeatmapTracker {
 
     this.lastMoveTime = now;
     if (event.touches.length > 0) {
-      const touch = event.touches[0];
+      const touch = event.touches[0]!;
       this.addPointFromTouch(touch, "move");
     }
   }
@@ -133,7 +133,7 @@ class HeatmapTracker {
     if (!this.isTracking) return;
 
     if (event.changedTouches.length > 0) {
-      const touch = event.changedTouches[0];
+      const touch = event.changedTouches[0]!;
       this.addPointFromTouch(touch, "click");
     }
   }

@@ -18,6 +18,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Download, AlertTriangle, CheckCircle, Zap } from "lucide-react";
 import { useCanvasStore, canvasActions } from "@/state/canvasStore";
 import {
@@ -31,9 +37,13 @@ import { sendHeatmapData } from "@/lib/heatmap";
 
 interface ExportDialogProps {
   children: React.ReactNode;
+  isDragging?: boolean;
 }
 
-export function ExportDialog({ children }: ExportDialogProps) {
+export function ExportDialog({
+  children,
+  isDragging = false,
+}: ExportDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [estimatedSize, setEstimatedSize] = useState<number>(0);
   const [isExporting, setIsExporting] = useState(false);
@@ -74,6 +84,15 @@ export function ExportDialog({ children }: ExportDialogProps) {
 
   const handleExport = async () => {
     if (!hasContent) return;
+
+    if (isDragging) {
+      toast({
+        title: "Please finish dragging",
+        description: "Complete layer manipulation before exporting.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsExporting(true);
     const startTime = performance.now();
@@ -164,7 +183,7 @@ export function ExportDialog({ children }: ExportDialogProps) {
           <DialogTitle>Export Settings</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-6 pb-6">
           {/* Format Selection */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -201,7 +220,7 @@ export function ExportDialog({ children }: ExportDialogProps) {
               <SelectContent>
                 <SelectItem value="auto">
                   <div className="flex items-center space-x-2">
-                    <Zap className="w-4 h-4 text-yellow-500" />
+                    <Zap className="w-[18px] h-[18px] text-yellow-500" />
                     <span>Auto (Recommended)</span>
                   </div>
                 </SelectItem>
@@ -283,9 +302,9 @@ export function ExportDialog({ children }: ExportDialogProps) {
                   <span className="text-sm font-medium">Estimated Size</span>
                   <div className="flex items-center space-x-1">
                     {isSizeValid ? (
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <CheckCircle className="w-[18px] h-[18px] text-green-600" />
                     ) : (
-                      <AlertTriangle className="w-4 h-4 text-amber-600" />
+                      <AlertTriangle className="w-[18px] h-[18px] text-amber-600" />
                     )}
                   </div>
                 </div>
@@ -350,45 +369,59 @@ export function ExportDialog({ children }: ExportDialogProps) {
               </div>
             )}
 
-          {/* Export Button */}
-          <Button
-            onClick={handleExport}
-            disabled={!hasContent || isExporting}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-            aria-label={
-              hasContent
-                ? autoFormat
-                  ? "Export with smart compression"
-                  : "Export thumbnail"
-                : "Export disabled - no content"
-            }
-          >
-            {isExporting ? (
-              <>
-                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2" />
-                Optimizing & Exporting...
-              </>
-            ) : (
-              <>
-                <Download className="w-4 h-4 mr-2" />
-                {autoFormat ? (
-                  <>
-                    <Zap className="w-4 h-4 mr-1" />
-                    Smart Export
-                  </>
-                ) : (
-                  `Export ${prefs.format.toUpperCase()}`
+          {/* Export Button - Sticky at bottom */}
+          <div className="sticky bottom-0 bg-white pt-4 pb-safe-area-inset-bottom">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={handleExport}
+                    disabled={!hasContent || isExporting}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    aria-disabled={!hasContent}
+                    aria-label={
+                      hasContent
+                        ? autoFormat
+                          ? "Export with smart compression"
+                          : "Export thumbnail"
+                        : "Export disabled - no content"
+                    }
+                  >
+                    {isExporting ? (
+                      <>
+                        <div className="animate-spin w-[18px] h-[18px] border-2 border-white border-t-transparent rounded-full mr-2" />
+                        Optimizing & Exporting...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-[18px] h-[18px] mr-2" />
+                        {autoFormat ? (
+                          <>
+                            <Zap className="w-[18px] h-[18px] mr-1" />
+                            Smart Export
+                          </>
+                        ) : (
+                          `Export ${prefs.format.toUpperCase()}`
+                        )}
+                      </>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                {!hasContent && (
+                  <TooltipContent>
+                    <p>Upload content to enable export</p>
+                  </TooltipContent>
                 )}
-              </>
-            )}
-          </Button>
+              </Tooltip>
+            </TooltipProvider>
 
-          {autoFormat && (
-            <div className="text-xs text-center text-gray-500">
-              Smart export will auto-select the best format and compress to fit
-              under {prefs.keepUnderMB}MB
-            </div>
-          )}
+            {autoFormat && (
+              <div className="text-xs text-center text-gray-500 mt-2">
+                Smart export will auto-select the best format and compress to
+                fit under {prefs.keepUnderMB}MB
+              </div>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

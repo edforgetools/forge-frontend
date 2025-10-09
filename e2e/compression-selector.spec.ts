@@ -4,12 +4,16 @@ test.describe("Compression Selector (FE-012)", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
 
+    // Navigate to app page
+    await page.click('button:has-text("Start Creating")');
+    await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
+
     // Upload a test image
     const fileInput = page.locator('input[type="file"]');
     await fileInput.setInputFiles("e2e/fixtures/test-image.png");
 
     // Wait for image to load
-    await expect(page.locator("canvas")).toBeVisible();
+    await expect(page.locator('[data-testid="canvas-toolbar"]')).toBeVisible();
   });
 
   test("should show compression settings when toggled", async ({ page }) => {

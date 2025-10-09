@@ -223,7 +223,7 @@ test.describe("Snapthumb Export", () => {
     await expect(page.locator("text=Export Thumbnail")).toBeVisible();
   });
 
-  test("should provide proper error handling", async ({ page }) => {
+  test("should provide proper error handling", async () => {
     // Skip error handling test for now - requires proper file fixtures
     // TODO: Implement proper error handling test with fixtures
     test.skip(true, "Error handling test requires proper fixtures setup");
