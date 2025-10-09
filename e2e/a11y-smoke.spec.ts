@@ -68,7 +68,7 @@ test.describe("A11y Smoke Tests - WCAG AA Focus", () => {
     // Wait for any h1 element to be visible, or proceed after timeout
     try {
       await page.waitForSelector("h1", { timeout: 5000 });
-    } catch (error) {
+    } catch {
       console.log("No h1 found, proceeding with accessibility scan");
     }
 
@@ -106,7 +106,7 @@ test.describe("A11y Smoke Tests - WCAG AA Focus", () => {
     // Wait for any h1 element to be visible, or proceed after timeout
     try {
       await page.waitForSelector("h1", { timeout: 5000 });
-    } catch (error) {
+    } catch {
       console.log("No h1 found, proceeding with accessibility scan");
     }
 

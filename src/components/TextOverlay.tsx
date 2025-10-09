@@ -132,7 +132,7 @@ export function TextOverlay({ className }: TextOverlayProps) {
   ]);
 
   const handleUpdateText = useCallback(
-    (field: string, value: any) => {
+    (field: string, value: unknown) => {
       if (selectedOverlay) {
         updateOverlay(selectedId!, { [field]: value });
       }

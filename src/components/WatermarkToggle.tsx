@@ -26,8 +26,8 @@ export function WatermarkToggle({ className }: WatermarkToggleProps) {
   const existingWatermark = overlays.find(
     (o) =>
       o.type === "text" &&
-      (o as any).text === watermarkText &&
-      (o as any).isWatermark === true
+      (o as Record<string, unknown>).text === watermarkText &&
+      (o as Record<string, unknown>).isWatermark === true
   );
 
   const handleWatermarkToggle = (enabled: boolean) => {
