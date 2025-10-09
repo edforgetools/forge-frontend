@@ -5,12 +5,12 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { useCanvasStore } from "@/state/canvasStore";
-import { Lock, Unlock, RotateCcw } from "lucide-react";
+import { Lock, RotateCcw } from "lucide-react";
 
 export function CropPanel() {
   const { crop, image, videoSrc, setCrop } = useCanvasStore();
   const [autoCrop, setAutoCrop] = useState(true);
-  const [lockAspectRatio, setLockAspectRatio] = useState(true);
+  const [lockAspectRatio] = useState(true); // Always locked for Snapthumb
 
   const hasContent = image || videoSrc;
 
@@ -87,14 +87,11 @@ export function CropPanel() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setLockAspectRatio(!lockAspectRatio)}
-              className="h-8 w-8 p-0"
+              disabled={true}
+              className="h-8 w-8 p-0 opacity-50"
+              title="16:9 aspect ratio is locked for Snapthumb"
             >
-              {lockAspectRatio ? (
-                <Lock className="w-4 h-4" />
-              ) : (
-                <Unlock className="w-4 h-4" />
-              )}
+              <Lock className="w-4 h-4" />
             </Button>
             <Button
               variant="outline"
@@ -217,18 +214,16 @@ export function CropPanel() {
         <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg">
           <div className="flex items-center justify-between">
             <div className="font-medium">
-              {lockAspectRatio
-                ? "16:9 Aspect Ratio (Locked)"
-                : "Custom Aspect Ratio"}
+              16:9 Aspect Ratio (Required for Snapthumb)
             </div>
             <div className="text-xs">{(crop.w / crop.h).toFixed(2)}:1</div>
           </div>
-          {lockAspectRatio && Math.abs(crop.w / crop.h - 16 / 9) > 0.01 && (
+          {Math.abs(crop.w / crop.h - 16 / 9) > 0.01 && (
             <div className="text-amber-600 mt-1">⚠️ Not exactly 16:9</div>
           )}
-          {!lockAspectRatio && (
-            <div className="text-blue-600 mt-1">🔓 Free aspect ratio</div>
-          )}
+          <div className="text-blue-600 mt-1">
+            🔒 16:9 aspect ratio is enforced for Snapthumb
+          </div>
         </div>
 
         {/* Quick preset buttons */}

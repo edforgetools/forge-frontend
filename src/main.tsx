@@ -23,12 +23,8 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("/sw.js")
-      .then((registration) => {
-        console.log("SW registered: ", registration);
-      })
-      .catch((registrationError) => {
-        console.log("SW registration failed: ", registrationError);
-      });
+      .then(() => {})
+      .catch(() => {});
   });
 }
 
@@ -52,7 +48,7 @@ const node = (
       <Toaster />
     </Suspense>
     {/* Only load analytics in production */}
-    {process.env.NODE_ENV === "production" && (
+    {import.meta.env.PROD && (
       <Suspense fallback={null}>
         <Analytics />
       </Suspense>
@@ -61,9 +57,5 @@ const node = (
 );
 
 root.render(
-  process.env.NODE_ENV === "development" ? (
-    <React.StrictMode>{node}</React.StrictMode>
-  ) : (
-    node
-  )
+  import.meta.env.DEV ? <React.StrictMode>{node}</React.StrictMode> : node
 );

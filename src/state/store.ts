@@ -55,8 +55,6 @@ function createStore(): SnapStore {
     return storeInstance;
   }
 
-  console.log("✅ SNAP Store: Creating new store instance");
-
   // Create new store instance
   storeInstance = {
     canvas: useCanvasStore.getState(),
@@ -73,12 +71,9 @@ function createStore(): SnapStore {
 
   // Handle HMR cleanup
   if (import.meta.hot) {
-    import.meta.hot.accept(() => {
-      console.log("🔄 SNAP Store: HMR detected, preserving store instance");
-    });
+    import.meta.hot.accept(() => {});
 
     import.meta.hot.dispose(() => {
-      console.log("🔄 SNAP Store: HMR dispose, cleaning up store");
       // Don't reset the store on HMR dispose to prevent state loss
       // The store will be reused on the next createStore call
     });

@@ -52,6 +52,9 @@ export function ExportDialog({
 
   const { image, videoSrc, crop, prefs } = useCanvasStore();
   const hasContent = image || videoSrc;
+  const aspectRatio = crop.w / crop.h;
+  const is16to9 = Math.abs(aspectRatio - 16 / 9) < 0.01;
+  const isReadyForExport = hasContent && is16to9;
 
   // Update estimated size when settings change
   useEffect(() => {
@@ -83,7 +86,18 @@ export function ExportDialog({
   ]);
 
   const handleExport = async () => {
-    if (!hasContent) return;
+    if (!isReadyForExport) {
+      toast({
+        title: "Not ready for export",
+        description: !hasContent
+          ? "Please upload content first."
+          : !is16to9
+            ? "Crop must be 16:9 aspect ratio for Snapthumb."
+            : "Please ensure your content is ready for export.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (isDragging) {
       toast({
@@ -134,7 +148,7 @@ export function ExportDialog({
       const result = await exportAndDownload({
         canvas,
         format: autoFormat ? "auto" : prefs.format,
-        targetSizeMB: prefs.keepUnderMB,
+        targetSizeMB: 2.0, // Enforce 2MB limit for Snapthumb
         quality: prefs.quality,
       });
 
@@ -172,8 +186,9 @@ export function ExportDialog({
     canvasActions.setPrefs(updates);
   };
 
-  const isSizeValid = estimatedSize <= prefs.keepUnderMB;
-  const sizeRatio = estimatedSize / prefs.keepUnderMB;
+  const targetSizeMB = 2.0; // Enforce 2MB limit for Snapthumb
+  const isSizeValid = estimatedSize <= targetSizeMB;
+  const sizeRatio = estimatedSize / targetSizeMB;
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -230,7 +245,7 @@ export function ExportDialog({
               </SelectContent>
             </Select>
             {autoFormat && (
-              <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+              <div className="text-xs text-blue-600 bg-blue-50 p-4 rounded">
                 <div className="font-medium">Auto-format enabled</div>
                 <div>
                   Will automatically choose the best format based on your image
@@ -312,7 +327,7 @@ export function ExportDialog({
                   {estimatedSize.toFixed(2)} MB
                 </div>
                 <div className="text-xs text-gray-500">
-                  Limit: {prefs.keepUnderMB} MB
+                  Limit: {targetSizeMB} MB (Snapthumb requirement)
                   {autoFormat && (
                     <span className="ml-2 text-blue-600">
                       • Auto-compression enabled
@@ -336,14 +351,14 @@ export function ExportDialog({
                     {autoFormat && (
                       <div className="mt-1 text-blue-600">
                         Auto-compression will reduce quality to fit under{" "}
-                        {prefs.keepUnderMB}MB
+                        {targetSizeMB}MB
                       </div>
                     )}
                   </div>
                 )}
 
                 {autoFormat && isSizeValid && (
-                  <div className="text-xs text-green-600 bg-green-50 p-2 rounded">
+                  <div className="text-xs text-green-600 bg-green-50 p-4 rounded">
                     <div className="font-medium">✅ Optimized export ready</div>
                     <div>
                       Auto-format will ensure the best quality within size
@@ -358,7 +373,7 @@ export function ExportDialog({
           {/* Scale down option */}
           {image &&
             (image.width < prefs.width || image.height < prefs.height) && (
-              <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+              <div className="text-xs text-gray-500 bg-gray-50 p-4 rounded">
                 <div className="font-medium">Scale down available</div>
                 <div>
                   Source: {image.width}×{image.height}
@@ -376,15 +391,19 @@ export function ExportDialog({
                 <TooltipTrigger asChild>
                   <Button
                     onClick={handleExport}
-                    disabled={!hasContent || isExporting}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    aria-disabled={!hasContent}
+                    disabled={!isReadyForExport || isExporting}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+                    aria-disabled={!isReadyForExport}
                     aria-label={
-                      hasContent
+                      isReadyForExport
                         ? autoFormat
                           ? "Export with smart compression"
                           : "Export thumbnail"
-                        : "Export disabled - no content"
+                        : !hasContent
+                          ? "Export disabled - no content"
+                          : !is16to9
+                            ? "Export disabled - crop must be 16:9"
+                            : "Export disabled - not ready"
                     }
                   >
                     {isExporting ? (
@@ -407,9 +426,15 @@ export function ExportDialog({
                     )}
                   </Button>
                 </TooltipTrigger>
-                {!hasContent && (
+                {!isReadyForExport && (
                   <TooltipContent>
-                    <p>Upload content to enable export</p>
+                    <p>
+                      {!hasContent
+                        ? "Upload content to enable export"
+                        : !is16to9
+                          ? "Crop must be 16:9 aspect ratio for Snapthumb"
+                          : "Not ready for export"}
+                    </p>
                   </TooltipContent>
                 )}
               </Tooltip>
@@ -418,7 +443,7 @@ export function ExportDialog({
             {autoFormat && (
               <div className="text-xs text-center text-gray-500 mt-2">
                 Smart export will auto-select the best format and compress to
-                fit under {prefs.keepUnderMB}MB
+                fit under {targetSizeMB}MB
               </div>
             )}
           </div>

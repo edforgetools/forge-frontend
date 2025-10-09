@@ -177,7 +177,7 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
     <div className={`space-y-4 ${className}`}>
       {/* Video Info */}
       {videoInfo && (
-        <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+        <div className="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg">
           <div className="flex justify-between items-center">
             <span>
               Resolution: {videoInfo.width}×{videoInfo.height}

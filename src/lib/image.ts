@@ -40,11 +40,6 @@ export async function exportCanvasUnder2MB(
     }
 
     if (blob.size <= maxSizeBytes) {
-      console.log(
-        `Export successful: ${format} at ${(quality * 100).toFixed(
-          1
-        )}% quality, ${(blob.size / 1024 / 1024).toFixed(2)}MB`
-      );
       return blob;
     }
 
@@ -53,9 +48,6 @@ export async function exportCanvasUnder2MB(
   }
 
   // If we still can't get under the limit, try resizing
-  console.log(
-    `Quality reduction insufficient, attempting resize for ${format}`
-  );
   return exportResizedCanvas(canvas, format, maxSizeBytes);
 }
 

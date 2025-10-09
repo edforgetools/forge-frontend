@@ -4,7 +4,7 @@ import {
   TextOverlay as TextOverlayType,
   LogoOverlay,
 } from "@/state/canvasStore";
-import { TextOverlay } from "./TextOverlay";
+import { CanvasTextOverlay } from "./CanvasTextOverlay";
 import { CropOverlay } from "./CropOverlay";
 import { LayerHost } from "./LayerHost";
 import { startHeatmapTracking, stopHeatmapTracking } from "@/lib/heatmap";
@@ -540,7 +540,10 @@ export function CanvasStage({ onDragStateChange }: CanvasStageProps) {
               .filter((overlay) => !overlay.hidden && overlay.type === "text")
               .sort((a, b) => a.z - b.z)
               .map((overlay) => (
-                <TextOverlay key={overlay.id} />
+                <CanvasTextOverlay
+                  key={overlay.id}
+                  overlay={overlay as TextOverlayType}
+                />
               ))}
           </LayerHost>
 

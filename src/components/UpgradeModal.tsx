@@ -45,7 +45,6 @@ export function UpgradeModal({ children }: UpgradeModalProps) {
 
   const handleUpgrade = () => {
     // Placeholder for future Stripe integration
-    console.log("Upgrade to Pro clicked - Stripe integration coming soon");
 
     // For now, just simulate upgrading (remove this in production)
     setIsPro(true);

@@ -207,7 +207,7 @@ export function TextToolbar({ overlayId, onClose }: TextToolbarProps) {
       </div>
 
       {/* Text Alignment */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         {alignments.map((alignment) => {
           const Icon = alignment.icon;
           return (

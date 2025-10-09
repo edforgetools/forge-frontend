@@ -143,7 +143,7 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
         <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium">Logo Controls</h3>
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -287,11 +287,11 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
 
           {/* Instructions */}
           <div className="text-xs text-gray-500 bg-white p-2 rounded border">
-            <div className="flex items-center gap-1 mb-1">
+            <div className="flex items-center gap-2 mb-1">
               <Move className="w-3 h-3" />
               <span>Drag to move</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               <Square className="w-3 h-3" />
               <span>Drag corner to resize</span>
             </div>
@@ -324,7 +324,7 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
                     />
                     <span className="text-sm">Logo {logo.id.slice(-4)}</span>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-2">
                     {logo.locked && (
                       <div
                         className="w-2 h-2 bg-yellow-400 rounded-full"

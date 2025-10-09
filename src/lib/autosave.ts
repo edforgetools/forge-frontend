@@ -118,13 +118,12 @@ class AutosaveManager {
         // Also save to history
         this.saveToHistory(autosaveData);
 
-        console.log("Canvas state autosaved");
         return true;
       }
 
       return false;
-    } catch (error) {
-      console.error("Failed to save canvas state:", error);
+    } catch (_error) {
+      console.error("Failed to save canvas state:", _error);
       return false;
     }
   }
@@ -148,7 +147,6 @@ class AutosaveManager {
       // Check if data is not too old (24 hours)
       const maxAge = 24 * 60 * 60 * 1000; // 24 hours
       if (Date.now() - autosaveData.timestamp > maxAge) {
-        console.log("Autosave data too old, skipping restore");
         return false;
       }
 
@@ -159,10 +157,9 @@ class AutosaveManager {
       // Clear current state first
       useCanvasStore.setState(newState);
 
-      console.log("Canvas state restored from autosave");
       return true;
-    } catch (error) {
-      console.error("Failed to load saved state:", error);
+    } catch (_error) {
+      console.error("Failed to load saved state:", _error);
       return false;
     }
   }
@@ -196,8 +193,8 @@ class AutosaveManager {
       }
 
       localStorage.setItem(historyKey, JSON.stringify(history));
-    } catch (error) {
-      console.error("Failed to save to history:", error);
+    } catch (_error) {
+      console.error("Failed to save to history:", _error);
     }
   }
 
@@ -216,8 +213,8 @@ class AutosaveManager {
       const historyKey = `${this.options.keyPrefix}_history`;
       const existingHistory = localStorage.getItem(historyKey);
       return existingHistory ? JSON.parse(existingHistory) : [];
-    } catch (error) {
-      console.error("Failed to get history:", error);
+    } catch (_error) {
+      console.error("Failed to get history:", _error);
       return [];
     }
   }
@@ -241,10 +238,9 @@ class AutosaveManager {
 
       useCanvasStore.setState(newState);
 
-      console.log("Canvas state restored from history");
       return true;
-    } catch (error) {
-      console.error("Failed to restore from history:", error);
+    } catch (_error) {
+      console.error("Failed to restore from history:", _error);
       return false;
     }
   }
@@ -274,7 +270,7 @@ class AutosaveManager {
       localStorage.setItem(test, test);
       localStorage.removeItem(test);
       return true;
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -300,7 +296,7 @@ class AutosaveManager {
         available,
         total: estimatedTotal,
       };
-    } catch (error) {
+    } catch (_error) {
       return { used: 0, available: 0, total: 0 };
     }
   }

@@ -58,6 +58,14 @@ export default [
     },
   },
   {
+    files: ["**/*.mjs"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
     files: ["public/**/*.js"],
     languageOptions: {
       globals: {

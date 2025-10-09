@@ -227,11 +227,11 @@ export function UploadDropzone() {
               Supported formats:
             </div>
             <div className="flex items-center gap-4 text-xs text-gray-600">
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <ImageIcon className="w-4 h-4" />
                 <span>PNG, JPG, WebP</span>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <Video className="w-4 h-4" />
                 <span>MP4, WebM</span>
               </div>

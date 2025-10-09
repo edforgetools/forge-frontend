@@ -2,6 +2,8 @@
 
 A modern thumbnail creation tool built with React, TypeScript, and Canvas API. Upload videos or images, capture frames, crop to 16:9, add overlays, and export optimized thumbnails under 2MB.
 
+**Powered by Forge Layer v0.2**
+
 ## 🚀 Features
 
 - **Video & Image Support**: Upload MP4, WebM, JPG, PNG, WebP files
@@ -256,4 +258,7 @@ For issues and questions:
 ---
 
 Built with ❤️ using modern web technologies.
+
+**Powered by Forge Layer v0.2**
+
 # Triggering new CI run for debugging

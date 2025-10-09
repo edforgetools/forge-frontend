@@ -78,9 +78,6 @@ export function validateRootElements(): ValidationResult {
  */
 export function logValidationIssues(result: ValidationResult): void {
   if (result.isValid) {
-    console.log(
-      "✅ Portal/Root validation passed - exactly one #root and one #portal-root found"
-    );
     return;
   }
 
@@ -91,15 +88,6 @@ export function logValidationIssues(result: ValidationResult): void {
   console.groupEnd();
 
   // Log additional context for debugging
-  console.log("🔍 DOM Structure Context:", {
-    rootCount: document.querySelectorAll("#root").length,
-    portalRootCount: document.querySelectorAll("#portal-root").length,
-    bodyChildren: Array.from(document.body.children).map((el) => ({
-      tagName: el.tagName,
-      id: el.id,
-      className: el.className,
-    })),
-  });
 }
 
 /**
@@ -234,7 +222,7 @@ export function runPortalRootValidation(): void {
  * Development-only validation that runs more frequently
  */
 export function enableDevelopmentValidation(): void {
-  if (process.env.NODE_ENV !== "development") {
+  if (!import.meta.env.DEV) {
     return;
   }
 
@@ -251,7 +239,6 @@ export function enableDevelopmentValidation(): void {
     );
 
     if (hasStructuralChanges) {
-      console.log("🔍 DOM structure changed, re-running validation...");
       runPortalRootValidation();
     }
   });

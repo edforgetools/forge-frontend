@@ -213,7 +213,7 @@ export function WatermarkToggle({ className }: WatermarkToggleProps) {
       )}
 
       {/* Info */}
-      <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded border">
+      <div className="text-xs text-gray-500 bg-gray-50 p-4 rounded border">
         <p className="font-medium mb-1">About Watermarks:</p>
         <ul className="space-y-1 text-xs">
           <li>• Watermarks are automatically positioned and locked</li>

@@ -9,7 +9,7 @@ export function EditorRoot({ children }: EditorRootProps) {
 
   useEffect(() => {
     // Check if this is a second mount attempt
-    if (initializedRef.current && process.env.NODE_ENV === "development") {
+    if (initializedRef.current && import.meta.env.DEV) {
       console.warn(
         "EditorRoot: Second mount detected! EditorRoot should only be mounted once. " +
           "This may indicate duplicate provider setup."

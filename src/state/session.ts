@@ -51,21 +51,6 @@ export function useSessionRestoreGuard(): SessionRestoreGuard {
 
       // If difference is greater than 25%, restore viewport
       if (maxDiff > VIEWPORT_SIZE_THRESHOLD) {
-        console.log(
-          `Session restore guard: Canvas size difference detected (${(
-            maxDiff * 100
-          ).toFixed(1)}% > ${
-            VIEWPORT_SIZE_THRESHOLD * 100
-          }%). Restoring viewport.`,
-          {
-            saved: savedDimensions,
-            current: currentDimensions,
-            widthDiff: (widthDiff * 100).toFixed(1) + "%",
-            heightDiff: (heightDiff * 100).toFixed(1) + "%",
-            maxDiff: (maxDiff * 100).toFixed(1) + "%",
-          }
-        );
-
         // Reset zoom to 100% and center the canvas
         resetView();
 

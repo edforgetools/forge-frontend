@@ -144,7 +144,7 @@ export function V2BetaCTA({ className, onDismiss }: V2BetaCTAProps) {
           </Button>
         </div>
 
-        <div className="mt-4 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+        <div className="mt-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
           <p className="text-xs text-gray-600 text-center">
             <span className="font-medium">Beta Access:</span> Free for all users
             during beta period. Help shape the future of Snapthumb!
