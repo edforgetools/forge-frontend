@@ -83,11 +83,15 @@ class AutosaveManager {
       const serializableState: Partial<CanvasState> = {
         aspect: state.aspect,
         crop: state.crop,
-        overlays: state.overlays.map((overlay) => ({
-          ...overlay,
-          // Convert image elements to data URLs if needed
-          src: overlay.type === "logo" ? overlay.src : undefined,
-        })),
+        overlays: state.overlays.map((overlay) => {
+          if (overlay.type === "logo") {
+            return {
+              ...overlay,
+              src: overlay.src,
+            };
+          }
+          return overlay;
+        }),
         prefs: state.prefs,
         zoom: state.zoom,
         showGrid: state.showGrid,
@@ -341,6 +345,7 @@ export function useAutosave(options: Partial<AutosaveOptions> = {}) {
       };
     } else {
       autosaveManager.stop();
+      return undefined;
     }
   }, [enabled, interval]);
 

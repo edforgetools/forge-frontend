@@ -89,7 +89,11 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
       try {
         setIsLoading(true);
         const frame = await extractFrameFromVideo(videoRef.current, timestamp);
-        setImage(frame.canvas);
+
+        // Convert canvas to image
+        const img = new Image();
+        img.onload = () => setImage(img);
+        img.src = frame.canvas.toDataURL();
 
         toast({
           title: "Frame extracted",
@@ -131,7 +135,7 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
   };
 
   const handleSeek = (value: number[]) => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || value[0] === undefined) return;
     const newTime = value[0];
     videoRef.current.currentTime = newTime;
     setCurrentTime(newTime);

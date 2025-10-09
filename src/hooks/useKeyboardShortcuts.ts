@@ -39,7 +39,7 @@ export function useKeyboardShortcuts() {
       activeElement &&
       (activeElement.tagName === "INPUT" ||
         activeElement.tagName === "TEXTAREA" ||
-        activeElement.contentEditable === "true")
+        (activeElement as HTMLElement).contentEditable === "true")
     );
   }, []);
 
@@ -461,10 +461,11 @@ export function useKeyboardShortcuts() {
   return {
     shortcuts: shortcuts.reduce(
       (acc, shortcut) => {
-        if (!acc[shortcut.category]) {
-          acc[shortcut.category] = [];
+        const category = shortcut.category || "Other";
+        if (!acc[category]) {
+          acc[category] = [];
         }
-        acc[shortcut.category].push(shortcut);
+        acc[category].push(shortcut);
         return acc;
       },
       {} as Record<string, KeyboardShortcut[]>

@@ -109,7 +109,7 @@ export function TextOverlay({ className }: TextOverlayProps) {
       shadow: hasShadow,
       align: textAlign,
       color: textColor,
-    });
+    } as Omit<import("@/state/canvasStore").TextOverlay, "id" | "z">);
 
     toast({
       title: "Text added",
@@ -352,7 +352,9 @@ export function TextOverlay({ className }: TextOverlayProps) {
           <div className="space-y-2">
             <Label className="text-xs">Text Content</Label>
             <Input
-              value={selectedOverlay.text}
+              value={
+                selectedOverlay.type === "text" ? selectedOverlay.text : ""
+              }
               onChange={(e) => handleUpdateText("text", e.target.value)}
               className="w-full h-8 text-sm"
               maxLength={100}
@@ -387,11 +389,14 @@ export function TextOverlay({ className }: TextOverlayProps) {
               <div className="flex justify-between">
                 <Label className="text-xs">Font Size</Label>
                 <span className="text-xs text-gray-500">
-                  {selectedOverlay.size}px
+                  {selectedOverlay.type === "text" ? selectedOverlay.size : 16}
+                  px
                 </span>
               </div>
               <Slider
-                value={[selectedOverlay.size]}
+                value={[
+                  selectedOverlay.type === "text" ? selectedOverlay.size : 16,
+                ]}
                 onValueChange={(v) => handleUpdateText("size", v[0])}
                 min={12}
                 max={72}
@@ -424,12 +429,20 @@ export function TextOverlay({ className }: TextOverlayProps) {
             <div className="flex items-center gap-2">
               <input
                 type="color"
-                value={selectedOverlay.color}
+                value={
+                  selectedOverlay.type === "text"
+                    ? selectedOverlay.color
+                    : "#FFFFFF"
+                }
                 onChange={(e) => handleUpdateText("color", e.target.value)}
                 className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
               />
               <Input
-                value={selectedOverlay.color}
+                value={
+                  selectedOverlay.type === "text"
+                    ? selectedOverlay.color
+                    : "#FFFFFF"
+                }
                 onChange={(e) => handleUpdateText("color", e.target.value)}
                 className="flex-1 h-8 text-sm font-mono"
                 placeholder="#FFFFFF"

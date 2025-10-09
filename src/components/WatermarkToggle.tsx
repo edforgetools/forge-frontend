@@ -13,7 +13,7 @@ interface WatermarkToggleProps {
 }
 
 export function WatermarkToggle({ className }: WatermarkToggleProps) {
-  const { addOverlay, overlays, setPrefs, prefs } = useCanvasStore();
+  const { addOverlay, overlays } = useCanvasStore();
   const { toast } = useToast();
 
   const [showWatermark, setShowWatermark] = useState(false);
@@ -65,8 +65,7 @@ export function WatermarkToggle({ className }: WatermarkToggleProps) {
         shadow: true,
         align: "center",
         color: "#FFFFFF",
-        isWatermark: true,
-      });
+      } as Omit<import("@/state/canvasStore").TextOverlay, "id" | "z">);
 
       toast({
         title: "Watermark added",
@@ -193,7 +192,7 @@ export function WatermarkToggle({ className }: WatermarkToggleProps) {
                 </div>
                 <Slider
                   value={[watermarkOpacity]}
-                  onValueChange={(v) => setWatermarkOpacity(v[0])}
+                  onValueChange={(v) => setWatermarkOpacity(v[0] ?? 0.3)}
                   min={0.1}
                   max={0.8}
                   step={0.1}

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,11 +15,6 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
   const { addOverlay, overlays, selectedId, updateOverlay } = useCanvasStore();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [isDragging, setIsDragging] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, w: 0, h: 0 });
 
   const selectedOverlay = overlays.find(
     (o) => o.id === selectedId && o.type === "logo"
@@ -54,6 +49,15 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
       reader.onload = (e) => {
         const logoUrl = e.target?.result as string;
 
+        if (!logoUrl) {
+          toast({
+            title: "Error",
+            description: "Failed to load logo image.",
+            variant: "destructive",
+          });
+          return;
+        }
+
         // Add logo overlay
         addOverlay({
           type: "logo",
@@ -66,7 +70,7 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
           locked: false,
           hidden: false,
           opacity: 1,
-        });
+        } as Omit<import("@/state/canvasStore").LogoOverlay, "id" | "z">);
 
         toast({
           title: "Logo added",
@@ -77,76 +81,6 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
     },
     [addOverlay, toast]
   );
-
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent, action: "drag" | "resize") => {
-      if (!selectedOverlay) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (action === "drag") {
-        setIsDragging(true);
-        setDragStart({
-          x: e.clientX - selectedOverlay.x,
-          y: e.clientY - selectedOverlay.y,
-        });
-      } else if (action === "resize") {
-        setIsResizing(true);
-        setResizeStart({
-          x: e.clientX,
-          y: e.clientY,
-          w: selectedOverlay.w,
-          h: selectedOverlay.h,
-        });
-      }
-    },
-    [selectedOverlay]
-  );
-
-  const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (!selectedOverlay) return;
-
-      if (isDragging) {
-        const newX = e.clientX - dragStart.x;
-        const newY = e.clientY - dragStart.y;
-        updateOverlay(selectedId!, { x: newX, y: newY });
-      } else if (isResizing) {
-        const deltaX = e.clientX - resizeStart.x;
-        const deltaY = e.clientY - resizeStart.y;
-        const newW = Math.max(20, resizeStart.w + deltaX);
-        const newH = Math.max(20, resizeStart.h + deltaY);
-        updateOverlay(selectedId!, { w: newW, h: newH });
-      }
-    },
-    [
-      isDragging,
-      isResizing,
-      dragStart,
-      resizeStart,
-      selectedOverlay,
-      selectedId,
-      updateOverlay,
-    ]
-  );
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-    setIsResizing(false);
-  }, []);
-
-  // Add global mouse event listeners
-  React.useEffect(() => {
-    if (isDragging || isResizing) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      return () => {
-        document.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-      };
-    }
-  }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
 
   const handleOpacityChange = (value: number[]) => {
     if (selectedOverlay) {

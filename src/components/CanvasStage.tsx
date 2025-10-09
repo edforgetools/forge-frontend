@@ -540,15 +540,7 @@ export function CanvasStage({ onDragStateChange }: CanvasStageProps) {
               .filter((overlay) => !overlay.hidden && overlay.type === "text")
               .sort((a, b) => a.z - b.z)
               .map((overlay) => (
-                <TextOverlay
-                  key={overlay.id}
-                  overlay={overlay as TextOverlayType}
-                  isSelected={selectedId === overlay.id}
-                  onUpdate={(updates: Partial<TextOverlayType>) =>
-                    updateOverlay(overlay.id, updates)
-                  }
-                  onSelect={() => select(overlay.id)}
-                />
+                <TextOverlay key={overlay.id} />
               ))}
           </LayerHost>
 
