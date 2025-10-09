@@ -131,7 +131,7 @@ function overlayReducer(
         const newIndex = state.historyIndex - 1;
         return {
           ...state,
-          items: [...state.history[newIndex]],
+          items: [...(state.history[newIndex] ?? [])],
           historyIndex: newIndex,
         };
       }
@@ -141,7 +141,7 @@ function overlayReducer(
         const newIndex = state.historyIndex + 1;
         return {
           ...state,
-          items: [...state.history[newIndex]],
+          items: [...(state.history[newIndex] ?? [])],
           historyIndex: newIndex,
         };
       }

@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
+import { Header } from "./components/Header";
 import { EditorSkeleton } from "./components/EditorSkeleton";
 
 // Lazy load pages for better performance
@@ -9,101 +10,77 @@ const Terms = lazy(() => import("./pages/terms.tsx"));
 const Privacy = lazy(() => import("./pages/privacy.tsx"));
 const About = lazy(() => import("./pages/about.tsx"));
 
+const LoadingFallback = ({
+  label = "Loading application",
+}: {
+  label?: string;
+}) => (
+  <div
+    className="h-[100dvh] bg-background flex items-center justify-center"
+    role="status"
+    aria-label={label}
+  >
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+      <p className="text-muted-foreground">Loading...</p>
+    </div>
+  </div>
+);
+
 export default function App() {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <Suspense
-            fallback={
-              <div
-                className="h-[100dvh] bg-gray-50 flex items-center justify-center"
-                role="status"
-                aria-label="Loading application"
-              >
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading...</p>
-                </div>
-              </div>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main className="flex-1">
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Suspense fallback={<LoadingFallback />}>
+                <Home />
+              </Suspense>
             }
-          >
-            <Home />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/app"
-        element={
-          <Suspense fallback={<EditorSkeleton />}>
-            <Editor />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/terms"
-        element={
-          <Suspense
-            fallback={
-              <div
-                className="h-[100dvh] bg-gray-50 flex items-center justify-center"
-                role="status"
-                aria-label="Loading page"
-              >
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading...</p>
-                </div>
-              </div>
+          />
+          <Route
+            path="/app"
+            element={
+              <Suspense fallback={<EditorSkeleton />}>
+                <Editor />
+              </Suspense>
             }
-          >
-            <Terms />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/privacy"
-        element={
-          <Suspense
-            fallback={
-              <div
-                className="h-[100dvh] bg-gray-50 flex items-center justify-center"
-                role="status"
-                aria-label="Loading page"
+          />
+          <Route
+            path="/terms"
+            element={
+              <Suspense
+                fallback={<LoadingFallback label="Loading terms page" />}
               >
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading...</p>
-                </div>
-              </div>
+                <Terms />
+              </Suspense>
             }
-          >
-            <Privacy />
-          </Suspense>
-        }
-      />
-      <Route
-        path="/about"
-        element={
-          <Suspense
-            fallback={
-              <div
-                className="h-[100dvh] bg-gray-50 flex items-center justify-center"
-                role="status"
-                aria-label="Loading page"
+          />
+          <Route
+            path="/privacy"
+            element={
+              <Suspense
+                fallback={<LoadingFallback label="Loading privacy page" />}
               >
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading...</p>
-                </div>
-              </div>
+                <Privacy />
+              </Suspense>
             }
-          >
-            <About />
-          </Suspense>
-        }
-      />
-    </Routes>
+          />
+          <Route
+            path="/about"
+            element={
+              <Suspense
+                fallback={<LoadingFallback label="Loading about page" />}
+              >
+                <About />
+              </Suspense>
+            }
+          />
+        </Routes>
+      </main>
+    </div>
   );
 }

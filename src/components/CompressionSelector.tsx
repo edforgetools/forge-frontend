@@ -58,21 +58,21 @@ export function CompressionSelector({
   const handleQualityChange = (quality: number[]) => {
     onChange({
       ...value,
-      quality: quality[0],
+      quality: quality[0] ?? 0.8,
     });
   };
 
   const handleTargetSizeChange = (targetSizeMB: number[]) => {
     onChange({
       ...value,
-      targetSizeMB: targetSizeMB[0],
+      targetSizeMB: targetSizeMB[0] ?? 1,
     });
   };
 
   const handleSSIMChange = (ssimThreshold: number[]) => {
     onChange({
       ...value,
-      ssimThreshold: ssimThreshold[0],
+      ssimThreshold: ssimThreshold[0] ?? 0.9,
     });
   };
 

@@ -45,7 +45,7 @@ export function CanvasToolbar() {
   const zoomPresets = [0.5, 0.75, 1, 1.5, 2];
 
   const handleZoomChange = (value: number[]) => {
-    setZoom(value[0]);
+    setZoom(value[0] ?? 1);
   };
 
   return (

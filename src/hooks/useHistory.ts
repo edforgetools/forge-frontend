@@ -79,7 +79,7 @@ export function useHistory(): [HistoryState, HistoryActions] {
     setState((prev) => {
       if (prev.currentIndex > 0) {
         const newIndex = prev.currentIndex - 1;
-        result = prev.commands[newIndex];
+        result = prev.commands[newIndex] ?? null;
 
         return {
           ...prev,
@@ -100,7 +100,7 @@ export function useHistory(): [HistoryState, HistoryActions] {
     setState((prev) => {
       if (prev.currentIndex < prev.commands.length - 1) {
         const newIndex = prev.currentIndex + 1;
-        result = prev.commands[newIndex];
+        result = prev.commands[newIndex] ?? null;
 
         return {
           ...prev,
@@ -130,13 +130,13 @@ export function useHistory(): [HistoryState, HistoryActions] {
 
   const getPreviousCommand = useCallback((): HistoryCommand | null => {
     return state.currentIndex > 0
-      ? state.commands[state.currentIndex - 1]
+      ? (state.commands[state.currentIndex - 1] ?? null)
       : null;
   }, [state.commands, state.currentIndex]);
 
   const getNextCommand = useCallback((): HistoryCommand | null => {
     return state.currentIndex < state.commands.length - 1
-      ? state.commands[state.currentIndex + 1]
+      ? (state.commands[state.currentIndex + 1] ?? null)
       : null;
   }, [state.commands, state.currentIndex]);
 

@@ -3,7 +3,9 @@ import { z } from "zod";
 // Define the environment schema
 const envSchema = z.object({
   // Node environment
-  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
 
   // Vite specific
   VITE_APP_TITLE: z.string().optional(),
@@ -24,12 +26,12 @@ const envSchema = z.object({
   // Feature flags
   VITE_ENABLE_ANALYTICS: z
     .string()
-    .transform((val) => val === "true")
-    .default("false"),
+    .default("false")
+    .transform((val) => val === "true"),
   VITE_ENABLE_DEBUG: z
     .string()
-    .transform((val) => val === "true")
-    .default("false"),
+    .default("false")
+    .transform((val) => val === "true"),
 
   // Build info
   VITE_BUILD_TIME: z.string().optional(),
@@ -44,12 +46,12 @@ const envSchema = z.object({
   // Development tools
   VITE_ENABLE_MOCK_API: z
     .string()
-    .transform((val) => val === "true")
-    .default("false"),
+    .default("false")
+    .transform((val) => val === "true"),
   VITE_MOCK_API_DELAY: z
     .string()
-    .transform((val) => parseInt(val, 10))
-    .default("500"),
+    .default("500")
+    .transform((val) => parseInt(val, 10)),
 });
 
 // Parse and validate environment variables
@@ -58,17 +60,21 @@ const parseEnv = () => {
     return envSchema.parse(import.meta.env);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const missingVars = error.errors.map((err) => {
-        if (err.code === "invalid_type" && err.received === "undefined") {
+      const missingVars = error.issues.map((err) => {
+        if (
+          err.code === "invalid_type" &&
+          (err as any).received === "undefined"
+        ) {
           return `${err.path.join(".")} is required but not set`;
         }
         return `${err.path.join(".")}: ${err.message}`;
       });
 
-      throw new Error(
-        `Environment validation failed:\n${missingVars.join("\n")}`,
-        { cause: error }
+      const errorMessage = new Error(
+        `Environment validation failed:\n${missingVars.join("\n")}`
       );
+      (errorMessage as any).cause = error;
+      throw errorMessage;
     }
     throw error;
   }

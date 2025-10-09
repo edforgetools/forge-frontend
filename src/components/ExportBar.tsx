@@ -179,9 +179,9 @@ export function ExportBar({
         const duration = performance.now() - startTime;
         toast({
           title: "Export successful! 🎉",
-          description: `Downloaded ${formatFileSize(blob.size)} ${exportFormat
-            .split("/")[1]
-            .toUpperCase()} file in ${formatDuration(duration)}`,
+          description: `Downloaded ${formatFileSize(blob.size)} ${
+            exportFormat?.split("/")[1]?.toUpperCase() ?? "IMAGE"
+          } file in ${formatDuration(duration)}`,
         });
       }
     } catch (error) {
@@ -205,7 +205,7 @@ export function ExportBar({
   };
 
   const isOverLimit = fileSize > 2 * 1024 * 1024;
-  const qualityPercent = Math.round(quality[0] * 100);
+  const qualityPercent = Math.round((quality[0] ?? 0.8) * 100);
 
   return (
     <div

@@ -183,6 +183,7 @@ export function useViewportScale(
 
       return () => clearTimeout(timeoutId);
     }
+    return undefined;
   }, [containerRef.current, calculateViewportScale]);
 
   // Zoom preset functions

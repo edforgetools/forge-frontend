@@ -117,7 +117,7 @@ class KeyRegistry {
       .toLowerCase()
       .split("+")
       .map((part) => part.trim());
-    const key = parts[parts.length - 1];
+    const key = parts[parts.length - 1]!;
 
     const matcher: KeyMatcher = { key };
 

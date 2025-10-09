@@ -23,6 +23,8 @@ import { UserProfile } from "./UserProfile";
 import { AuthModal } from "./AuthModal";
 import { ProjectManager } from "./ProjectManager";
 import { StatusBar } from "./StatusBar";
+import { UndoRedoToolbar } from "./UndoRedoToolbar";
+import { WatermarkToggle } from "./WatermarkToggle";
 import { useCanvasStore, canvasActions } from "@/state/canvasStore";
 import { useModalStore, modalActions } from "@/state/modalStore";
 import { useAutosave, useProjectManager } from "@/hooks/useAutosave";
@@ -385,7 +387,20 @@ export function AppShell({ onBack }: AppShellProps) {
 
       {/* Right Panel - Export Controls */}
       <aside className="row-[2] col-[3] bg-white border-l border-gray-200 overflow-auto">
-        <div className="p-6 flex flex-col h-full">
+        <div className="p-6 flex flex-col h-full space-y-6">
+          {/* Undo/Redo Controls */}
+          <div>
+            <UndoRedoToolbar />
+          </div>
+
+          {/* Watermark Toggle */}
+          {hasContent && (
+            <div>
+              <WatermarkToggle />
+            </div>
+          )}
+
+          {/* Export Controls */}
           <div className="flex-1">
             <PanelSection
               title="Export Controls"
