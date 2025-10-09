@@ -222,7 +222,7 @@ export function runPortalRootValidation(): void {
  * Development-only validation that runs more frequently
  */
 export function enableDevelopmentValidation(): void {
-  if (process.env.NODE_ENV !== "development") {
+  if (!import.meta.env.DEV) {
     return;
   }
 

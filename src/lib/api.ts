@@ -3,7 +3,7 @@ import { forgeRequest } from "./forge-layer-sdk";
 export const thumb = (payload: unknown) => forgeRequest("thumb", payload);
 
 const FORGE_LAYER_URL =
-  process.env.FORGE_LAYER_URL || "https://forge-layer.onrender.com";
+  import.meta.env.VITE_FORGE_LAYER_URL || "https://forge-layer.onrender.com";
 
 export const healthCheck = async () => {
   const response = await fetch(`${FORGE_LAYER_URL}/health`);

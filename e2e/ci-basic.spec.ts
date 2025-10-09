@@ -8,8 +8,8 @@ test.describe("CI Basic Smoke Tests", () => {
     // Simple check that page loads and has some content
     await expect(page.locator("body")).toBeVisible();
 
-    // Wait a bit more for React to render
-    await page.waitForTimeout(1000);
+    // Wait for React to load by checking that the loading spinner disappears
+    await expect(page.locator(".loading")).not.toBeVisible({ timeout: 15000 });
 
     // Check that there's at least one heading
     await expect(page.locator("h1")).toBeVisible({ timeout: 10000 });
@@ -19,8 +19,13 @@ test.describe("CI Basic Smoke Tests", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle", { timeout: 15000 });
 
+    // Wait for React to load by checking that the loading spinner disappears
+    await expect(page.locator(".loading")).not.toBeVisible({ timeout: 15000 });
+
     // Check for any button with "Start" text (more flexible matching)
-    await expect(page.locator('button:has-text("Start Creating"), button:has-text("Get Started Now")')).toBeVisible({
+    await expect(
+      page.locator('button:has-text("Start Creating")').first()
+    ).toBeVisible({
       timeout: 10000,
     });
   });

@@ -2,7 +2,7 @@
 // This simulates the @forge-layer/sdk package interface
 
 const FORGE_LAYER_URL =
-  process.env.FORGE_LAYER_URL || "https://forge-layer.onrender.com";
+  import.meta.env.VITE_FORGE_LAYER_URL || "https://forge-layer.onrender.com";
 
 export function forgeRequest(endpoint: string, payload: unknown) {
   const url = `${FORGE_LAYER_URL}/forge/${endpoint}`;

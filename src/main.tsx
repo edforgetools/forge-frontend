@@ -48,7 +48,7 @@ const node = (
       <Toaster />
     </Suspense>
     {/* Only load analytics in production */}
-    {process.env.NODE_ENV === "production" && (
+    {import.meta.env.PROD && (
       <Suspense fallback={null}>
         <Analytics />
       </Suspense>
@@ -57,7 +57,7 @@ const node = (
 );
 
 root.render(
-  process.env.NODE_ENV === "development" ? (
+  import.meta.env.DEV ? (
     <React.StrictMode>{node}</React.StrictMode>
   ) : (
     node
