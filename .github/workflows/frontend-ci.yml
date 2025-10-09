@@ -234,12 +234,6 @@ jobs:
         with:
           version: 10.18.1
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: false
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
