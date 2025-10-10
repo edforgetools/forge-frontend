@@ -30,16 +30,12 @@ import { UserProfile } from "./UserProfile";
 import { AuthModal } from "./AuthModal";
 import { ProjectManager } from "./ProjectManager";
 import { StatusBar } from "./StatusBar";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useCanvasStore, canvasActions } from "@/state/canvasStore";
 import { useModalStore, modalActions } from "@/state/modalStore";
-import { useAutosave, useProjectManager } from "@/hooks/useAutosave";
+import { useAutosave } from "@/hooks/useAutosave";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { useCallback } from "react";
 
 interface EditorLayoutProps {
   onBack: () => void;
@@ -57,8 +53,70 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
 
   // Initialize autosave
   useAutosave();
-  const { createNewProject, duplicateProject, clearProject } =
-    useProjectManager();
+  const { toast } = useToast();
+  const createNewProject = useCallback(() => {
+    const newProjectId = `project_${Date.now()}`;
+    useCanvasStore.setState({
+      projectId: newProjectId,
+      image: undefined,
+      videoSrc: undefined,
+      overlays: [],
+      selectedId: undefined,
+      crop: {
+        x: 0,
+        y: 0,
+        w: 1280,
+        h: 720,
+        active: false,
+      },
+    });
+
+    toast({
+      title: "New project created",
+      description: "Started a fresh project.",
+    });
+
+    return newProjectId;
+  }, [toast]);
+
+  const duplicateProject = useCallback(() => {
+    const newProjectId = `project_${Date.now()}`;
+    const currentState = useCanvasStore.getState();
+
+    useCanvasStore.setState({
+      ...currentState,
+      projectId: newProjectId,
+      selectedId: undefined,
+    });
+
+    toast({
+      title: "Project duplicated",
+      description: "Created a copy of the current project.",
+    });
+
+    return newProjectId;
+  }, [toast]);
+
+  const clearProject = useCallback(() => {
+    useCanvasStore.setState({
+      image: undefined,
+      videoSrc: undefined,
+      overlays: [],
+      selectedId: undefined,
+      crop: {
+        x: 0,
+        y: 0,
+        w: 1280,
+        h: 720,
+        active: false,
+      },
+    });
+
+    toast({
+      title: "Project cleared",
+      description: "Removed all content from the current project.",
+    });
+  }, [toast]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -175,7 +233,7 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
       <div className="hidden xl:block h-full">
         <div className="editor-grid h-full grid grid-cols-[320px_1fr_340px] gap-4 p-4 min-h-[100dvh] pt-[var(--header-h)]">
           {/* Header - Spans all columns */}
-          <header className="navbar bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-4 sticky top-[var(--header)] z-[var(--z-toolbar)] col-span-3">
+          <header className="z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-4 sticky top-[var(--header)] z-[var(--z-toolbar)] col-span-3">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
               <div className="flex items-center space-x-6">
                 <Button
@@ -189,32 +247,22 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
                   <ArrowLeft className="w-[18px] h-[18px] mr-2" />
                   Back
                 </Button>
-                <h1 className="editor-title text-gray-900">Snapthumb Editor</h1>
+                <h1 className="text-xl font-semibold leading-tight text-gray-900">
+                  Snapthumb Editor
+                </h1>
               </div>
               <div className="flex items-center space-x-3">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => modalActions.openShortcuts()}
-                        className="text-gray-600 hover:text-gray-900"
-                        aria-label="Show keyboard shortcuts"
-                        tabIndex={2}
-                      >
-                        <HelpCircle className="w-[18px] h-[18px] mr-2" />
-                        Shortcuts
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      side="bottom"
-                      className="z-[var(--z-toast)]"
-                    >
-                      <p>Shortcuts (?)</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => modalActions.openShortcuts()}
+                  className="text-gray-600 hover:text-gray-900"
+                  aria-label="Show keyboard shortcuts (?)"
+                  tabIndex={2}
+                >
+                  <HelpCircle className="w-[18px] h-[18px] mr-2" />
+                  Shortcuts
+                </Button>
                 {hasContent && (
                   <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
                     {image ? "📷" : "🎬"}
@@ -330,7 +378,7 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
                         showDivider={false}
                       >
                         <div className="text-center text-gray-500 py-4">
-                          <div className="panel-description">
+                          <div className="text-sm text-gray-600">
                             Click the Export button in the bottom-right to
                             configure and download your thumbnail.
                           </div>
@@ -432,7 +480,7 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
                   showDivider={false}
                 >
                   <div className="text-center text-gray-500 py-4">
-                    <div className="panel-description">
+                    <div className="text-sm text-gray-600">
                       Configure and download your thumbnail below.
                     </div>
                   </div>
@@ -452,7 +500,7 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
       <div className="xl:hidden h-full">
         <div className="flex flex-col h-full bg-gray-50">
           {/* Header */}
-          <header className="navbar bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3 sticky top-[var(--header)] z-[var(--z-toolbar)]">
+          <header className="z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3 sticky top-[var(--header)] z-[var(--z-toolbar)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Button
@@ -465,31 +513,21 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
                 >
                   <ArrowLeft className="w-[18px] h-[18px]" />
                 </Button>
-                <h1 className="editor-title text-gray-900">Snapthumb Editor</h1>
+                <h1 className="text-xl font-semibold leading-tight text-gray-900">
+                  Snapthumb Editor
+                </h1>
               </div>
               <div className="flex items-center space-x-2">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => modalActions.openShortcuts()}
-                        className="text-gray-600 hover:text-gray-900 min-h-[44px] min-w-[44px]"
-                        aria-label="Show keyboard shortcuts"
-                        tabIndex={2}
-                      >
-                        <HelpCircle className="w-[18px] h-[18px]" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      side="bottom"
-                      className="z-[var(--z-toast)]"
-                    >
-                      <p>Shortcuts (?)</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => modalActions.openShortcuts()}
+                  className="text-gray-600 hover:text-gray-900 min-h-[44px] min-w-[44px]"
+                  aria-label="Show keyboard shortcuts (?)"
+                  tabIndex={2}
+                >
+                  <HelpCircle className="w-[18px] h-[18px]" />
+                </Button>
                 {hasContent && (
                   <div className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
                     {image ? "📷" : "🎬"}
@@ -551,8 +589,10 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
               ) : (
                 <div className="h-full flex items-center justify-center bg-white rounded-lg border border-gray-200">
                   <div className="text-center text-gray-500">
-                    <div className="panel-title mb-2">No content loaded</div>
-                    <div className="panel-description">
+                    <div className="text-lg font-semibold leading-tight mb-2">
+                      No content loaded
+                    </div>
+                    <div className="text-sm text-gray-600">
                       Tap Upload to get started
                     </div>
                   </div>
@@ -588,8 +628,10 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
                 {activePanel === "export" && hasContent && (
                   <div className="space-y-4">
                     <div className="text-center text-gray-500 py-4">
-                      <div className="panel-title mb-2">Export Options</div>
-                      <div className="panel-description">
+                      <div className="text-lg font-semibold leading-tight mb-2">
+                        Export Options
+                      </div>
+                      <div className="text-sm text-gray-600">
                         Configure and download your thumbnail below.
                       </div>
                     </div>

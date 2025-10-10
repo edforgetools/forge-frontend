@@ -3,16 +3,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Trash2, Type, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
 import { useCanvasStore } from "@/state/canvasStore";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+
+// Validation schemas for text overlay
+const textOverlaySchema = z.object({
+  text: z
+    .string()
+    .min(1, "Text is required")
+    .max(100, "Text must be 100 characters or less"),
+  fontSize: z
+    .number()
+    .min(8, "Font size must be at least 8px")
+    .max(200, "Font size must be 200px or less"),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format"),
+  x: z.number().min(0, "X position must be non-negative"),
+  y: z.number().min(0, "Y position must be non-negative"),
+});
 
 interface TextOverlayProps {
   className?: string;
@@ -82,42 +91,52 @@ export function TextOverlay({ className }: TextOverlayProps) {
   );
 
   const handleAddText = useCallback(() => {
-    if (!newText.trim()) {
+    try {
+      // Validate text input
+      textOverlaySchema.pick({ text: true }).parse({ text: newText.trim() });
+
+      addOverlay({
+        type: "text",
+        text: newText.trim(),
+        x: 100,
+        y: 100,
+        w: newText.length * 20, // Estimate width
+        h: fontSize + 10, // Estimate height
+        rot: 0,
+        locked: false,
+        hidden: false,
+        opacity: 1,
+        font: fontFamily,
+        size: fontSize,
+        weight: fontWeight,
+        letter: letterSpacing,
+        shadow: hasShadow,
+        align: textAlign,
+        color: textColor,
+      } as Omit<import("@/state/canvasStore").TextOverlay, "id" | "z">);
+
       toast({
-        title: "No text entered",
-        description: "Please enter some text to add.",
-        variant: "destructive",
+        title: "Text added",
+        description: "Text overlay has been added to the canvas.",
       });
-      return;
+
+      // Reset form
+      setNewText("");
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.issues[0]?.message || "Invalid input",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to add text overlay",
+          variant: "destructive",
+        });
+      }
     }
-
-    addOverlay({
-      type: "text",
-      text: newText.trim(),
-      x: 100,
-      y: 100,
-      w: newText.length * 20, // Estimate width
-      h: fontSize + 10, // Estimate height
-      rot: 0,
-      locked: false,
-      hidden: false,
-      opacity: 1,
-      font: fontFamily,
-      size: fontSize,
-      weight: fontWeight,
-      letter: letterSpacing,
-      shadow: hasShadow,
-      align: textAlign,
-      color: textColor,
-    } as Omit<import("@/state/canvasStore").TextOverlay, "id" | "z">);
-
-    toast({
-      title: "Text added",
-      description: "Text overlay has been added to the canvas.",
-    });
-
-    // Reset form
-    setNewText("");
   }, [
     newText,
     fontFamily,
@@ -171,40 +190,36 @@ export function TextOverlay({ className }: TextOverlayProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label className="text-xs">Font Family</Label>
-            <Select value={fontFamily} onValueChange={setFontFamily}>
-              <SelectTrigger className="h-8 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {FONT_FAMILIES.map((font) => (
-                  <SelectItem key={font} value={font} className="text-sm">
-                    {font}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-1">
+              {FONT_FAMILIES.slice(0, 6).map((font) => (
+                <Button
+                  key={font}
+                  variant={fontFamily === font ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setFontFamily(font)}
+                  className="text-xs h-8"
+                >
+                  {font}
+                </Button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label className="text-xs">Font Weight</Label>
-            <Select
-              value={fontWeight.toString()}
-              onValueChange={(v) => setFontWeight(Number(v))}
-            >
-              <SelectTrigger className="h-8 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {FONT_WEIGHTS.map((weight) => (
-                  <SelectItem
-                    key={weight.value}
-                    value={weight.value.toString()}
-                  >
-                    {weight.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-1">
+              {FONT_WEIGHTS.map((weight) => (
+                <Button
+                  key={weight.value}
+                  variant={fontWeight === weight.value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setFontWeight(weight.value)}
+                  className="text-xs h-8"
+                >
+                  {weight.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
 

@@ -10,20 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Download, AlertTriangle, CheckCircle, Zap } from "lucide-react";
 import { useCanvasStore, canvasActions } from "@/state/canvasStore";
 import {
@@ -217,33 +204,56 @@ export function ExportDialog({
                 </Label>
               </div>
             </div>
-            <Select
-              value={autoFormat ? "auto" : prefs.format}
-              onValueChange={(value: "auto" | "jpeg" | "png" | "webp") => {
-                if (value === "auto") {
-                  setAutoFormat(true);
-                } else {
-                  setAutoFormat(false);
-                  handlePrefsChange({ format: value });
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                variant={autoFormat ? "default" : "outline"}
+                size="sm"
+                onClick={() => setAutoFormat(true)}
+                className="justify-start"
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Auto
+              </Button>
+              <Button
+                variant={
+                  !autoFormat && prefs.format === "jpeg" ? "default" : "outline"
                 }
-              }}
-              disabled={autoFormat}
-            >
-              <SelectTrigger aria-label="Select export format">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="auto">
-                  <div className="flex items-center space-x-2">
-                    <Zap className="w-[18px] h-[18px] text-yellow-500" />
-                    <span>Auto (Recommended)</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="jpeg">JPEG (Compatible)</SelectItem>
-                <SelectItem value="png">PNG (Lossless)</SelectItem>
-                <SelectItem value="webp">WebP (Modern)</SelectItem>
-              </SelectContent>
-            </Select>
+                size="sm"
+                onClick={() => {
+                  setAutoFormat(false);
+                  handlePrefsChange({ format: "jpeg" });
+                }}
+                className="justify-start"
+              >
+                JPEG
+              </Button>
+              <Button
+                variant={
+                  !autoFormat && prefs.format === "png" ? "default" : "outline"
+                }
+                size="sm"
+                onClick={() => {
+                  setAutoFormat(false);
+                  handlePrefsChange({ format: "png" });
+                }}
+                className="justify-start"
+              >
+                PNG
+              </Button>
+              <Button
+                variant={
+                  !autoFormat && prefs.format === "webp" ? "default" : "outline"
+                }
+                size="sm"
+                onClick={() => {
+                  setAutoFormat(false);
+                  handlePrefsChange({ format: "webp" });
+                }}
+                className="justify-start"
+              >
+                WebP
+              </Button>
+            </div>
             {autoFormat && (
               <div className="text-xs text-blue-600 bg-blue-50 p-4 rounded">
                 <div className="font-medium">Auto-format enabled</div>
@@ -386,59 +396,44 @@ export function ExportDialog({
 
           {/* Export Button - Sticky at bottom */}
           <div className="sticky bottom-0 bg-white pt-4 pb-safe-area-inset-bottom">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={handleExport}
-                    disabled={!isReadyForExport || isExporting}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
-                    aria-disabled={!isReadyForExport}
-                    aria-label={
-                      isReadyForExport
-                        ? autoFormat
-                          ? "Export with smart compression"
-                          : "Export thumbnail"
-                        : !hasContent
-                          ? "Export disabled - no content"
-                          : !is16to9
-                            ? "Export disabled - crop must be 16:9"
-                            : "Export disabled - not ready"
-                    }
-                  >
-                    {isExporting ? (
-                      <>
-                        <div className="animate-spin w-[18px] h-[18px] border-2 border-white border-t-transparent rounded-full mr-2" />
-                        Optimizing & Exporting...
-                      </>
-                    ) : (
-                      <>
-                        <Download className="w-[18px] h-[18px] mr-2" />
-                        {autoFormat ? (
-                          <>
-                            <Zap className="w-[18px] h-[18px] mr-1" />
-                            Smart Export
-                          </>
-                        ) : (
-                          `Export ${prefs.format.toUpperCase()}`
-                        )}
-                      </>
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                {!isReadyForExport && (
-                  <TooltipContent>
-                    <p>
-                      {!hasContent
-                        ? "Upload content to enable export"
-                        : !is16to9
-                          ? "Crop must be 16:9 aspect ratio for Snapthumb"
-                          : "Not ready for export"}
-                    </p>
-                  </TooltipContent>
-                )}
-              </Tooltip>
-            </TooltipProvider>
+            <Button
+              onClick={handleExport}
+              disabled={!isReadyForExport || isExporting}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+              aria-disabled={!isReadyForExport}
+              title={
+                !isReadyForExport
+                  ? !hasContent
+                    ? "Upload content to enable export"
+                    : !is16to9
+                      ? "Crop must be 16:9 aspect ratio for Snapthumb"
+                      : "Not ready for export"
+                  : isReadyForExport
+                    ? autoFormat
+                      ? "Export with smart compression"
+                      : "Export thumbnail"
+                    : ""
+              }
+            >
+              {isExporting ? (
+                <>
+                  <div className="animate-spin w-[18px] h-[18px] border-2 border-white border-t-transparent rounded-full mr-2" />
+                  Optimizing & Exporting...
+                </>
+              ) : (
+                <>
+                  <Download className="w-[18px] h-[18px] mr-2" />
+                  {autoFormat ? (
+                    <>
+                      <Zap className="w-[18px] h-[18px] mr-1" />
+                      Smart Export
+                    </>
+                  ) : (
+                    `Export ${prefs.format.toUpperCase()}`
+                  )}
+                </>
+              )}
+            </Button>
 
             {autoFormat && (
               <div className="text-xs text-center text-gray-500 mt-2">

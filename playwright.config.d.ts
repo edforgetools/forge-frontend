@@ -1,5 +1,5 @@
 declare const _default: import("@playwright/test").PlaywrightTestConfig<
-  Record<string, unknown>,
-  Record<string, unknown>
+  object,
+  object
 >;
 export default _default;

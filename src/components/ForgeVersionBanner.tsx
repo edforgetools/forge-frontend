@@ -5,21 +5,20 @@
 
 import { useState, useEffect } from "react";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
-import { getVersionInfo, healthCheck } from "@/lib/api";
-
-interface VersionInfo {
-  version: string;
-  layer: string;
-}
-
-interface HealthStatus {
-  status: string;
-  version: string;
-}
+import {
+  getVersionInfo,
+  healthCheck,
+  type VersionInfoResponse,
+  type HealthCheckResponse,
+} from "@/lib/api";
 
 export function ForgeVersionBanner() {
-  const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
-  const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
+  const [versionInfo, setVersionInfo] = useState<VersionInfoResponse | null>(
+    null
+  );
+  const [healthStatus, setHealthStatus] = useState<HealthCheckResponse | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);

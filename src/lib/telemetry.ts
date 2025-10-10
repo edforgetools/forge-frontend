@@ -4,7 +4,7 @@
 
 interface TelemetryEvent {
   event: string;
-  meta: Record<string, any>;
+  meta: Record<string, unknown>;
   sessionId: string;
   timestamp: number;
 }
@@ -23,12 +23,12 @@ const getSessionId = (): string => {
 };
 
 // Debounce utility
-const debounce = <T extends (...args: any[]) => void>(
+const debounce = <T extends (...args: unknown[]) => void>(
   func: T,
   delay: number
 ): T => {
   let timeoutId: NodeJS.Timeout;
-  return ((...args: any[]) => {
+  return ((...args: unknown[]) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
   }) as T;
@@ -84,7 +84,7 @@ const debouncedSender = createDebouncedSender();
  */
 export const sendTelemetry = (
   event: string,
-  meta: Record<string, any> = {}
+  meta: Record<string, unknown> = {}
 ): void => {
   const telemetryEvent: TelemetryEvent = {
     event,
@@ -94,9 +94,13 @@ export const sendTelemetry = (
   };
 
   // Add to pending events and trigger debounced send
-  const pendingEvents = (debouncedSender as any).__pendingEvents || [];
+  const pendingEvents =
+    (debouncedSender as unknown as { __pendingEvents?: TelemetryEvent[] })
+      .__pendingEvents || [];
   pendingEvents.push(telemetryEvent);
-  (debouncedSender as any).__pendingEvents = pendingEvents;
+  (
+    debouncedSender as unknown as { __pendingEvents: TelemetryEvent[] }
+  ).__pendingEvents = pendingEvents;
 
   // Trigger the debounced sender
   debouncedSender();
@@ -113,7 +117,7 @@ export const sendTelemetry = (
  */
 export const sendTelemetryImmediate = async (
   event: string,
-  meta: Record<string, any> = {}
+  meta: Record<string, unknown> = {}
 ): Promise<void> => {
   const telemetryEvent: TelemetryEvent = {
     event,

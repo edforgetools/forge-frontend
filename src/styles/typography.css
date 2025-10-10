@@ -112,48 +112,4 @@
       line-height: 1.4;
     }
   }
-
-  /* Editor specific typography */
-  .editor-title {
-    font-size: 20px;
-    line-height: 1.3;
-    font-weight: 600;
-  }
-
-  .editor-subtitle {
-    font-size: 15px;
-    line-height: 1.4;
-    font-weight: 400;
-  }
-
-  .panel-title {
-    font-size: 17px;
-    line-height: 1.3;
-    font-weight: 600;
-  }
-
-  .panel-description {
-    font-size: 13px;
-    line-height: 1.4;
-    font-weight: 400;
-  }
-
-  /* Button text sizing */
-  .btn-text-sm {
-    font-size: 13px;
-    line-height: 1.2;
-    font-weight: 500;
-  }
-
-  .btn-text-base {
-    font-size: 15px;
-    line-height: 1.2;
-    font-weight: 500;
-  }
-
-  .btn-text-lg {
-    font-size: 17px;
-    line-height: 1.2;
-    font-weight: 600;
-  }
 }

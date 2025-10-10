@@ -43,15 +43,10 @@ const envSchema = z.object({
   VITE_SANITY_DATASET: z.string().optional(),
   VITE_SANITY_API_VERSION: z.string().default("2024-01-01"),
 
+  // Forge Layer API
+  VITE_FORGE_LAYER_URL: z.string().url().optional(),
+
   // Development tools
-  VITE_ENABLE_MOCK_API: z
-    .string()
-    .default("false")
-    .transform((val) => val === "true"),
-  VITE_MOCK_API_DELAY: z
-    .string()
-    .default("500")
-    .transform((val) => parseInt(val, 10)),
 });
 
 // Parse and validate environment variables
@@ -115,6 +110,5 @@ export const getFeatureFlags = () => {
   return {
     analytics: env.VITE_ENABLE_ANALYTICS,
     debug: env.VITE_ENABLE_DEBUG,
-    mockApi: env.VITE_ENABLE_MOCK_API,
   };
 };

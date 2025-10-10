@@ -12,6 +12,23 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, Mail, Lock, User } from "lucide-react";
+import { z } from "zod";
+
+// Validation schemas
+const signInSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const signUpSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  fullName: z.string().min(2, "Full name must be at least 2 characters"),
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+});
 
 interface AuthModalProps {
   open: boolean;
@@ -52,21 +69,37 @@ export function AuthModal({
     setSuccess("");
 
     try {
+      // Validate form data based on mode
+      let validatedData;
       if (mode === "signin") {
-        const { error } = await signIn(email, password);
+        validatedData = signInSchema.parse({ email, password });
+        const { error } = await signIn(
+          validatedData.email,
+          validatedData.password
+        );
         if (error) throw error;
         onOpenChange(false);
       } else if (mode === "signup") {
-        const { error } = await signUp(email, password, fullName);
+        validatedData = signUpSchema.parse({ email, password, fullName });
+        const { error } = await signUp(
+          validatedData.email,
+          validatedData.password,
+          validatedData.fullName
+        );
         if (error) throw error;
         setSuccess("Check your email for a confirmation link!");
       } else if (mode === "forgot") {
-        const { error } = await resetPassword(email);
+        validatedData = forgotPasswordSchema.parse({ email });
+        const { error } = await resetPassword(validatedData.email);
         if (error) throw error;
         setSuccess("Password reset email sent!");
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      if (err instanceof z.ZodError) {
+        setError(err.issues[0]?.message || "Validation error");
+      } else {
+        setError(err instanceof Error ? err.message : "An error occurred");
+      }
     } finally {
       setLoading(false);
     }

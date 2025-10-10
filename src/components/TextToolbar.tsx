@@ -3,13 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Type,
@@ -143,24 +136,19 @@ export function TextToolbar({ overlayId, onClose }: TextToolbarProps) {
       {/* Font Family */}
       <div className="flex items-center gap-2">
         <Type className="h-4 w-4 text-gray-500" />
-        <Select
-          value={textOverlay.font}
-          onValueChange={(value) => handleUpdate({ font: value })}
-        >
-          <SelectTrigger className="h-8 w-32" aria-label="Select font family">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Arial">Arial</SelectItem>
-            <SelectItem value="Helvetica">Helvetica</SelectItem>
-            <SelectItem value="Times New Roman">Times New Roman</SelectItem>
-            <SelectItem value="Georgia">Georgia</SelectItem>
-            <SelectItem value="Verdana">Verdana</SelectItem>
-            <SelectItem value="Inter">Inter</SelectItem>
-            <SelectItem value="Roboto">Roboto</SelectItem>
-            <SelectItem value="Open Sans">Open Sans</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex gap-1">
+          {["Arial", "Helvetica", "Georgia", "Verdana"].map((font) => (
+            <Button
+              key={font}
+              variant={textOverlay.font === font ? "default" : "outline"}
+              size="sm"
+              onClick={() => handleUpdate({ font })}
+              className="text-xs h-8 px-2"
+            >
+              {font}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Font Size */}
@@ -189,21 +177,21 @@ export function TextToolbar({ overlayId, onClose }: TextToolbarProps) {
       {/* Font Weight */}
       <div className="flex items-center gap-2">
         <Bold className="h-4 w-4 text-gray-500" />
-        <Select
-          value={textOverlay.weight.toString()}
-          onValueChange={(value) => handleUpdate({ weight: Number(value) })}
-        >
-          <SelectTrigger className="h-8 w-24" aria-label="Select font weight">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {fontWeights.map((weight) => (
-              <SelectItem key={weight.value} value={weight.value.toString()}>
-                {weight.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex gap-1">
+          {fontWeights.map((weight) => (
+            <Button
+              key={weight.value}
+              variant={
+                textOverlay.weight === weight.value ? "default" : "outline"
+              }
+              size="sm"
+              onClick={() => handleUpdate({ weight: weight.value })}
+              className="text-xs h-8 px-2"
+            >
+              {weight.label}
+            </Button>
+          ))}
+        </div>
       </div>
 
       {/* Text Alignment */}

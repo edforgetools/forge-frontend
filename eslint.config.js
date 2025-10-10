@@ -3,6 +3,7 @@ import typescript from "@typescript-eslint/eslint-plugin";
 import typescriptParser from "@typescript-eslint/parser";
 import prettier from "eslint-plugin-prettier";
 import prettierConfig from "eslint-config-prettier";
+import importPlugin from "eslint-plugin-import";
 import globals from "globals";
 
 export default [
@@ -17,11 +18,13 @@ export default [
         ...globals.browser,
         ...globals.node,
         ...globals.es2020,
+        ...globals.serviceworker,
       },
     },
     plugins: {
       "@typescript-eslint": typescript,
       prettier: prettier,
+      import: importPlugin,
     },
     rules: {
       ...typescript.configs.recommended.rules,
@@ -31,34 +34,17 @@ export default [
       "no-undef": "off", // TypeScript handles this
       "no-case-declarations": "off", // Allow const declarations in case blocks
       "prettier/prettier": "error",
+      "import/no-unused-modules": [
+        "error",
+        {
+          unusedExports: true,
+          ignoreExports: ["*.config.*", "*.d.ts"],
+        },
+      ],
     },
   },
   {
-    files: ["**/*.js"],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
-  {
-    files: ["e2e/**/*.ts", "playwright.config.ts"],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
-  {
-    files: ["scripts/**/*.js"],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
-  {
-    files: ["**/*.mjs"],
+    files: ["**/*.mjs", "scripts/**/*.js"],
     languageOptions: {
       globals: {
         ...globals.node,

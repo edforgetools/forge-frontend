@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Upload, Image as ImageIcon, Video, Zap } from "lucide-react";
 import { canvasActions, useCanvasStore } from "@/state/canvasStore";
 import { useToast } from "@/hooks/use-toast";
-import { validateVideoFile, validateImageFile } from "@/lib/image";
+import { validateImageFile } from "@/lib/image";
+import { validateVideoFile } from "@/lib/video";
 import { VideoFrameScrubber } from "./VideoFrameScrubber";
 
 export function UploadDropzone() {

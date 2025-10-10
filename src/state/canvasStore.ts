@@ -238,7 +238,7 @@ export const useCanvasStore = create<CanvasStore>()(
         // Push undo state for significant changes
         if (
           overlay &&
-          ((patch as any).text !== undefined ||
+          ((patch as Record<string, unknown>).text !== undefined ||
             patch.x !== undefined ||
             patch.y !== undefined)
         ) {

@@ -40,7 +40,15 @@ computeScrollbarWidth();
 // Ensure portal root exists (fallback for missing portal-root)
 ensurePortalRoot();
 
-const root = ReactDOM.createRoot(document.getElementById("root")!);
+// Compile-time guard: ensure root element exists
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error(
+    "Critical error: #root element not found in DOM. Cannot mount React application."
+  );
+}
+
+const root = ReactDOM.createRoot(rootElement);
 const node = (
   <BrowserRouter>
     <App />

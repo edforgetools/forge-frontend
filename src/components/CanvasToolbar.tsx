@@ -1,13 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Grid3X3,
   Shield,
   ZoomIn,
@@ -50,8 +43,8 @@ export function CanvasToolbar() {
 
   return (
     <div
-      className="toolbar sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 md:px-6 py-2 md:py-3"
-      data-testid="canvas-toolbar"
+      className="z-20 sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 md:px-6 py-2 md:py-3"
+      data-testid="canvas-z-20"
     >
       <div className="max-w-7xl mx-auto">
         {/* Desktop Layout */}
@@ -62,28 +55,22 @@ export function CanvasToolbar() {
               <Monitor className="w-[18px] h-[18px] text-gray-500" />
               <span className="text-sm font-medium text-gray-700">Ratio:</span>
             </div>
-            <Select
-              value={aspect}
-              onValueChange={(value) =>
-                setAspectRatio(value as AspectRatioType)
-              }
-            >
-              <SelectTrigger
-                className="w-40"
-                data-testid="ratio-selector"
-                aria-label="Select aspect ratio"
-                tabIndex={7}
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {aspectRatioOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center space-x-1">
+              {aspectRatioOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={aspect === option.value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setAspectRatio(option.value)}
+                  className="h-8 px-2 text-xs"
+                  data-testid={`ratio-${option.value}`}
+                  aria-label={`Set aspect ratio to ${option.label}`}
+                  tabIndex={7 + aspectRatioOptions.indexOf(option)}
+                >
+                  {option.value}
+                </Button>
+              ))}
+            </div>
           </div>
 
           {/* Center - Toggle buttons */}
@@ -198,28 +185,22 @@ export function CanvasToolbar() {
           {/* Aspect Ratio Selector */}
           <div className="flex items-center space-x-2">
             <Monitor className="w-[18px] h-[18px] text-gray-500" />
-            <Select
-              value={aspect}
-              onValueChange={(value) =>
-                setAspectRatio(value as AspectRatioType)
-              }
-            >
-              <SelectTrigger
-                className="w-32 min-h-[44px]"
-                data-testid="ratio-selector"
-                aria-label="Select aspect ratio"
-                tabIndex={7}
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {aspectRatioOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center space-x-1">
+              {aspectRatioOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={aspect === option.value ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setAspectRatio(option.value)}
+                  className="min-h-[44px] px-2 text-xs min-w-[44px]"
+                  data-testid={`ratio-${option.value}`}
+                  aria-label={`Set aspect ratio to ${option.label}`}
+                  tabIndex={7 + aspectRatioOptions.indexOf(option)}
+                >
+                  {option.value}
+                </Button>
+              ))}
+            </div>
           </div>
 
           {/* Toggle Buttons */}

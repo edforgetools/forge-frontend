@@ -19,6 +19,11 @@ build/
 .tmp/
 .vercel/
 
+# Screenshots and test artifacts
+screenshots/
+*-snapshots/
+test-results/
+
 # Environment variables
 .env
 .env.local

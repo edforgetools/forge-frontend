@@ -12,12 +12,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { z } from "zod";
+
+// Validation schemas for project management
+const projectNameSchema = z.object({
+  name: z
+    .string()
+    .min(1, "Project name is required")
+    .max(50, "Project name must be 50 characters or less"),
+});
+
+const projectDescriptionSchema = z.object({
+  description: z
+    .string()
+    .max(200, "Description must be 200 characters or less")
+    .optional(),
+});
 import {
   Card,
   CardContent,
@@ -25,7 +35,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Loader2, Plus, MoreVertical, Trash2, Eye } from "lucide-react";
+import { Loader2, Plus, Trash2, Eye } from "lucide-react";
 import { projectManager } from "@/lib/projects";
 
 interface ProjectManagerProps {
@@ -59,13 +69,29 @@ export function ProjectManager({
     setError("");
 
     try {
-      const { projectData, name, description } = onSaveProject();
-      await saveProject(projectData, name, description);
+      // Validate project name and description
+      const validatedName = projectNameSchema.parse({
+        name: projectName.trim(),
+      });
+      const validatedDescription = projectDescriptionSchema.parse({
+        description: projectDescription.trim(),
+      });
+
+      const { projectData } = onSaveProject();
+      await saveProject(
+        projectData,
+        validatedName.name,
+        validatedDescription.description || ""
+      );
       setSaveDialogOpen(false);
       setProjectName("");
       setProjectDescription("");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to save project");
+      if (err instanceof z.ZodError) {
+        setError(err.issues[0]?.message || "Validation error");
+      } else {
+        setError(err instanceof Error ? err.message : "Failed to save project");
+      }
     } finally {
       setSaving(false);
     }
@@ -168,27 +194,26 @@ export function ProjectManager({
                       </CardDescription>
                     )}
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                        <MoreVertical className="w-[18px] h-[18px]" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => handleLoadProject(project.id)}
-                      >
-                        <Eye className="w-[18px] h-[18px] mr-2" />
-                        Load
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleDeleteProject(project.id)}
-                      >
-                        <Trash2 className="w-[18px] h-[18px] mr-2" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => handleLoadProject(project.id)}
+                      aria-label="Load project"
+                    >
+                      <Eye className="w-[18px] h-[18px]" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => handleDeleteProject(project.id)}
+                      aria-label="Delete project"
+                    >
+                      <Trash2 className="w-[18px] h-[18px]" />
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
