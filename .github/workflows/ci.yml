@@ -70,7 +70,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10.18.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -194,7 +194,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10.18.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -278,7 +278,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10.18.1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -461,7 +461,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: latest
+          version: 10.18.1
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
