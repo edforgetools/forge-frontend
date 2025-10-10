@@ -8,6 +8,7 @@ import { ErrorBoundary } from "./components/ErrorBoundary";
 // Lazy load pages for better performance
 const Home = lazy(() => import("./pages/Home.tsx"));
 const Editor = lazy(() => import("./pages/Editor.tsx"));
+const WireGenerateDemo = lazy(() => import("./pages/WireGenerateDemo.tsx"));
 const Terms = lazy(() => import("./pages/terms.tsx"));
 const Privacy = lazy(() => import("./pages/privacy.tsx"));
 const About = lazy(() => import("./pages/about.tsx"));
@@ -33,7 +34,7 @@ const LoadingFallback = ({
 export default function App() {
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Header />
         <ForgeVersionBanner />
         <main className="flex-1">
@@ -51,6 +52,18 @@ export default function App() {
               element={
                 <Suspense fallback={<EditorSkeleton />}>
                   <Editor />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/wire-generate-demo"
+              element={
+                <Suspense
+                  fallback={
+                    <LoadingFallback label="Loading wire generate demo" />
+                  }
+                >
+                  <WireGenerateDemo />
                 </Suspense>
               }
             />
@@ -94,6 +107,14 @@ export default function App() {
             />
           </Routes>
         </main>
+        <footer className="bg-white border-t border-gray-200 py-3 px-6">
+          <div className="max-w-7xl mx-auto flex items-center justify-center">
+            <p className="text-sm text-gray-500">
+              Powered by Forge Layer v
+              {import.meta.env.VITE_APP_VERSION || "0.1.0"}
+            </p>
+          </div>
+        </footer>
       </div>
     </ErrorBoundary>
   );

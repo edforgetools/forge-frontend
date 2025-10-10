@@ -44,6 +44,8 @@ export default defineConfig({
     cssCodeSplit: true,
     // Enable compression
     reportCompressedSize: true,
+    // Optimize for faster LCP
+    assetsInlineLimit: 4096, // Inline small assets
     // Optimize dependencies
     rollupOptions: {
       onwarn(warning, warn) {

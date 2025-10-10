@@ -46,6 +46,19 @@ const envSchema = z.object({
   // Forge Layer API
   VITE_FORGE_LAYER_URL: z.string().url().optional(),
 
+  // API Keys for authorization
+  VITE_FORGE_API_KEYS: z
+    .string()
+    .optional()
+    .transform((val) =>
+      val
+        ? val
+            .split(",")
+            .map((key) => key.trim())
+            .filter(Boolean)
+        : []
+    ),
+
   // Development tools
 });
 

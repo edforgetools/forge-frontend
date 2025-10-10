@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { sessionDB } from "@/lib/db";
+import { ApiKeyManager } from "@/components/ApiKeyManager";
+import { useRateLimitStore } from "@/state/rateLimitStore";
 
 interface SettingsProps {
   onClearSession?: () => void;
@@ -8,11 +10,14 @@ interface SettingsProps {
 
 export function Settings({ onClearSession }: SettingsProps) {
   const [isSessionRestoreEnabled, setIsSessionRestoreEnabled] = useState(true);
+  const { updateTier } = useRateLimitStore();
 
   useEffect(() => {
     // Initialize the enabled state
     setIsSessionRestoreEnabled(sessionDB.isSessionRestoreEnabled());
-  }, []);
+    // Update tier on mount
+    updateTier();
+  }, [updateTier]);
 
   const handleToggleSessionRestore = () => {
     const newEnabled = !isSessionRestoreEnabled;
@@ -35,7 +40,9 @@ export function Settings({ onClearSession }: SettingsProps) {
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <h2 className="text-lg font-semibold mb-4">Settings</h2>
 
-      <div className="space-y-4">
+      <div className="space-y-6">
+        {/* API Key Manager */}
+        <ApiKeyManager onTierChange={updateTier} />
         {/* Session Restore Toggle */}
         <div className="flex items-center justify-between">
           <div>

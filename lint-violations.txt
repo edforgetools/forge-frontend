@@ -1,0 +1,252 @@
+
+> forge-frontend@0.1.0 lint /Users/edbrooks/forge/forge-frontend
+> eslint .
+
+
+/Users/edbrooks/forge/forge-frontend/playwright.config.d.ts
+  1:73  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+  1:77  error  The `{}` ("empty object") type allows any non-nullish value, including literals like `0` and `""`.
+- If that's what you want, disable this lint rule with an inline comment or configure the 'allowObjectTypes' rule option.
+- If you want a type meaning "any object", you probably want `object` instead.
+- If you want a type meaning "any value", you probably want `unknown` instead  @typescript-eslint/no-empty-object-type
+
+/Users/edbrooks/forge/forge-frontend/playwright.config.js
+   1:15  error  Replace `·(this·&&·this.__assign)·||` with `⏎··(this·&&·this.__assign)·||⏎·`                                                                                                                          prettier/prettier
+   2:15  error  Replace `·Object.assign·||·function` with `⏎······Object.assign·||⏎······function·`                                                                                                                   prettier/prettier
+   4:11  error  Delete `··`                                                                                                                                                                                           prettier/prettier
+   5:1   error  Replace `············for·(var·p·in·s)·if·(Object.prototype.hasOwnProperty.call(s,·p))⏎···············` with `··········for·(var·p·in·s)⏎············if·(Object.prototype.hasOwnProperty.call(s,·p))`  prettier/prettier
+   9:1   error  Insert `··`                                                                                                                                                                                           prettier/prettier
+  11:1   error  Insert `··`                                                                                                                                                                                           prettier/prettier
+  14:3   error  Delete `··`                                                                                                                                                                                           prettier/prettier
+  15:1   error  Delete `··`                                                                                                                                                                                           prettier/prettier
+  16:3   error  Delete `··`                                                                                                                                                                                           prettier/prettier
+  17:1   error  Delete `····`                                                                                                                                                                                         prettier/prettier
+  18:7   error  Delete `······`                                                                                                                                                                                       prettier/prettier
+  19:1   error  Replace `············use:·__assign(__assign({},·devices["Desktop·Chrome"]),·{·headless:·true·})` with `······use:·__assign(__assign({},·devices["Desktop·Chrome"]),·{⏎········headless:·true`         prettier/prettier
+  20:7   error  Replace `··}` with `})`                                                                                                                                                                               prettier/prettier
+  21:5   error  Insert `},⏎`                                                                                                                                                                                          prettier/prettier
+  22:1   error  Replace `············` with `······`                                                                                                                                                                  prettier/prettier
+  23:1   error  Replace `············use:·__assign(__assign({},·devices["Desktop·Firefox"]),·{·headless:·true·})` with `······use:·__assign(__assign({},·devices["Desktop·Firefox"]),·{⏎········headless:·true`       prettier/prettier
+  24:7   error  Replace `··}` with `})`                                                                                                                                                                               prettier/prettier
+  25:5   error  Insert `},⏎`                                                                                                                                                                                          prettier/prettier
+  26:1   error  Replace `············` with `······`                                                                                                                                                                  prettier/prettier
+  27:1   error  Replace `············use:·__assign(__assign({},·devices["Desktop·Safari"]),·{·headless:·true·})` with `······use:·__assign(__assign({},·devices["Desktop·Safari"]),·{⏎········headless:·true`         prettier/prettier
+  28:1   error  Replace `········}` with `······})`                                                                                                                                                                   prettier/prettier
+  29:5   error  Replace `]` with `}`                                                                                                                                                                                  prettier/prettier
+  30:3   error  Insert `],⏎`                                                                                                                                                                                          prettier/prettier
+  31:1   error  Delete `····`                                                                                                                                                                                         prettier/prettier
+  32:5   error  Delete `····`                                                                                                                                                                                         prettier/prettier
+  33:1   error  Delete `····`                                                                                                                                                                                         prettier/prettier
+  34:1   error  Delete `··`                                                                                                                                                                                           prettier/prettier
+
+/Users/edbrooks/forge/forge-frontend/scripts/dead-code-summary.js
+  26:12  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/edbrooks/forge/forge-frontend/scripts/hallucination-detector.js
+  232:10  warning  'getInstalledPackages' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/edbrooks/forge/forge-frontend/scripts/hallucination-detector.ts
+   86:48  warning  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  292:10  warning  'getInstalledPackages' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/edbrooks/forge/forge-frontend/scripts/verify-cleanup.ts
+  67:13  warning  'moduleName' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  84:16  warning  'error' is defined but never used                @typescript-eslint/no-unused-vars
+
+/Users/edbrooks/forge/forge-frontend/src/lib/autosave.ts
+  273:14  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+  299:14  warning  '_error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/edbrooks/forge/forge-frontend/src/lib/compression.ts
+  156:3  warning  '_settings' is defined but never used  @typescript-eslint/no-unused-vars
+  208:3  warning  '_settings' is defined but never used  @typescript-eslint/no-unused-vars
+  296:3  warning  '_format' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/edbrooks/forge/forge-frontend/src/lib/db.ts
+  167:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/edbrooks/forge/forge-frontend/src/lib/imageWorker.ts
+   9:9   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  16:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/edbrooks/forge/forge-frontend/src/lib/telemetry.ts
+    7:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   26:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   31:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   87:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   97:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   99:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/edbrooks/forge/forge-frontend/src/lib/ui/toaster.tsx
+  34:6  warning  'className' is defined but never used  @typescript-eslint/no-unused-vars
+  42:6  warning  'className' is defined but never used  @typescript-eslint/no-unused-vars
+  50:6  warning  'className' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/edbrooks/forge/forge-frontend/src/lib/video.ts
+  72:16  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  96:14  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/edbrooks/forge/forge-frontend/src/state/canvasStore.ts
+   56:9   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   70:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   71:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  131:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  241:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/edbrooks/forge/forge-frontend/vite.config.js
+    7:3   error    Delete `··`                                                                                                                  prettier/prettier
+    8:1   error    Replace `········` with `····`                                                                                               prettier/prettier
+    9:1   error    Delete `····`                                                                                                                prettier/prettier
+   10:5   error    Delete `····`                                                                                                                prettier/prettier
+   11:1   error    Delete `······`                                                                                                              prettier/prettier
+   12:7   error    Delete `······`                                                                                                              prettier/prettier
+   13:1   error    Replace `············` with `······`                                                                                         prettier/prettier
+   14:5   error    Delete `····`                                                                                                                prettier/prettier
+   15:1   error    Delete `····`                                                                                                                prettier/prettier
+   16:7   error    Delete `······`                                                                                                              prettier/prettier
+   17:1   error    Replace `············` with `······`                                                                                         prettier/prettier
+   18:1   error    Delete `······`                                                                                                              prettier/prettier
+   19:1   error    Replace `········` with `····`                                                                                               prettier/prettier
+   20:1   error    Delete `····`                                                                                                                prettier/prettier
+   21:1   error    Replace `············` with `······`                                                                                         prettier/prettier
+   22:1   error    Replace `················` with `········`                                                                                   prettier/prettier
+   23:9   error    Delete `········`                                                                                                            prettier/prettier
+   24:1   error    Replace `················` with `········`                                                                                   prettier/prettier
+   25:1   error    Replace `················` with `········`                                                                                   prettier/prettier
+   26:1   error    Replace `············` with `······`                                                                                         prettier/prettier
+   27:1   error    Delete `··`                                                                                                                  prettier/prettier
+   28:1   error    Delete `··`                                                                                                                  prettier/prettier
+   29:1   error    Delete `····`                                                                                                                prettier/prettier
+   30:7   error    Delete `······`                                                                                                              prettier/prettier
+   31:1   error    Delete `····`                                                                                                                prettier/prettier
+   32:3   error    Delete `··`                                                                                                                  prettier/prettier
+   33:1   error    Delete `··`                                                                                                                  prettier/prettier
+   34:1   error    Delete `····`                                                                                                                prettier/prettier
+   35:1   error    Replace `········` with `····`                                                                                               prettier/prettier
+   36:1   error    Delete `····`                                                                                                                prettier/prettier
+   37:1   error    Delete `····`                                                                                                                prettier/prettier
+   38:5   error    Delete `····`                                                                                                                prettier/prettier
+   39:5   error    Delete `····`                                                                                                                prettier/prettier
+   40:1   error    Replace `········` with `····`                                                                                               prettier/prettier
+   41:5   error    Delete `····`                                                                                                                prettier/prettier
+   42:1   error    Replace `········` with `····`                                                                                               prettier/prettier
+   43:1   error    Delete `····`                                                                                                                prettier/prettier
+   44:5   error    Delete `····`                                                                                                                prettier/prettier
+   45:1   error    Replace `········` with `····`                                                                                               prettier/prettier
+   46:1   error    Replace `········` with `····`                                                                                               prettier/prettier
+   47:1   error    Replace `········` with `····`                                                                                               prettier/prettier
+   48:1   error    Delete `······`                                                                                                              prettier/prettier
+   49:1   error    Replace `················` with `········`                                                                                   prettier/prettier
+   50:9   error    Replace `········if·(` with `if·(⏎··········`                                                                                prettier/prettier
+   51:1   error    Replace `····················warning.plugin·===·"typescript")·{` with `··········warning.plugin·===·"typescript"`            prettier/prettier
+   52:9   error    Replace `············` with `)·{⏎··········`                                                                                 prettier/prettier
+   53:1   error    Delete `········`                                                                                                            prettier/prettier
+   54:9   error    Delete `········`                                                                                                            prettier/prettier
+   55:1   error    Replace `············` with `······`                                                                                         prettier/prettier
+   56:1   error    Delete `······`                                                                                                              prettier/prettier
+   57:9   error    Delete `········`                                                                                                            prettier/prettier
+   58:1   error    Delete `··········`                                                                                                          prettier/prettier
+   59:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+   60:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   61:15  error    Delete `··············`                                                                                                      prettier/prettier
+   62:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   63:1   error    Delete `············`                                                                                                        prettier/prettier
+   64:15  error    Delete `··············`                                                                                                      prettier/prettier
+   65:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   66:1   error    Delete `············`                                                                                                        prettier/prettier
+   67:15  error    Delete `··············`                                                                                                      prettier/prettier
+   68:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   69:1   error    Delete `············`                                                                                                        prettier/prettier
+   70:15  error    Delete `··············`                                                                                                      prettier/prettier
+   71:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   72:1   error    Delete `············`                                                                                                        prettier/prettier
+   73:15  error    Delete `··············`                                                                                                      prettier/prettier
+   74:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   75:1   error    Delete `············`                                                                                                        prettier/prettier
+   76:15  error    Delete `··············`                                                                                                      prettier/prettier
+   77:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   78:1   error    Delete `············`                                                                                                        prettier/prettier
+   79:15  error    Delete `··············`                                                                                                      prettier/prettier
+   80:1   error    Delete `············`                                                                                                        prettier/prettier
+   81:13  error    Delete `············`                                                                                                        prettier/prettier
+   82:1   error    Replace `····························` with `··············`                                                                 prettier/prettier
+   83:13  error    Delete `············`                                                                                                        prettier/prettier
+   84:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   85:1   error    Replace `····························` with `··············`                                                                 prettier/prettier
+   86:13  error    Delete `············`                                                                                                        prettier/prettier
+   87:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   88:1   error    Replace `····························` with `··············`                                                                 prettier/prettier
+   89:13  error    Delete `············`                                                                                                        prettier/prettier
+   90:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   91:1   error    Replace `····························` with `··············`                                                                 prettier/prettier
+   92:13  error    Delete `············`                                                                                                        prettier/prettier
+   93:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   94:1   error    Replace `····························` with `··············`                                                                 prettier/prettier
+   95:13  error    Delete `············`                                                                                                        prettier/prettier
+   96:1   error    Replace `························` with `············`                                                                       prettier/prettier
+   97:1   error    Delete `··············`                                                                                                      prettier/prettier
+   98:13  error    Delete `············`                                                                                                        prettier/prettier
+   99:1   error    Replace `························` with `············`                                                                       prettier/prettier
+  100:15  error    Delete `··············`                                                                                                      prettier/prettier
+  101:1   error    Replace `························` with `············`                                                                       prettier/prettier
+  102:1   error    Replace `························` with `············`                                                                       prettier/prettier
+  103:11  error    Delete `··········`                                                                                                          prettier/prettier
+  104:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+  105:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+  106:1   error    Replace `························` with `············`                                                                       prettier/prettier
+  107:11  error    Delete `··········`                                                                                                          prettier/prettier
+  108:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+  109:13  error    Delete `············`                                                                                                        prettier/prettier
+  110:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+  111:1   error    Delete `··········`                                                                                                          prettier/prettier
+  112:1   error    Replace `························` with `············`                                                                       prettier/prettier
+  113:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+  114:1   error    Delete `··········`                                                                                                          prettier/prettier
+  115:1   error    Replace `························` with `············`                                                                       prettier/prettier
+  116:11  error    Delete `··········`                                                                                                          prettier/prettier
+  117:9   error    Replace `············if·(i` with `··if·(⏎············i`                                                                      prettier/prettier
+  118:1   error    Replace `························!id.includes("src/components/ui"))·{` with `············!id.includes("src/components/ui")`  prettier/prettier
+  119:11  error    Replace `··` with `)·{⏎`                                                                                                     prettier/prettier
+  120:11  error    Delete `··········`                                                                                                          prettier/prettier
+  121:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+  122:13  error    Delete `············`                                                                                                        prettier/prettier
+  123:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+  124:1   error    Delete `··········`                                                                                                          prettier/prettier
+  125:1   error    Replace `························` with `············`                                                                       prettier/prettier
+  126:11  error    Delete `··········`                                                                                                          prettier/prettier
+  127:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+  128:1   error    Replace `························` with `············`                                                                       prettier/prettier
+  129:11  error    Delete `··········`                                                                                                          prettier/prettier
+  130:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+  131:13  error    Delete `············`                                                                                                        prettier/prettier
+  132:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+  133:1   error    Replace `················` with `········`                                                                                   prettier/prettier
+  134:1   error    Delete `········`                                                                                                            prettier/prettier
+  135:1   error    Replace `················` with `········`                                                                                   prettier/prettier
+  136:1   error    Replace `····················` with `··········`                                                                             prettier/prettier
+  136:25  warning  'facadeModuleId' is assigned a value but never used                                                                          @typescript-eslint/no-unused-vars
+  137:1   error    Replace `························` with `············`                                                                       prettier/prettier
+  138:1   error    Replace `························` with `············`                                                                       prettier/prettier
+  139:1   error    Delete `··········`                                                                                                          prettier/prettier
+  140:1   error    Replace `················` with `········`                                                                                   prettier/prettier
+  141:1   error    Delete `········`                                                                                                            prettier/prettier
+  142:1   error    Replace `················` with `········`                                                                                   prettier/prettier
+  143:1   error    Replace `············` with `······`                                                                                         prettier/prettier
+  144:1   error    Replace `········` with `····`                                                                                               prettier/prettier
+  145:1   error    Replace `····` with `··`                                                                                                     prettier/prettier
+  146:1   error    Replace `····` with `··`                                                                                                     prettier/prettier
+  147:3   error    Delete `··`                                                                                                                  prettier/prettier
+  148:1   error    Replace `········` with `····`                                                                                               prettier/prettier
+  149:1   error    Delete `··`                                                                                                                  prettier/prettier
+
+/Users/edbrooks/forge/forge-frontend/vite.config.ts
+  141:17  warning  'facadeModuleId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+✖ 205 problems (172 errors, 33 warnings)
+  170 errors and 0 warnings potentially fixable with the `--fix` option.
+
+ ELIFECYCLE  Command failed with exit code 1.

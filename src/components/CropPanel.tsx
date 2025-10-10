@@ -128,6 +128,7 @@ export function CropPanel() {
                   max={image ? image.width - crop.w : 1920 - crop.w}
                   step={1}
                   className="w-full"
+                  aria-label={`Crop X position: ${Math.round(crop.x)} pixels`}
                 />
               </div>
             </div>
@@ -152,6 +153,7 @@ export function CropPanel() {
                   max={image ? image.height - crop.h : 1080 - crop.h}
                   step={1}
                   className="w-full"
+                  aria-label={`Crop Y position: ${Math.round(crop.y)} pixels`}
                 />
               </div>
             </div>
@@ -179,6 +181,7 @@ export function CropPanel() {
                   min={100}
                   step={1}
                   className="w-full"
+                  aria-label={`Crop width: ${Math.round(crop.w)} pixels`}
                 />
               </div>
             </div>
@@ -204,6 +207,7 @@ export function CropPanel() {
                   min={100}
                   step={1}
                   className="w-full"
+                  aria-label={`Crop height: ${Math.round(crop.h)} pixels`}
                 />
               </div>
             </div>

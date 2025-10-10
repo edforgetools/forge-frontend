@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useRef } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,6 +14,7 @@ export function UploadDropzone() {
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const { videoSrc } = useCanvasStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -186,8 +187,15 @@ export function UploadDropzone() {
             className="w-full h-12"
             variant="default"
             disabled={isUploading}
+            aria-label={
+              isUploading ? "Uploading file..." : "Choose file to upload"
+            }
           >
-            <input {...getInputProps()} data-testid="upload-dropzone-input" />
+            <input
+              {...getInputProps()}
+              data-testid="upload-dropzone-input"
+              aria-label="File upload input"
+            />
             <Upload className="w-5 h-5 mr-2" />
             {isUploading ? "Uploading..." : "Choose File"}
           </Button>
@@ -204,6 +212,21 @@ export function UploadDropzone() {
               }
               ${isUploading ? "opacity-50 cursor-not-allowed" : ""}
             `}
+            role="button"
+            tabIndex={0}
+            aria-label={
+              isActive
+                ? "Drop files here to upload"
+                : "Drag and drop files here or click to upload"
+            }
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                if (!isUploading) {
+                  fileInputRef.current?.click();
+                }
+              }
+            }}
           >
             <div className="flex flex-col items-center space-y-3">
               <Upload

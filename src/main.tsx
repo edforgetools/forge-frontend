@@ -9,6 +9,7 @@ import {
   enableDevelopmentValidation,
 } from "./lib/sanity";
 import { computeScrollbarWidth, ensurePortalRoot } from "./lib/dom";
+import { optimizeCriticalRenderingPath } from "./lib/performance";
 
 // Lazy load non-critical components
 const Toaster = lazy(() =>
@@ -39,6 +40,9 @@ computeScrollbarWidth();
 
 // Ensure portal root exists (fallback for missing portal-root)
 ensurePortalRoot();
+
+// Optimize critical rendering path for better LCP
+optimizeCriticalRenderingPath();
 
 // Compile-time guard: ensure root element exists
 const rootElement = document.getElementById("root");

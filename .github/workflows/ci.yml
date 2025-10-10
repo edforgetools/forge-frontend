@@ -9,12 +9,12 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, labeled]
-  
+
   # Scheduled analytics
   schedule:
     # Run daily at 2 AM UTC
     - cron: "0 2 * * *"
-  
+
   # Manual triggers
   workflow_dispatch:
     inputs:
@@ -107,6 +107,9 @@ jobs:
 
       - name: Type check
         run: pnpm typecheck
+
+      - name: Run unit tests
+        run: pnpm test:unit --run
 
       - name: Build
         run: pnpm build

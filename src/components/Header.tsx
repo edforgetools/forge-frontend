@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { RateLimitDisplay } from "@/components/RateLimitDisplay";
 import { Camera, Menu } from "lucide-react";
 
 export function Header() {
@@ -34,6 +35,11 @@ export function Header() {
             About
           </Link>
         </nav>
+
+        {/* Rate limit display */}
+        <div className="hidden lg:flex">
+          <RateLimitDisplay />
+        </div>
 
         <div className="flex items-center space-x-2">
           <ThemeToggle />

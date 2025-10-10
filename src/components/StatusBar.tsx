@@ -1,4 +1,5 @@
 import { useCanvasStore } from "@/state/canvasStore";
+import { RateLimitDisplay } from "@/components/RateLimitDisplay";
 
 interface StatusBarProps {
   className?: string;
@@ -69,11 +70,19 @@ export function StatusBar({ className = "" }: StatusBarProps) {
 
   return (
     <div
-      className={`absolute bottom-0 right-0 left-0 h-12 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-4 flex items-center justify-end text-sm text-gray-600 whitespace-nowrap z-10 ${className}`}
+      className={`absolute bottom-0 right-0 left-0 h-12 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-4 flex items-center justify-between text-sm text-gray-600 whitespace-nowrap z-10 ${className}`}
     >
-      <span className="font-medium">{aspectRatioText}</span>
-      <span className="text-gray-400 mx-2">•</span>
-      <span className="font-mono">{resolutionText}</span>
+      {/* Left side - Rate limit for mobile */}
+      <div className="lg:hidden">
+        <RateLimitDisplay showUpgradeCTA={false} />
+      </div>
+
+      {/* Right side - Aspect ratio and resolution */}
+      <div className="flex items-center">
+        <span className="font-medium">{aspectRatioText}</span>
+        <span className="text-gray-400 mx-2">•</span>
+        <span className="font-mono">{resolutionText}</span>
+      </div>
     </div>
   );
 }

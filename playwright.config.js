@@ -20,15 +20,21 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: __assign({}, devices["Desktop Chrome"], { headless: true }),
+      use: __assign(__assign({}, devices["Desktop Chrome"]), {
+        headless: true,
+      }),
     },
     {
       name: "firefox",
-      use: __assign({}, devices["Desktop Firefox"], { headless: true }),
+      use: __assign(__assign({}, devices["Desktop Firefox"]), {
+        headless: true,
+      }),
     },
     {
       name: "webkit",
-      use: __assign({}, devices["Desktop Safari"], { headless: true }),
+      use: __assign(__assign({}, devices["Desktop Safari"]), {
+        headless: true,
+      }),
     },
   ],
   webServer: {

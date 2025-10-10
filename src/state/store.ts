@@ -12,12 +12,14 @@
 import { useCanvasStore, CanvasStore } from "./canvasStore";
 import { useEditorStore, EditorStore } from "./editorStore";
 import { useModalStore, ModalStore } from "./modalStore";
+import { useRateLimitStore, RateLimitStore } from "./rateLimitStore";
 
 // Global store interface
 interface SnapStore {
   canvas: CanvasStore;
   editor: EditorStore;
   modal: ModalStore;
+  rateLimit: RateLimitStore;
   isInitialized: boolean;
   createdAt: number;
 }
@@ -60,6 +62,7 @@ function createStore(): SnapStore {
     canvas: useCanvasStore.getState(),
     editor: useEditorStore.getState(),
     modal: useModalStore.getState(),
+    rateLimit: useRateLimitStore.getState(),
     isInitialized: true,
     createdAt: Date.now(),
   };
@@ -141,10 +144,10 @@ export function resetStore(): void {
 const store = createStore();
 
 // Export individual store hooks for component use
-export { useCanvasStore, useEditorStore, useModalStore };
+export { useCanvasStore, useEditorStore, useModalStore, useRateLimitStore };
 
 // Export store instance for direct access
 export { store as default };
 
 // Type exports
-export type { CanvasStore, EditorStore, ModalStore, SnapStore };
+export type { CanvasStore, EditorStore, ModalStore, RateLimitStore, SnapStore };

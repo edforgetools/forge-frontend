@@ -20,6 +20,7 @@ import {
   formatDuration,
 } from "@/lib/export";
 import { useToast } from "@/hooks/use-toast";
+import { useTelemetry } from "@/hooks/useTelemetry";
 import { sendHeatmapData } from "@/lib/heatmap";
 
 interface ExportDialogProps {
@@ -36,6 +37,7 @@ export function ExportDialog({
   const [isExporting, setIsExporting] = useState(false);
   const [autoFormat, setAutoFormat] = useState<boolean>(true);
   const { toast } = useToast();
+  const { trackDownloadClick } = useTelemetry();
 
   const { image, videoSrc, crop, prefs } = useCanvasStore();
   const hasContent = image || videoSrc;
@@ -140,6 +142,9 @@ export function ExportDialog({
       });
 
       const duration = performance.now() - startTime;
+
+      // Track download click
+      trackDownloadClick(result.format, "export-dialog", result.sizeBytes);
 
       // Show success toast with duration and size
       toast({

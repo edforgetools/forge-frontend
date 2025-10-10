@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview --port 4173",
     "typecheck": "tsc -b",
-    "test": "playwright test",
+    "test": "vitest",
+    "test:unit": "vitest",
+    "test:e2e": "playwright test",
     "test:ci": "playwright test --reporter=github",
     "test:ui": "playwright test --reporter=line",
     "test:a11y": "playwright test --config=playwright.a11y.config.ts",
@@ -23,15 +25,15 @@
     "size-limit": "size-limit",
     "analyze": "size-limit --why",
     "bundle-analyze": "ANALYZE=true pnpm build",
-    "ci": "pnpm build && pnpm test:ci && pnpm test:a11y:ci && pnpm size-limit && pnpm lighthouse && pnpm hallucination-check",
-    "ci:full": "pnpm build && pnpm test:ci && pnpm test:a11y:ci && pnpm size-limit && pnpm lighthouse && pnpm hallucination-check",
+    "ci": "pnpm build && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:unit",
+    "ci:full": "pnpm build && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test:unit --run && pnpm test:ci && pnpm test:a11y:ci && pnpm size-limit && pnpm lighthouse && pnpm hallucination-check",
     "bump:patch": "node scripts/bump-version.js patch",
     "bump:minor": "node scripts/bump-version.js minor",
     "bump:major": "node scripts/bump-version.js major",
-    "test:e2e": "playwright test",
     "verify": "bash scripts/verify.sh",
     "hallucination-check": "node scripts/hallucination-detector.js",
-    "hallucination-check:ts": "npx tsx scripts/hallucination-detector.ts"
+    "hallucination-check:ts": "npx tsx scripts/hallucination-detector.ts",
+    "pre-commit": "pnpm lint:fix && pnpm format:check && pnpm typecheck"
   },
   "keywords": [],
   "author": "",
@@ -80,6 +82,7 @@
     "@typescript-eslint/eslint-plugin": "^8.45.0",
     "@typescript-eslint/parser": "^8.45.0",
     "@vitejs/plugin-react": "^5.0.4",
+    "@vitest/ui": "^3.2.4",
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "eslint": "^9.37.0",
@@ -88,6 +91,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "framer-motion": "^12.23.22",
     "globals": "^16.4.0",
+    "jsdom": "^27.0.0",
     "lighthouse": "^12.8.2",
     "lucide-react": "^0.544.0",
     "playwright": "^1.55.1",
@@ -100,6 +104,7 @@
     "tailwindcss": "^4.1.14",
     "typescript": "^5.9.3",
     "vite": "^7.1.9",
-    "vite-plugin-compression": "^0.5.1"
+    "vite-plugin-compression": "^0.5.1",
+    "vitest": "^3.2.4"
   }
 }

@@ -43,6 +43,8 @@ export default defineConfig({
     cssCodeSplit: true,
     // Enable compression
     reportCompressedSize: true,
+    // Optimize for faster LCP
+    assetsInlineLimit: 4096, // Inline small assets
     // Optimize dependencies
     rollupOptions: {
       onwarn: function (warning, warn) {
@@ -136,10 +138,7 @@ export default defineConfig({
           }
         },
         // Optimize chunk names for better caching
-        chunkFileNames: function (chunkInfo) {
-          var facadeModuleId = chunkInfo.facadeModuleId
-            ? chunkInfo.facadeModuleId.split("/").pop()
-            : "chunk";
+        chunkFileNames: function () {
           return "assets/[name]-[hash].js";
         },
         entryFileNames: "assets/[name]-[hash].js",

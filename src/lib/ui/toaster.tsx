@@ -31,7 +31,7 @@ export function Toaster() {
 const ToastTitle = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => (
+>(({ ...props }, ref) => (
   <div ref={ref} className="text-sm font-semibold [&+div]:text-xs" {...props} />
 ));
 ToastTitle.displayName = "ToastTitle";
@@ -39,7 +39,7 @@ ToastTitle.displayName = "ToastTitle";
 const ToastDescription = React.forwardRef<
   React.ElementRef<"div">,
   React.ComponentPropsWithoutRef<"div">
->(({ className, ...props }, ref) => (
+>(({ ...props }, ref) => (
   <div ref={ref} className="text-sm opacity-90" {...props} />
 ));
 ToastDescription.displayName = "ToastDescription";
@@ -47,7 +47,7 @@ ToastDescription.displayName = "ToastDescription";
 const ToastClose = React.forwardRef<
   React.ElementRef<"button">,
   React.ComponentPropsWithoutRef<"button">
->(({ className, ...props }, ref) => (
+>(({ ...props }, ref) => (
   <button
     ref={ref}
     className="absolute right-1 top-1 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-1 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600 [&>svg]:h-4 [&>svg]:w-4"

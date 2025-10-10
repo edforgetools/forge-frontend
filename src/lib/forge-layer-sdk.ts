@@ -41,21 +41,43 @@ if (
 }
 
 /**
- * Generic API request handler with error handling
+ * Generic API request handler with error handling and rate limit tracking
  */
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
   const url = `${FORGE_LAYER_URL}${endpoint}`;
+
+  // Get authorization from options or try to get from localStorage
+  const authToken =
+    (options.headers as Record<string, string>)?.["Authorization"] ||
+    (typeof window !== "undefined"
+      ? localStorage.getItem("forge_api_key")
+      : null);
+
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options.headers as Record<string, string>),
+  };
+
+  // Add authorization header if token is available
+  if (authToken) {
+    headers["Authorization"] = authToken;
+  }
+
   try {
     const response = await fetch(url, {
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
       ...options,
+      headers,
     });
+
+    // Update rate limit info from response headers
+    if (response.headers) {
+      // Dynamically import to avoid circular dependencies
+      const { rateLimitActions } = await import("@/state/rateLimitStore");
+      rateLimitActions.updateRateLimit(response.headers);
+    }
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

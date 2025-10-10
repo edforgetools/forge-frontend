@@ -13,6 +13,104 @@
       content="Create perfect 16:9 thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB."
     />
 
+    <!-- OpenGraph Meta Tags -->
+    <meta
+      property="og:title"
+      content="Snapthumb - Create Perfect 16:9 Thumbnails"
+    />
+    <meta
+      property="og:description"
+      content="Create perfect 16:9 thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://snapthumb.tools/" />
+    <meta property="og:image" content="https://snapthumb.tools/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Snapthumb" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Snapthumb - Create Perfect 16:9 Thumbnails"
+    />
+    <meta
+      name="twitter:description"
+      content="Create perfect 16:9 thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB."
+    />
+    <meta name="twitter:image" content="https://snapthumb.tools/og-image.png" />
+
+    <!-- Additional SEO Meta Tags -->
+    <meta
+      name="keywords"
+      content="thumbnail maker, video thumbnail, image crop, 16:9 aspect ratio, video frame extractor, thumbnail generator, online image editor, video thumbnail creator"
+    />
+    <meta name="author" content="Forge Tools" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://snapthumb.tools/" />
+
+    <!-- Preconnect to external domains for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://vitals.vercel-insights.com" />
+    <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
+
+    <!-- Performance hints -->
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="x-dns-prefetch-control" content="on" />
+
+    <!-- Resource hints for faster loading -->
+    <link rel="modulepreload" href="/src/main.tsx" />
+    <link rel="modulepreload" href="/src/App.tsx" />
+    <link rel="modulepreload" href="/src/pages/Home.tsx" />
+
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="/src/styles/globals.css" as="style" />
+    <link rel="preload" href="/src/styles/typography.css" as="style" />
+
+    <!-- JSON-LD Schema for SoftwareApplication -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Snapthumb",
+        "description": "Create perfect 16:9 thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB.",
+        "url": "https://snapthumb.tools/",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Web Browser",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "creator": {
+          "@type": "Organization",
+          "name": "Forge Tools",
+          "url": "https://forge.tools"
+        },
+        "featureList": [
+          "Video frame extraction",
+          "Smart 16:9 cropping",
+          "Image overlay support",
+          "Export under 2MB",
+          "Drag and drop interface",
+          "Keyboard shortcuts",
+          "Responsive design"
+        ],
+        "screenshot": "https://snapthumb.tools/og-image.png",
+        "softwareVersion": "1.2.0",
+        "datePublished": "2024-01-01",
+        "dateModified": "2024-12-01",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5.0",
+          "ratingCount": "1"
+        },
+        "keywords": "thumbnail maker, video thumbnail, image crop, 16:9 aspect ratio, video frame extractor, thumbnail generator, online image editor, video thumbnail creator"
+      }
+    </script>
+
     <!-- Critical CSS inlined for instant rendering -->
     <style>
       * {
@@ -25,10 +123,53 @@
           -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         line-height: 1.5;
         color: #1f2937;
+        font-display: swap;
       }
       #root {
         height: 100dvh;
         padding-top: env(safe-area-inset-top);
+      }
+      /* Critical above-the-fold styles for faster LCP */
+      .hero-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(to bottom right, #eff6ff, #ffffff, #e0e7ff);
+        padding: 2rem 1rem;
+      }
+      .hero-content {
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .hero-title {
+        font-size: clamp(2.5rem, 8vw, 4.5rem);
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        color: #1f2937;
+      }
+      .hero-subtitle {
+        font-size: clamp(1.125rem, 3vw, 1.5rem);
+        line-height: 1.4;
+        color: #6b7280;
+        margin-bottom: 2rem;
+      }
+      .hero-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #2563eb;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.2s;
+      }
+      .hero-cta:hover {
+        background: #1d4ed8;
       }
       /* Loading spinner for better UX */
       .loading {
@@ -53,6 +194,10 @@
         100% {
           transform: rotate(360deg);
         }
+      }
+      /* Prevent layout shift during loading */
+      .prevent-shift {
+        contain: layout style paint;
       }
     </style>
   </head>

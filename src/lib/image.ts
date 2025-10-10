@@ -219,22 +219,22 @@ export function validateImageFile(file: File): {
   valid: boolean;
   error?: string;
 } {
-  const maxSizeBytes = 200 * 1024 * 1024; // 200MB limit for graceful failure
+  const maxSizeBytes = 10 * 1024 * 1024; // 10MB limit as requested
   const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
   if (file.size > maxSizeBytes) {
     return {
       valid: false,
-      error: `File size ${(file.size / 1024 / 1024).toFixed(
+      error: `Image file size ${(file.size / 1024 / 1024).toFixed(
         1
-      )}MB exceeds 200MB limit`,
+      )}MB exceeds 10MB limit. Please use a smaller image.`,
     };
   }
 
   if (!allowedTypes.includes(file.type)) {
     return {
       valid: false,
-      error: `Unsupported file type: ${file.type}`,
+      error: `Unsupported image format: ${file.type}. Please use PNG, JPG, or WebP format.`,
     };
   }
 

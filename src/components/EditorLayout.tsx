@@ -30,6 +30,7 @@ import { UserProfile } from "./UserProfile";
 import { AuthModal } from "./AuthModal";
 import { ProjectManager } from "./ProjectManager";
 import { StatusBar } from "./StatusBar";
+import { WireGenerate } from "./WireGenerate";
 import { useCanvasStore, canvasActions } from "@/state/canvasStore";
 import { useModalStore, modalActions } from "@/state/modalStore";
 import { useAutosave } from "@/hooks/useAutosave";
@@ -233,7 +234,7 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
       <div className="hidden xl:block h-full">
         <div className="editor-grid h-full grid grid-cols-[320px_1fr_340px] gap-4 p-4 min-h-[100dvh] pt-[var(--header-h)]">
           {/* Header - Spans all columns */}
-          <header className="z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-4 sticky top-[var(--header)] z-[var(--z-toolbar)] col-span-3">
+          <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-4 sticky top-[var(--header)] z-[var(--z-toolbar)] col-span-3">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
               <div className="flex items-center space-x-6">
                 <Button
@@ -473,7 +474,7 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
           {/* Right Sidebar - Export Controls */}
           <aside className="bg-white border border-gray-200 rounded-lg overflow-hidden sticky top-0 h-fit max-h-[calc(100vh-32px)]">
             <div className="p-6 flex flex-col h-full">
-              <div className="flex-1">
+              <div className="flex-1 space-y-4">
                 <PanelSection
                   title="Export Controls"
                   icon={<Settings className="w-[18px] h-[18px]" />}
@@ -485,6 +486,15 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
                     </div>
                   </div>
                 </PanelSection>
+
+                {/* Wire Generate Component */}
+                {hasContent && (
+                  <WireGenerate
+                    onResult={(result) => {
+                      console.log("Wire Generate Result:", result);
+                    }}
+                  />
+                )}
               </div>
 
               {/* Export Button at bottom of right panel */}
@@ -500,7 +510,7 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
       <div className="xl:hidden h-full">
         <div className="flex flex-col h-full bg-gray-50">
           {/* Header */}
-          <header className="z-10 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3 sticky top-[var(--header)] z-[var(--z-toolbar)]">
+          <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3 sticky top-[var(--header)] z-[var(--z-toolbar)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <Button
@@ -635,6 +645,14 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
                         Configure and download your thumbnail below.
                       </div>
                     </div>
+
+                    {/* Wire Generate Component for Mobile */}
+                    <WireGenerate
+                      onResult={(result) => {
+                        console.log("Wire Generate Result:", result);
+                      }}
+                    />
+
                     <StickyFooter isDragging={isDragging} />
                   </div>
                 )}
