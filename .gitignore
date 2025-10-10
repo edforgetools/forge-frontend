@@ -129,3 +129,7 @@ bundle-analysis.html
 # yarn.lock
 # pnpm-lock.yaml
 .vercel
+
+# Debug and test files
+debug-*.png
+test-*.html
