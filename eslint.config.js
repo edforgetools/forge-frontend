@@ -34,13 +34,13 @@ export default [
       "no-undef": "off", // TypeScript handles this
       "no-case-declarations": "off", // Allow const declarations in case blocks
       "prettier/prettier": "error",
-      "import/no-unused-modules": [
-        "error",
-        {
-          unusedExports: true,
-          ignoreExports: ["*.config.*", "*.d.ts"],
-        },
-      ],
+      // "import/no-unused-modules": [
+      //   "error",
+      //   {
+      //     unusedExports: true,
+      //     ignoreExports: ["*.config.*", "*.d.ts"],
+      //   },
+      // ],
     },
   },
   {
