@@ -1,22 +1,14 @@
-import { Button } from "@/components/ui/button";
 import { Page } from "@/components/ui/page";
 import { Container } from "@/components/ui/container";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function PrivacyPage() {
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    navigate("/");
-  };
-
   return (
     <Page>
       <Container>
-        <h1 className="text-xl mb-6">Privacy</h1>
+        <h1 className="text-xl text-center">Privacy</h1>
 
-        <section className="flex flex-col gap-3 text-sm leading-6">
+        <section className="mt-6 space-y-3 text-sm leading-6">
           <div>
             <h2 className="font-medium text-base mb-2">
               1. Information We Collect
@@ -150,15 +142,9 @@ export default function PrivacyPage() {
         </section>
 
         <div className="mt-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBack}
-            className="text-blue-600 hover:text-blue-700"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back
-          </Button>
+          <Link to="/" className="text-xs underline">
+            ← Back
+          </Link>
         </div>
       </Container>
     </Page>
