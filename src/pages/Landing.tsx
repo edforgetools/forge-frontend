@@ -15,28 +15,25 @@ export default function Landing() {
               Fast in-browser creative tools powered by Forge Layer
             </p>
           </div>
-          <div className="flex flex-col gap-3">
-            <Button asChild variant="primary" className="w-full">
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-3">
+            <Button asChild>
               <Link to="/app">Try Snapthumb</Link>
             </Button>
-            <Button asChild variant="outline" className="w-full">
+            <Button variant="outline" asChild>
               <Link to="/api">Use API</Link>
             </Button>
           </div>
-          <footer className="flex justify-center gap-4 text-xs text-muted-foreground">
-            <Button asChild variant="outline" className="text-xs">
-              <Link to="/privacy">Privacy</Link>
-            </Button>
-            {env.VITE_CANONICAL_URL && (
-              <Button asChild variant="outline" className="text-xs">
-                <a
-                  href={env.VITE_CANONICAL_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Project Canonical
-                </a>
-              </Button>
+          <footer className="flex justify-center gap-4">
+            <Link to="/privacy" className="text-xs underline">Privacy</Link>
+            {import.meta.env.VITE_CANONICAL_URL && (
+              <a 
+                href={import.meta.env.VITE_CANONICAL_URL} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="text-xs underline"
+              >
+                Project Canonical
+              </a>
             )}
           </footer>
         </div>
