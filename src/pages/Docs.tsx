@@ -1,16 +1,8 @@
-import { Button } from "@/components/ui/button";
 import { Page } from "@/components/ui/page";
 import { Container } from "@/components/ui/container";
-import { ArrowLeft, Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function DocsPage() {
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    navigate("/");
-  };
-
   const shortcuts = [
     {
       category: "Canvas",
@@ -56,233 +48,46 @@ export default function DocsPage() {
   return (
     <Page>
       <Container>
-        <h1 className="text-xl mb-6">Documentation</h1>
-
-        <div className="flex flex-col gap-6">
-          {/* Quick Start */}
-          <section id="quick-start">
-            <h2 className="text-base mb-3">Quick Start</h2>
-            <div className="flex flex-col gap-3">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                  1
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">Upload Media</h3>
-                  <p className="text-sm text-gray-600">
-                    Click upload area or press{" "}
-                    <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 rounded">
-                      U
-                    </kbd>{" "}
-                    to select video (MP4, WebM) or image (JPG, PNG, WebP)
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                  2
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">Frame Selection</h3>
-                  <p className="text-sm text-gray-600">
-                    For videos, scrub timeline to find perfect frame, then press{" "}
-                    <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 rounded">
-                      F
-                    </kbd>{" "}
-                    to capture it
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                  3
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">Crop & Resize</h3>
-                  <p className="text-sm text-gray-600">
-                    Press{" "}
-                    <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 rounded">
-                      C
-                    </kbd>{" "}
-                    to toggle 16:9 crop overlay and position perfectly
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                  4
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">Add Overlays</h3>
-                  <p className="text-sm text-gray-600">
-                    Press{" "}
-                    <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 rounded">
-                      T
-                    </kbd>{" "}
-                    for text or drag & drop logo overlays. Use arrow keys to
-                    fine-tune positioning
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-sm font-medium">
-                  5
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">Export</h3>
-                  <p className="text-sm text-gray-600">
-                    Press{" "}
-                    <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 rounded">
-                      E
-                    </kbd>{" "}
-                    to open export options. Choose format and quality -
-                    automatically optimizes to stay under 2MB
-                  </p>
-                </div>
-              </div>
+        <h1 className="text-xl text-center">Documentation</h1>
+        <section className="mt-6 space-y-4 text-sm leading-6">
+          <div>
+            <h2 className="text-base font-medium">Quick Start</h2>
+            <ol className="mt-2 list-decimal pl-5 space-y-1">
+              <li>Upload image or video</li>
+              <li>Pick frame (if video)</li>
+              <li>Add logo overlay</li>
+              <li>Adjust position and size</li>
+              <li>Export thumbnail</li>
+            </ol>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <h3 className="font-medium">Supported Formats</h3>
+              <ul className="mt-2 list-disc pl-5 space-y-1">
+                <li>Input: MP4, WebM, JPG, PNG, WebP</li>
+                <li>Output: JPG, PNG, WebP</li>
+              </ul>
             </div>
-          </section>
-
-          {/* Limits */}
-          <section id="limits">
-            <h2 className="text-base mb-3">Limits</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-medium mb-2 text-sm">File Size Limits</h3>
-                <ul className="list-disc pl-5 space-y-1 text-sm">
-                  <li>
-                    <strong>Free Tier:</strong> 10MB max file size
-                  </li>
-                  <li>
-                    <strong>Pro Tier:</strong> 50MB max file size
-                  </li>
-                  <li>
-                    <strong>Export Limit:</strong> Automatic optimization to
-                    stay under 2MB
-                  </li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-medium mb-2 text-sm">Rate Limits</h3>
-                <ul className="list-disc pl-5 space-y-1 text-sm">
-                  <li>
-                    <strong>Free Tier:</strong> 10 generations per day
-                  </li>
-                  <li>
-                    <strong>Pro Tier:</strong> Unlimited generations
-                  </li>
-                  <li>
-                    <strong>Reset:</strong> Daily at midnight UTC
-                  </li>
-                </ul>
-              </div>
+            <div>
+              <h3 className="font-medium">Limits</h3>
+              <ul className="mt-2 list-disc pl-5 space-y-1">
+                <li>Free: 10 gens/day</li>
+                <li>Export: optimized ≤ 2 MB</li>
+              </ul>
             </div>
-            <div className="mt-4">
-              <h3 className="font-medium mb-2 text-sm">Supported Formats</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <h4 className="font-medium mb-1 text-sm">Input</h4>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>MP4, WebM (video)</li>
-                    <li>JPG, PNG, WebP (image)</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-1 text-sm">Output</h4>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>JPG, PNG, WebP</li>
-                    <li>Up to 4K resolution</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-1 text-sm">Aspect Ratio</h4>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>16:9 (YouTube standard)</li>
-                    <li>Auto-crop available</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-1 text-sm">Processing</h4>
-                  <ul className="list-disc pl-5 space-y-1">
-                    <li>Client-side only</li>
-                    <li>No server uploads</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Privacy */}
-          <section id="privacy">
-            <h2 className="text-base mb-3">Privacy</h2>
-            <div className="flex flex-col gap-3">
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs">
-                  ✓
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">Local Processing</h3>
-                  <p className="text-sm text-gray-600">
-                    All processing happens in your browser. Your files never
-                    leave your device.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs">
-                  ✓
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">No Data Collection</h3>
-                  <p className="text-sm text-gray-600">
-                    We don't collect personal information or store your content.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-6 h-6 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xs">
-                  ✓
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">Anonymous Analytics</h3>
-                  <p className="text-sm text-gray-600">
-                    Only anonymous usage statistics to improve the service.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-3"
-              onClick={() => navigate("/privacy")}
-            >
-              <Shield className="w-4 h-4 mr-2" />
-              Read Privacy Policy
-            </Button>
-          </section>
-
-          {/* Shortcuts */}
-          <section id="shortcuts">
-            <h2 className="text-base mb-3">Shortcuts</h2>
-            <details className="mt-3">
-              <summary className="cursor-pointer font-medium text-gray-700 hover:text-gray-900">
-                Keyboard Shortcuts
-              </summary>
-              <div className="max-h-64 overflow-y-auto mt-3 flex flex-col gap-3">
+          </div>
+          <details className="mt-2">
+            <summary className="cursor-pointer">Keyboard shortcuts</summary>
+            <div className="mt-2 max-h-64 overflow-y-auto">
+              <div className="space-y-4">
                 {shortcuts.map((category) => (
-                  <div key={category.category} className="flex flex-col gap-2">
-                    <h3 className="text-base font-medium text-gray-700">
-                      {category.category}
-                    </h3>
-                    <ul className="list-disc pl-5 space-y-1 text-sm">
+                  <div key={category.category}>
+                    <h4 className="font-medium">{category.category}</h4>
+                    <ul className="mt-1 space-y-1 text-sm">
                       {category.items.map((item, index) => (
-                        <li
-                          key={index}
-                          className="flex items-center justify-between"
-                        >
+                        <li key={index} className="flex justify-between">
                           <span>{item.description}</span>
-                          <kbd className="inline-flex items-center px-2 py-1 text-xs font-mono font-semibold bg-gray-100 border border-gray-300 rounded text-gray-700 ml-2">
+                          <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 rounded">
                             {item.key}
                           </kbd>
                         </li>
@@ -291,20 +96,22 @@ export default function DocsPage() {
                   </div>
                 ))}
               </div>
-            </details>
-          </section>
-        </div>
-
-        <div className="mt-8 text-center">
-          <Button
-            variant="ghost"
-            onClick={handleBack}
-            className="text-blue-600 hover:text-blue-700"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-        </div>
+            </div>
+          </details>
+          <p className="text-xs text-muted-foreground">
+            Privacy: local processing, no uploads.
+          </p>
+          <div className="pt-2">
+            <Link to="/privacy" className="underline">
+              Read Privacy Policy
+            </Link>
+          </div>
+          <div className="pt-4">
+            <Link to="/" className="text-xs underline">
+              ← Back
+            </Link>
+          </div>
+        </section>
       </Container>
     </Page>
   );
