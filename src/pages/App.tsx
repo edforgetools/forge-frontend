@@ -1,6 +1,5 @@
 import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
-import { Button } from "@/components/ui/button";
 import { Page } from "@/components/ui/page";
 import { Container } from "@/components/ui/container";
 import { canvasActions } from "@/state/canvasStore";
@@ -13,8 +12,6 @@ export default function App() {
   const [isDragActive, setIsDragActive] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [layerUnreachable, setLayerUnreachable] = useState(false);
-  const [sampleAvailable, setSampleAvailable] = useState(false);
-  const [sampleLoading, setSampleLoading] = useState(false);
   const { toast } = useToast();
 
   // Check Forge Layer connection status
@@ -38,15 +35,7 @@ export default function App() {
     checkLayerConnection();
   }, []);
 
-  // Check if sample asset is available
-  useEffect(() => {
-    const SAMPLE_URL = "/samples/sample.jpg";
-    fetch(SAMPLE_URL, { method: "HEAD" })
-      .then((r) => setSampleAvailable(r.ok))
-      .catch(() => setSampleAvailable(false));
-  }, []);
-
-  // Unified file input handler used by both file picker and sample
+  // Unified file input handler
   const handleFileInput = useCallback(
     async (file: File) => {
       setIsUploading(true);
@@ -165,28 +154,6 @@ export default function App() {
     onDragLeave: () => setIsDragActive(false),
   });
 
-  const onSampleClick = useCallback(async () => {
-    if (!sampleAvailable || sampleLoading) return;
-
-    const SAMPLE_URL = "/samples/sample.jpg";
-
-    try {
-      setSampleLoading(true);
-      const res = await fetch(SAMPLE_URL);
-      if (!res.ok) throw new Error("sample fetch failed");
-      const blob = await res.blob();
-      const file = new File([blob], "sample.jpg", {
-        type: blob.type || "image/jpeg",
-      });
-      await handleFileInput(file);
-    } catch {
-      // optional: toast('Sample unavailable');
-      setSampleAvailable(false);
-    } finally {
-      setSampleLoading(false);
-    }
-  }, [sampleAvailable, sampleLoading, handleFileInput]);
-
   const isActive = isDragActive || dropzoneActive;
 
   return (
@@ -211,23 +178,7 @@ export default function App() {
             }}
           >
             <input {...getInputProps()} data-testid="upload-dropzone-input" />
-            {isActive
-              ? "Drop to upload"
-              : "Drag & drop files here or click to choose"}
-          </div>
-          <div className="mt-4 flex flex-col gap-3">
-            {sampleAvailable && (
-              <Button
-                id="sample"
-                variant="outline"
-                onClick={onSampleClick}
-                disabled={sampleLoading || isUploading}
-                className="w-full"
-                data-testid="btn-sample"
-              >
-                {sampleLoading ? "Loading…" : "Try sample image"}
-              </Button>
-            )}
+            {isActive ? "Drop to upload" : "Drag & drop or click to choose"}
           </div>
           <p className="mt-4 text-center text-xs text-muted-foreground">
             PNG, JPG, WebP • MP4, WebM
