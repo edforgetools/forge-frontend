@@ -1,7 +1,6 @@
-import { Link } from "react-router-dom";
 import { Page } from "@/components/ui/page";
 import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
+import { LinkButton } from "@/components/ui/LinkButton";
 
 export default function Landing() {
   return (
@@ -12,22 +11,24 @@ export default function Landing() {
           Fast in-browser creative tools powered by Forge Layer
         </p>
         <div className="mt-6 flex flex-col items-center gap-3">
-          <Link to="/app" className="w-full sm:w-auto">
-            <Button variant="primary" className="w-full">
-              Try Snapthumb
-            </Button>
-          </Link>
-          <Link to="/docs" className="w-full sm:w-auto">
-            <Button variant="outline" className="w-full">
-              Use API
-            </Button>
-          </Link>
+          <LinkButton to="/app" variant="primary">
+            Try Snapthumb
+          </LinkButton>
+          <LinkButton to="/docs" variant="outline">
+            Use API
+          </LinkButton>
         </div>
         <footer className="mt-8 flex justify-center gap-4 text-xs text-muted-foreground">
-          <Link to="/privacy">Privacy</Link>
-          <a href="/docs" className="underline">
-            Canonical Doc
-          </a>
+          <LinkButton to="/privacy" variant="link" className="text-xs">
+            Privacy
+          </LinkButton>
+          <LinkButton
+            href="https://canonical.com"
+            variant="link"
+            className="text-xs"
+          >
+            Canonical
+          </LinkButton>
         </footer>
       </Container>
     </Page>
