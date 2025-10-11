@@ -34,20 +34,20 @@ test.describe("Sample Loader", () => {
     } else {
       // If sample is not available, just verify the upload interface works
       console.log("Sample button not available, testing upload interface only");
-      
+
       // Test that the dropzone is clickable
       const dropzone = page.locator("#dropzone");
       await expect(dropzone).toBeVisible();
-      
+
       // Set up a file dialog handler
       let fileDialogOpened = false;
       page.on("filechooser", () => {
         fileDialogOpened = true;
       });
-      
+
       // Click on the dropzone
       await dropzone.click();
-      
+
       // The file dialog should open
       expect(fileDialogOpened).toBe(true);
     }
@@ -127,7 +127,9 @@ test.describe("Sample Loader", () => {
     // Verify that the dropzone is clickable and has the correct label
     const dropzone = page.locator("#dropzone");
     await expect(dropzone).toBeVisible();
-    await expect(dropzone).toContainText("Drag & drop files here or click to choose");
+    await expect(dropzone).toContainText(
+      "Drag & drop files here or click to choose"
+    );
 
     // Verify that there's no separate "Choose file" button
     const chooseFileButton = page.locator('button:has-text("Choose file")');

@@ -1,30 +1,41 @@
+import { Button } from "@/components/ui/button";
 import { Page } from "@/components/ui/page";
 import { Container } from "@/components/ui/container";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ApiPage() {
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"curl" | "node" | "python">(
+    "curl"
+  );
+  const { toast } = useToast();
 
-  const copyToClipboard = async (text: string, id: string) => {
+  const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      setCopiedCode(id);
-      setTimeout(() => setCopiedCode(null), 2000);
+      toast({
+        title: "Copied to clipboard",
+        description: "Code example copied successfully",
+      });
     } catch (err) {
       console.error("Failed to copy: ", err);
+      toast({
+        title: "Copy failed",
+        description: "Unable to copy to clipboard",
+        variant: "destructive",
+      });
     }
   };
 
-  const CopyButton = ({ text, id }: { text: string; id: string }) => (
+  const CopyButton = ({ text }: { text: string }) => (
     <Button
       variant="outline"
       size="sm"
-      onClick={() => copyToClipboard(text, id)}
-      className="ml-2"
+      onClick={() => copyToClipboard(text)}
+      className="ml-auto focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      tabIndex={0}
     >
-      {copiedCode === id ? "Copied!" : "Copy"}
+      Copy
     </Button>
   );
 
@@ -37,129 +48,165 @@ export default function ApiPage() {
     "height": 720
   }'`;
 
-  const jsExample = `import { ForgeThumb } from '@forge-layer/thumb';
-
-const thumb = new ForgeThumb({
-  apiKey: 'your-api-key'
+  const nodeExample = `const response = await fetch('https://forge-layer.com/api/thumb', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    source: 'https://example.com/video.mp4',
+    timestamp: 5.2,
+    width: 1280,
+    height: 720
+  })
 });
 
-const result = await thumb.generate({
-  source: 'https://example.com/video.mp4',
-  timestamp: 5.2,
-  width: 1280,
-  height: 720
-});
-
+const result = await response.json();
 console.log(result.url);`;
 
-  const pythonExample = `from forge_layer import ThumbGenerator
+  const pythonExample = `import requests
 
-generator = ThumbGenerator(api_key="your-api-key")
+response = requests.post('https://forge-layer.com/api/thumb', json={
+    'source': 'https://example.com/video.mp4',
+    'timestamp': 5.2,
+    'width': 1280,
+    'height': 720
+})
 
-result = generator.generate(
-    source="https://example.com/video.mp4",
-    timestamp=5.2,
-    width=1280,
-    height=720
-)
+result = response.json()
+print(result['url'])`;
 
-print(result.url)`;
+  const getCurrentExample = () => {
+    switch (activeTab) {
+      case "curl":
+        return curlExample;
+      case "node":
+        return nodeExample;
+      case "python":
+        return pythonExample;
+      default:
+        return curlExample;
+    }
+  };
 
   return (
     <Page>
       <Container>
-        <h1 className="text-xl text-center">API Documentation</h1>
-        <p className="mt-2 text-center text-sm text-muted-foreground">
-          Generate thumbnails from videos and images using the Forge Layer API
+        <h1 className="text-center text-xl font-bold mb-4">
+          API Documentation
+        </h1>
+        <p className="text-center text-sm text-muted-foreground mb-8">
+          Generate thumbnails using Forge Layer.
         </p>
 
-        <section className="mt-6 space-y-6">
+        <section className="space-y-8">
           <div>
-            <h2 className="text-base font-medium mb-3">Quick Start</h2>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h3 className="font-medium text-sm mb-2">REST API Endpoint</h3>
-              <code className="text-sm bg-white p-2 rounded block">
+            <h2 className="text-base font-semibold mb-4">REST Endpoint</h2>
+            <div className="bg-muted p-4 rounded-lg">
+              <code className="text-sm font-mono">
                 POST https://forge-layer.com/api/thumb
               </code>
             </div>
           </div>
 
           <div>
-            <h2 className="text-base font-medium mb-3">Parameters</h2>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <div className="grid grid-cols-1 gap-3 text-sm">
-                <div>
-                  <code className="font-mono">source</code>{" "}
-                  <span className="text-muted-foreground">(required)</span>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    URL to video or image file
-                  </p>
-                </div>
-                <div>
-                  <code className="font-mono">timestamp</code>{" "}
-                  <span className="text-muted-foreground">(optional)</span>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Time in seconds for video frames
-                  </p>
-                </div>
-                <div>
-                  <code className="font-mono">width</code>{" "}
-                  <span className="text-muted-foreground">(optional)</span>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Output width in pixels (default: source width)
-                  </p>
-                </div>
-                <div>
-                  <code className="font-mono">height</code>{" "}
-                  <span className="text-muted-foreground">(optional)</span>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Output height in pixels (default: source height)
-                  </p>
-                </div>
+            <h2 className="text-base font-semibold mb-4">Parameters</h2>
+            <dl className="space-y-3">
+              <div>
+                <dt className="font-medium text-sm">
+                  <code className="bg-muted px-2 py-1 rounded text-xs">
+                    source
+                  </code>
+                  <span className="text-muted-foreground ml-2">(required)</span>
+                </dt>
+                <dd className="text-sm text-muted-foreground ml-0 mt-1">
+                  URL to video or image file
+                </dd>
               </div>
-            </div>
+              <div>
+                <dt className="font-medium text-sm">
+                  <code className="bg-muted px-2 py-1 rounded text-xs">
+                    timestamp
+                  </code>
+                  <span className="text-muted-foreground ml-2">(optional)</span>
+                </dt>
+                <dd className="text-sm text-muted-foreground ml-0 mt-1">
+                  Time in seconds for video frames
+                </dd>
+              </div>
+              <div>
+                <dt className="font-medium text-sm">
+                  <code className="bg-muted px-2 py-1 rounded text-xs">
+                    width
+                  </code>
+                  <span className="text-muted-foreground ml-2">(optional)</span>
+                </dt>
+                <dd className="text-sm text-muted-foreground ml-0 mt-1">
+                  Output width in pixels
+                </dd>
+              </div>
+              <div>
+                <dt className="font-medium text-sm">
+                  <code className="bg-muted px-2 py-1 rounded text-xs">
+                    height
+                  </code>
+                  <span className="text-muted-foreground ml-2">(optional)</span>
+                </dt>
+                <dd className="text-sm text-muted-foreground ml-0 mt-1">
+                  Output height in pixels
+                </dd>
+              </div>
+            </dl>
           </div>
 
           <div>
-            <h2 className="text-base font-medium mb-3">Examples</h2>
-
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-medium text-sm mb-2 flex items-center">
+            <h2 className="text-base font-semibold mb-4">Examples</h2>
+            <div className="border rounded-lg overflow-hidden">
+              <div className="flex border-b bg-muted/50">
+                <button
+                  onClick={() => setActiveTab("curl")}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    activeTab === "curl"
+                      ? "bg-background text-foreground border-b-2 border-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
                   cURL
-                  <CopyButton text={curlExample} id="curl" />
-                </h3>
-                <pre className="bg-gray-50 p-3 rounded text-xs overflow-x-auto">
-                  <code>{curlExample}</code>
-                </pre>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-sm mb-2 flex items-center">
-                  JavaScript/Node.js
-                  <CopyButton text={jsExample} id="js" />
-                </h3>
-                <pre className="bg-gray-50 p-3 rounded text-xs overflow-x-auto">
-                  <code>{jsExample}</code>
-                </pre>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-sm mb-2 flex items-center">
+                </button>
+                <button
+                  onClick={() => setActiveTab("node")}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    activeTab === "node"
+                      ? "bg-background text-foreground border-b-2 border-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Node.js
+                </button>
+                <button
+                  onClick={() => setActiveTab("python")}
+                  className={`px-4 py-2 text-sm font-medium transition-colors ${
+                    activeTab === "python"
+                      ? "bg-background text-foreground border-b-2 border-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
                   Python
-                  <CopyButton text={pythonExample} id="python" />
-                </h3>
-                <pre className="bg-gray-50 p-3 rounded text-xs overflow-x-auto">
-                  <code>{pythonExample}</code>
+                </button>
+                <CopyButton text={getCurrentExample()} />
+              </div>
+              <div className="p-4">
+                <pre className="text-sm overflow-auto max-h-80">
+                  <code>{getCurrentExample()}</code>
                 </pre>
               </div>
             </div>
           </div>
 
           <div>
-            <h2 className="text-base font-medium mb-3">Response</h2>
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <pre className="text-xs overflow-x-auto">
+            <h2 className="text-base font-semibold mb-4">Response</h2>
+            <div className="bg-muted p-4 rounded-lg">
+              <pre className="text-sm overflow-auto max-h-80">
                 <code>{`{
   "success": true,
   "url": "https://forge-layer.com/thumb/abc123.jpg",
@@ -172,20 +219,21 @@ print(result.url)`;
           </div>
 
           <div>
-            <h2 className="text-base font-medium mb-3">Rate Limits</h2>
-            <div className="bg-gray-50 p-4 rounded-lg text-sm">
-              <ul className="space-y-1">
-                <li>• Free tier: 10 generations per day</li>
-                <li>• Pro tier: 1000 generations per day</li>
-                <li>• Enterprise: Custom limits</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <Link to="/docs" className="text-xs underline">
-              ← Product Help
-            </Link>
+            <h2 className="text-base font-semibold mb-4">Rate Limits</h2>
+            <ul className="space-y-2 text-sm">
+              <li className="flex items-start">
+                <span className="text-muted-foreground mr-2">•</span>
+                <span>Free tier: 10 generations per day</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-muted-foreground mr-2">•</span>
+                <span>Pro tier: 1000 generations per day</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-muted-foreground mr-2">•</span>
+                <span>Enterprise: Custom limits</span>
+              </li>
+            </ul>
           </div>
         </section>
       </Container>

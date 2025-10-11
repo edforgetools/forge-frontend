@@ -60,6 +60,9 @@ const envSchema = z.object({
     ),
 
   // Development tools
+
+  // Canonical URL for project documentation
+  VITE_CANONICAL_URL: z.string().url().optional(),
 });
 
 // Parse and validate environment variables

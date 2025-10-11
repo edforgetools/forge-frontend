@@ -2,7 +2,7 @@ import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Upload, Image as ImageIcon, Video, Zap } from "lucide-react";
+import { Upload, Zap } from "lucide-react";
 import { canvasActions, useCanvasStore } from "@/state/canvasStore";
 import { useToast } from "@/hooks/use-toast";
 import { validateImageFile } from "@/lib/image";
@@ -226,7 +226,7 @@ export function UploadDropzone() {
                 <p className="text-sm font-medium text-gray-900">
                   {isActive
                     ? "Drop to upload"
-                    : "Drag & drop files here or click to choose"}
+                    : "Drag & drop or click to choose"}
                 </p>
                 <p className="text-xs text-gray-500">
                   Images & videos supported
@@ -240,15 +240,8 @@ export function UploadDropzone() {
             <div className="text-sm font-medium text-gray-900">
               Supported formats:
             </div>
-            <div className="flex items-center gap-4 text-xs text-gray-600">
-              <div className="flex items-center gap-2">
-                <ImageIcon className="w-4 h-4" />
-                <span>PNG, JPG, WebP</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Video className="w-4 h-4" />
-                <span>MP4, WebM</span>
-              </div>
+            <div className="text-xs text-gray-600">
+              PNG, JPG, WebP • MP4, WebM
             </div>
           </div>
 

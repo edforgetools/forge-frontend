@@ -270,21 +270,21 @@ export function AuthModal({
                 <span className="text-muted-foreground">
                   Don't have an account?{" "}
                 </span>
-                <button
-                  type="button"
-                  className="text-primary hover:underline"
+                <Button
+                  variant="link"
                   onClick={() => setMode("signup")}
+                  className="p-0 h-auto"
                 >
                   Sign up
-                </button>
+                </Button>
                 <br />
-                <button
-                  type="button"
-                  className="text-primary hover:underline"
+                <Button
+                  variant="link"
                   onClick={() => setMode("forgot")}
+                  className="p-0 h-auto"
                 >
                   Forgot your password?
-                </button>
+                </Button>
               </>
             )}
             {mode === "signup" && (
@@ -292,13 +292,13 @@ export function AuthModal({
                 <span className="text-muted-foreground">
                   Already have an account?{" "}
                 </span>
-                <button
-                  type="button"
-                  className="text-primary hover:underline"
+                <Button
+                  variant="link"
                   onClick={() => setMode("signin")}
+                  className="p-0 h-auto"
                 >
                   Sign in
-                </button>
+                </Button>
               </>
             )}
             {mode === "forgot" && (
@@ -306,13 +306,13 @@ export function AuthModal({
                 <span className="text-muted-foreground">
                   Remember your password?{" "}
                 </span>
-                <button
-                  type="button"
-                  className="text-primary hover:underline"
+                <Button
+                  variant="link"
                   onClick={() => setMode("signin")}
+                  className="p-0 h-auto"
                 >
                   Sign in
-                </button>
+                </Button>
               </>
             )}
           </div>

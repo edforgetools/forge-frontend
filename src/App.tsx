@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { EditorSkeleton } from "./components/EditorSkeleton";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { useDocumentTitle } from "./hooks/useDocumentTitle";
 
 // Lazy load pages for better performance
 const Landing = lazy(() => import("./pages/Landing.tsx"));
@@ -33,6 +34,8 @@ const LoadingFallback = ({
 );
 
 export default function App() {
+  useDocumentTitle();
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background">

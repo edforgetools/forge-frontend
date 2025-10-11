@@ -4,10 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./styles/globals.css";
 import "./styles/layers.css";
-import {
-  runPortalRootValidation,
-  enableDevelopmentValidation,
-} from "./lib/sanity";
+// Portal validation removed - portal-root exists in index.html
 import { computeScrollbarWidth, ensurePortalRoot } from "./lib/dom";
 import { optimizeCriticalRenderingPath } from "./lib/performance";
 
@@ -29,15 +26,7 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// Run portal/root validation after DOM is ready
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", runPortalRootValidation);
-} else {
-  runPortalRootValidation();
-}
-
-// Enable development validation for hot reloading scenarios
-enableDevelopmentValidation();
+// Portal validation removed - portal-root exists in index.html
 
 // Compute scrollbar width on load
 computeScrollbarWidth();

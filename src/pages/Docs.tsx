@@ -48,37 +48,48 @@ export default function DocsPage() {
   return (
     <Page>
       <Container>
-        <h1 className="text-xl text-center">How to use Snapthumb</h1>
-        <section className="mt-6 space-y-4 text-sm leading-6">
+        <h1 className="text-xl text-center">Snapthumb Help</h1>
+        <section className="mt-6 space-y-6 text-sm leading-6">
           <div>
-            <h2 className="text-base font-medium">Quick Start</h2>
-            <ol className="mt-2 list-decimal pl-5 space-y-1">
-              <li>Upload image or video</li>
-              <li>Pick frame (if video)</li>
-              <li>Add logo overlay</li>
-              <li>Adjust position and size</li>
-              <li>Export thumbnail</li>
-            </ol>
+            <h2 className="text-base font-medium mb-3">Quick Start</h2>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>Upload an image or video file to get started</li>
+              <li>If using video, pick the perfect frame to capture</li>
+              <li>Add your logo or text overlay to the canvas</li>
+              <li>Adjust position, size, and styling as needed</li>
+              <li>Export your finished thumbnail image</li>
+            </ul>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <h3 className="font-medium">Supported Formats</h3>
-              <ul className="mt-2 list-disc pl-5 space-y-1">
-                <li>Input: MP4, WebM, JPG, PNG, WebP</li>
-                <li>Output: JPG, PNG, WebP</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-medium">Limits</h3>
-              <ul className="mt-2 list-disc pl-5 space-y-1">
-                <li>Free: 10 gens/day</li>
-                <li>Export: optimized ≤ 2 MB</li>
-              </ul>
-            </div>
+
+          <div>
+            <h2 className="text-base font-medium mb-3">Supported Formats</h2>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>
+                <strong>Input:</strong> MP4, WebM, JPG, PNG, WebP
+              </li>
+              <li>
+                <strong>Output:</strong> JPG, PNG, WebP
+              </li>
+            </ul>
           </div>
-          <details className="mt-2">
-            <summary className="cursor-pointer">Keyboard shortcuts</summary>
-            <div className="mt-2 max-h-64 overflow-y-auto">
+
+          <div>
+            <h2 className="text-base font-medium mb-3">Limits</h2>
+            <ul className="list-disc pl-5 space-y-2">
+              <li>
+                <strong>Free tier:</strong> 10 generations per day
+              </li>
+              <li>
+                <strong>Export size:</strong> Optimized files under 2 MB
+              </li>
+            </ul>
+          </div>
+
+          <details className="mt-6">
+            <summary className="cursor-pointer text-base font-medium mb-3">
+              Keyboard shortcuts
+            </summary>
+            <div className="mt-2 max-h-64 overflow-auto">
               <div className="space-y-4">
                 {shortcuts.map((category) => (
                   <div key={category.category}>
@@ -98,20 +109,21 @@ export default function DocsPage() {
               </div>
             </div>
           </details>
-          <p className="text-xs text-muted-foreground">
-            Privacy: local processing, no uploads.
-          </p>
-          <div className="pt-2">
+
+          <div>
+            <h2 className="text-base font-medium mb-3">Privacy</h2>
+            <p className="mb-3">
+              All processing happens locally in your browser. No files are
+              uploaded to our servers.
+            </p>
             <Link to="/privacy" className="underline">
-              Read Privacy Policy
+              Read our full Privacy Policy
             </Link>
           </div>
-          <div className="pt-4 flex gap-4">
-            <Link to="/api" className="text-xs underline">
-              API Documentation
-            </Link>
+
+          <div className="pt-4">
             <Link to="/" className="text-xs underline">
-              ← Back
+              ← Back to Editor
             </Link>
           </div>
         </section>
