@@ -2,40 +2,37 @@ import { Page } from "@/components/ui/page";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/Button";
 import { Link } from "react-router-dom";
-import { env } from "@/env";
 
 export default function Landing() {
   return (
     <Page>
       <Container>
-        <div className="flex flex-col gap-6">
-          <div className="text-center">
-            <h1 className="text-xl">Forge Tools</h1>
-            <p className="text-sm text-muted-foreground">
-              Fast in-browser creative tools powered by Forge Layer
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:gap-3">
-            <Button asChild>
-              <Link to="/app">Try Snapthumb</Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/api">Use API</Link>
-            </Button>
-          </div>
-          <footer className="flex justify-center gap-4">
-            <Link to="/privacy" className="text-xs underline">Privacy</Link>
-            {import.meta.env.VITE_CANONICAL_URL && (
-              <a 
-                href={import.meta.env.VITE_CANONICAL_URL} 
-                target="_blank" 
-                rel="noreferrer" 
-                className="text-xs underline"
-              >
-                Project Canonical
-              </a>
-            )}
-          </footer>
+        <h1 className="text-xl text-center">Forge Tools</h1>
+        <p className="mt-2 text-center text-sm text-neutral-600">
+          Fast in-browser creative tools powered by Forge Layer.
+        </p>
+        <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+          <Button asChild variant="primary">
+            <Link to="/app">Try Snapthumb</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/api">Use the API</Link>
+          </Button>
+        </div>
+        <div className="mt-8 flex justify-center gap-6 text-xs text-neutral-600">
+          <Link to="/privacy" className="underline">
+            Privacy
+          </Link>
+          {import.meta.env.VITE_CANONICAL_URL && (
+            <a
+              className="underline"
+              href={import.meta.env.VITE_CANONICAL_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Project Canonical
+            </a>
+          )}
         </div>
       </Container>
     </Page>

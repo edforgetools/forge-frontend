@@ -1,7 +1,12 @@
 import { Container } from "@/components/ui/container";
+import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function DocsPage() {
+  useEffect(() => {
+    document.title = "Snapthumb Help • Forge";
+  }, []);
   const shortcuts = [
     {
       category: "Canvas",
@@ -46,38 +51,50 @@ export default function DocsPage() {
 
   return (
     <Container>
-      <h1 className="text-center">Snapthumb Help</h1>
-      
-      <section>
-        <h2 className="text-base font-medium">Quick Start</h2>
-        <ul className="list-disc pl-5 space-y-1 text-sm">
-          <li>Upload an image or video file to get started</li>
-          <li>If using video, pick the perfect frame to capture</li>
-          <li>Add your logo or text overlay to the canvas</li>
-          <li>Adjust position, size, and styling as needed</li>
-          <li>Export your finished thumbnail image</li>
-        </ul>
-      </section>
+      <h1 className="text-center mb-6">Snapthumb Help</h1>
 
-      <section>
-        <h2 className="text-base font-medium">Supported Formats</h2>
-        <ul className="list-disc pl-5 space-y-1 text-sm">
+      <Card>
+        <h2 className="text-lg font-semibold mb-4">Quick Start</h2>
+        <ul className="space-y-2">
+          <li>• Upload an image or video file to get started</li>
+          <li>• If using video, pick the perfect frame to capture</li>
+          <li>• Add your logo or text overlay to the canvas</li>
+          <li>• Adjust position, size, and styling as needed</li>
+          <li>• Export your finished thumbnail image</li>
+        </ul>
+      </Card>
+
+      <Card className="mt-4">
+        <h2 className="text-lg font-semibold mb-4">Supported Formats</h2>
+        <ul className="space-y-1">
           <li>Input: MP4, WebM, JPG, PNG, WebP</li>
           <li>Output: JPG, PNG, WebP</li>
         </ul>
-      </section>
+      </Card>
 
-      <section>
-        <h2 className="text-base font-medium">Limits</h2>
-        <ul className="list-disc pl-5 space-y-1 text-sm">
+      <Card className="mt-4">
+        <h2 className="text-lg font-semibold mb-4">Limits</h2>
+        <ul className="space-y-1">
           <li>Free tier: 10 generations per day</li>
           <li>Export size: Optimized files under 2 MB</li>
         </ul>
-      </section>
+      </Card>
 
-      <details className="mt-2">
-        <summary className="cursor-pointer">Keyboard shortcuts</summary>
-        <div className="mt-2 max-h-64 overflow-y-auto text-sm">
+      <Card className="mt-4">
+        <h2 className="text-lg font-semibold mb-4">Privacy Note</h2>
+        <p>
+          All processing happens locally in your browser.{" "}
+          <Link to="/privacy" className="underline">
+            Read our full Privacy Policy
+          </Link>
+        </p>
+      </Card>
+
+      <details className="mt-4">
+        <summary className="cursor-pointer text-lg font-medium">
+          Keyboard shortcuts
+        </summary>
+        <div className="mt-2 max-h-64 overflow-y-auto text-sm leading-6">
           <div className="space-y-4">
             {shortcuts.map((category) => (
               <div key={category.category}>
@@ -97,14 +114,6 @@ export default function DocsPage() {
           </div>
         </div>
       </details>
-
-      <section>
-        <h2 className="text-base font-medium">Privacy note</h2>
-        <p className="text-sm">
-          All processing happens locally in your browser.{" "}
-          <Link to="/privacy" className="underline">Read our full Privacy Policy</Link>
-        </p>
-      </section>
     </Container>
   );
 }

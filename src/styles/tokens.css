@@ -1,6 +1,15 @@
 /* Design Tokens for Snapthumb - Neutral Substrate Aesthetic */
 
 :root {
+  /* === CORE DESIGN TOKENS === */
+  --radius: 12px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
   /* === COLOR TOKENS === */
   /* Neutral Palette */
   --color-neutral-50: 250 250 250;
@@ -48,13 +57,7 @@
 
   /* === SPACING TOKENS === */
   --space-0: 0px;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
   --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
@@ -119,6 +122,11 @@
   --transition-fast: 150ms ease-in-out;
   --transition-normal: 250ms ease-in-out;
   --transition-slow: 350ms ease-in-out;
+}
+
+/* Base body styles */
+body {
+  font-size: 14px;
 }
 
 /* Dark theme overrides */

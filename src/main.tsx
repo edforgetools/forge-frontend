@@ -4,14 +4,12 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./styles/globals.css";
 import "./styles/layers.css";
+import "./styles/tokens.css";
 // Portal validation removed - portal-root exists in index.html
 import { computeScrollbarWidth, ensurePortalRoot } from "./lib/dom";
 import { optimizeCriticalRenderingPath } from "./lib/performance";
 
 // Lazy load non-critical components
-const Toaster = lazy(() =>
-  import("@/lib/ui/toaster").then((m) => ({ default: m.Toaster }))
-);
 const Analytics = lazy(() =>
   import("@vercel/analytics/react").then((m) => ({ default: m.Analytics }))
 );
@@ -53,9 +51,6 @@ const root = ReactDOM.createRoot(rootElement);
 const node = (
   <BrowserRouter>
     <App />
-    <Suspense fallback={null}>
-      <Toaster />
-    </Suspense>
     {/* Only load analytics in production */}
     {import.meta.env.PROD && (
       <Suspense fallback={null}>
