@@ -29,8 +29,12 @@ if ("serviceWorker" in navigator) {
   });
 }
 
-// Run portal/root validation at boot
-runPortalRootValidation();
+// Run portal/root validation after DOM is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", runPortalRootValidation);
+} else {
+  runPortalRootValidation();
+}
 
 // Enable development validation for hot reloading scenarios
 enableDevelopmentValidation();
@@ -39,7 +43,11 @@ enableDevelopmentValidation();
 computeScrollbarWidth();
 
 // Ensure portal root exists (fallback for missing portal-root)
-ensurePortalRoot();
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", ensurePortalRoot);
+} else {
+  ensurePortalRoot();
+}
 
 // Optimize critical rendering path for better LCP
 optimizeCriticalRenderingPath();
