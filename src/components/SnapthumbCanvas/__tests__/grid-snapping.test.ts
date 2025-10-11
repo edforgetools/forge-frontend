@@ -1,9 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  GridPosition,
-  GRID_POSITION_MAP,
-  CalculatedPosition,
-} from "../types";
+import { GridPosition, GRID_POSITION_MAP, CalculatedPosition } from "../types";
 
 // Helper function to calculate position based on grid position
 function calculateGridPosition(

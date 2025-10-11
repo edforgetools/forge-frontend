@@ -18,6 +18,7 @@ export function RateLimitDisplay({
     limit,
     remaining,
     reset,
+    isPro,
     showUpgradeCTA: storeShowUpgradeCTA,
     dismissUpgradeCTA,
   } = useRateLimitStore();
@@ -52,17 +53,19 @@ export function RateLimitDisplay({
   }, [reset]);
 
   const shouldShowUpgrade =
-    showUpgradeCTA && (remaining === 0 || storeShowUpgradeCTA);
-  const isLow = remaining <= 2;
-  const isZero = remaining === 0;
+    showUpgradeCTA && (remaining === 0 || storeShowUpgradeCTA) && !isPro;
+  const isLow = remaining <= 2 && !isPro;
+  const isZero = remaining === 0 && !isPro;
 
   const getStatusColor = () => {
+    if (isPro) return "default";
     if (isZero) return "destructive";
     if (isLow) return "secondary";
     return "default";
   };
 
   const getStatusIcon = () => {
+    if (isPro) return <Crown className="h-3 w-3" />;
     if (isZero) return <Crown className="h-3 w-3" />;
     if (isLow) return <Zap className="h-3 w-3" />;
     return null;
@@ -77,12 +80,12 @@ export function RateLimitDisplay({
       >
         {getStatusIcon()}
         <span className="text-xs font-medium">
-          {remaining} of {limit} free today
+          {isPro ? "Unlimited Pro" : `${remaining} of ${limit} free today`}
         </span>
       </Badge>
 
       {/* Time until reset */}
-      {timeUntilReset && (
+      {timeUntilReset && !isPro && (
         <span className="text-xs text-muted-foreground">
           Resets in {timeUntilReset}
         </span>
