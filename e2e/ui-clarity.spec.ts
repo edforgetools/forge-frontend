@@ -17,17 +17,27 @@ test.describe("UI Clarity Tests", () => {
     await expect(page.locator('a:has-text("Try Snapthumb")')).toBeVisible();
     await expect(page.locator('a:has-text("Use API")')).toBeVisible();
 
-    // Check footer has exactly 2 links: Privacy and Project Canonical
+    // Check footer has Privacy link and optionally Project Canonical
     const footer = page.locator("footer");
     await expect(footer).toBeVisible();
 
-    const footerLinks = footer.locator("a");
-    await expect(footerLinks).toHaveCount(2);
-
+    // Privacy link should always be present
     await expect(footer.locator('a:has-text("Privacy")')).toBeVisible();
-    await expect(
-      footer.locator('a:has-text("Project Canonical")')
-    ).toBeVisible();
+
+    // Project Canonical link is conditional based on VITE_CANONICAL_URL
+    const canonicalLink = footer.locator('a:has-text("Project Canonical")');
+    const canonicalLinkCount = await canonicalLink.count();
+
+    // Footer should have at least 1 link (Privacy) and at most 2 links
+    const footerLinks = footer.locator("a");
+    const footerLinkCount = await footerLinks.count();
+    expect(footerLinkCount).toBeGreaterThanOrEqual(1);
+    expect(footerLinkCount).toBeLessThanOrEqual(2);
+
+    // If Project Canonical link exists, verify it's visible
+    if (canonicalLinkCount > 0) {
+      await expect(canonicalLink).toBeVisible();
+    }
   });
 
   test("'/app' → one dropzone, optional sample button, no duplicate 'Choose file' button, no portal warning", async ({
