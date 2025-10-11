@@ -6,6 +6,7 @@ const routeTitles: Record<string, string> = {
   "/app": "Snapthumb • Forge",
   "/docs": "Snapthumb Help • Forge",
   "/api": "API • Forge",
+  "/privacy": "Privacy • Forge",
 };
 
 export function useDocumentTitle() {
