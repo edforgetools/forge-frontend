@@ -1,6 +1,7 @@
 import { SnapthumbCanvas } from "./SnapthumbCanvas";
 import { Controls } from "./Controls";
 import { useSnapthumbURLSync } from "@/lib/snapthumb-state";
+import { Button } from "@/components/ui/Button";
 
 interface SnapthumbEditorProps {
   backgroundImage?: string;
@@ -38,12 +39,7 @@ export function SnapthumbEditor({
         {/* Generate Button */}
         {onGenerate && (
           <div className="mt-4 flex justify-center">
-            <button
-              onClick={handleGenerate}
-              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
-            >
-              Generate Thumbnail
-            </button>
+            <Button onClick={handleGenerate}>Generate Thumbnail</Button>
           </div>
         )}
       </div>

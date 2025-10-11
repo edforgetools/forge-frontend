@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Slider } from "@/components/ui/slider";
 import {
   Grid3X3,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, HelpCircle, Upload, Camera } from "lucide-react";
 import { UploadDropzone } from "./UploadDropzone";

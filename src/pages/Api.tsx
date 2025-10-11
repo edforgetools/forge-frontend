@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Page } from "@/components/ui/page";
 import { Container } from "@/components/ui/container";
 import { useState } from "react";
@@ -163,7 +163,9 @@ print(result['url'])`;
             <h2 className="text-base font-semibold mb-4">Examples</h2>
             <div className="border rounded-lg overflow-hidden">
               <div className="flex border-b bg-muted/50">
-                <button
+                <Button
+                  variant={activeTab === "curl" ? "primary" : "outline"}
+                  size="sm"
                   onClick={() => setActiveTab("curl")}
                   className={`px-4 py-2 text-sm font-medium transition-colors ${
                     activeTab === "curl"
@@ -172,8 +174,10 @@ print(result['url'])`;
                   }`}
                 >
                   cURL
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant={activeTab === "node" ? "primary" : "outline"}
+                  size="sm"
                   onClick={() => setActiveTab("node")}
                   className={`px-4 py-2 text-sm font-medium transition-colors ${
                     activeTab === "node"
@@ -182,8 +186,10 @@ print(result['url'])`;
                   }`}
                 >
                   Node.js
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant={activeTab === "python" ? "primary" : "outline"}
+                  size="sm"
                   onClick={() => setActiveTab("python")}
                   className={`px-4 py-2 text-sm font-medium transition-colors ${
                     activeTab === "python"
@@ -192,7 +198,7 @@ print(result['url'])`;
                   }`}
                 >
                   Python
-                </button>
+                </Button>
                 <CopyButton text={getCurrentExample()} />
               </div>
               <div className="p-4">

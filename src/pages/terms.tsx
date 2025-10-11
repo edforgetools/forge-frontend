@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Page } from "@/components/ui/page";
 import { Container } from "@/components/ui/container";
 import { ArrowLeft } from "lucide-react";

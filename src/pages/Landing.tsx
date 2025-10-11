@@ -1,6 +1,7 @@
 import { Page } from "@/components/ui/page";
 import { Container } from "@/components/ui/container";
-import { LinkButton } from "@/components/ui/LinkButton";
+import { Button } from "@/components/ui/Button";
+import { Link } from "react-router-dom";
 import { env } from "@/env";
 
 export default function Landing() {
@@ -15,25 +16,27 @@ export default function Landing() {
             </p>
           </div>
           <div className="flex flex-col gap-3">
-            <LinkButton to="/app" variant="primary" className="w-full">
-              Try Snapthumb
-            </LinkButton>
-            <LinkButton to="/api" variant="outline" className="w-full">
-              Use API
-            </LinkButton>
+            <Button asChild variant="primary" className="w-full">
+              <Link to="/app">Try Snapthumb</Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/api">Use API</Link>
+            </Button>
           </div>
           <footer className="flex justify-center gap-4 text-xs text-muted-foreground">
-            <LinkButton to="/privacy" variant="link" className="text-xs">
-              Privacy
-            </LinkButton>
+            <Button asChild variant="outline" className="text-xs">
+              <Link to="/privacy">Privacy</Link>
+            </Button>
             {env.VITE_CANONICAL_URL && (
-              <LinkButton
-                href={env.VITE_CANONICAL_URL}
-                variant="link"
-                className="text-xs"
-              >
-                Project Canonical
-              </LinkButton>
+              <Button asChild variant="outline" className="text-xs">
+                <a
+                  href={env.VITE_CANONICAL_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Project Canonical
+                </a>
+              </Button>
             )}
           </footer>
         </div>

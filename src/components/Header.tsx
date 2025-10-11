@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { RateLimitDisplay } from "@/components/RateLimitDisplay";
 import { Camera } from "lucide-react";

@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -404,7 +404,7 @@ export function ExportDialog({
             <Button
               onClick={handleExport}
               disabled={!isReadyForExport || isExporting}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+              className="w-full"
               aria-disabled={!isReadyForExport}
               title={
                 !isReadyForExport

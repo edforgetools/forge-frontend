@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Slider } from "@/components/ui/slider";
 
 export type CompressionPreset = "high" | "medium" | "low";

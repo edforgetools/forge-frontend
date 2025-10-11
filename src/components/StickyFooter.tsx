@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Download } from "lucide-react";
 import { useCanvasStore } from "@/state/canvasStore";
 import { ExportDialog } from "./ExportDialog";
@@ -41,7 +41,7 @@ export function StickyFooter({ isDragging = false }: StickyFooterProps) {
         <ExportDialog isDragging={isDragging}>
           <Button
             disabled={!isReadyForExport || isDragging}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white h-10 rounded-xl disabled:opacity-50"
+            className="w-full h-10 rounded-xl"
             aria-label={
               isDragging
                 ? "Export disabled - finish dragging layers first"
