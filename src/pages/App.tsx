@@ -193,39 +193,49 @@ export default function App() {
     <Page>
       <Container>
         <section className="rounded-2xl border p-6 sm:p-8 shadow-sm">
-          <Button
-            id="choose"
-            variant="primary"
-            className="w-full"
-            {...getRootProps()}
-            disabled={isUploading}
-          >
-            <input {...getInputProps()} data-testid="upload-dropzone-input" />
-            {isUploading ? "Uploading..." : "Choose file"}
-          </Button>
           <div
             id="dropzone"
             {...getRootProps()}
-            className={`mt-4 h-36 rounded-lg border-2 border-dashed grid place-items-center text-sm text-muted-foreground cursor-pointer transition-colors ${
+            className={`h-36 rounded-lg border border-dashed grid place-items-center text-sm text-muted-foreground cursor-pointer transition-colors ${
               isActive
                 ? "border-primary bg-primary/5"
                 : "border-muted-foreground/25 hover:border-muted-foreground/50"
             } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            {isActive ? "Drop to upload" : "Or drag & drop files here"}
+            <input {...getInputProps()} data-testid="upload-dropzone-input" />
+            {isActive
+              ? "Drop to upload"
+              : "Drag & drop files here or click to choose"}
           </div>
-          {sampleAvailable && (
+          <div className="mt-4 flex flex-col gap-3">
             <Button
-              id="sample"
-              variant="outline"
-              onClick={onSampleClick}
-              disabled={sampleLoading || isUploading}
-              className="mt-4 w-full"
-              data-testid="btn-sample"
+              id="choose"
+              variant="primary"
+              className="w-full"
+              onClick={() =>
+                (
+                  document.querySelector(
+                    'input[data-testid="upload-dropzone-input"]'
+                  ) as HTMLInputElement
+                )?.click()
+              }
+              disabled={isUploading}
             >
-              {sampleLoading ? "Loading…" : "Try sample image"}
+              {isUploading ? "Uploading..." : "Choose file"}
             </Button>
-          )}
+            {sampleAvailable && (
+              <Button
+                id="sample"
+                variant="outline"
+                onClick={onSampleClick}
+                disabled={sampleLoading || isUploading}
+                className="w-full"
+                data-testid="btn-sample"
+              >
+                {sampleLoading ? "Loading…" : "Try sample image"}
+              </Button>
+            )}
+          </div>
           <p className="mt-4 text-center text-xs text-muted-foreground">
             PNG, JPG, WebP • MP4, WebM
           </p>

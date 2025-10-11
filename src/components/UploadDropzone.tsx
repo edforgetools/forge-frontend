@@ -185,7 +185,7 @@ export function UploadDropzone() {
           <Button
             {...getRootProps()}
             className="w-full h-12"
-            variant="default"
+            variant="primary"
             disabled={isUploading}
             aria-label={
               isUploading ? "Uploading file..." : "Choose file to upload"
@@ -204,7 +204,7 @@ export function UploadDropzone() {
           <div
             {...getRootProps()}
             className={`
-              relative border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
+              relative border border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
               ${
                 isActive
                   ? "border-blue-500 bg-blue-50"

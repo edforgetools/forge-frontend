@@ -59,7 +59,7 @@ export default function Index() {
 
           {/* Upload Controls */}
           <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+            <div className="border border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
               <h3 className="font-medium mb-2">Background Image</h3>
               <input
                 type="file"
@@ -74,7 +74,7 @@ export default function Index() {
               )}
             </div>
 
-            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+            <div className="border border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
               <h3 className="font-medium mb-2">Overlay Image</h3>
               <input
                 type="file"

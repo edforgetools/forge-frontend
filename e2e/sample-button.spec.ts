@@ -12,7 +12,7 @@ test.describe("Sample Button Tests", () => {
     const sampleButton = page.locator('[data-testid="btn-sample"]');
     await expect(sampleButton).toBeVisible({ timeout: 15000 });
     await expect(sampleButton).toContainText("Try sample image");
-    
+
     // Click the sample button
     await sampleButton.click();
 
