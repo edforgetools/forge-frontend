@@ -154,7 +154,7 @@ jobs:
           echo "Running Playwright tests..."
 
           # Run tests with server running - use ci-basic.spec.ts for CI reliability
-          pnpm exec playwright test ci-basic.spec.ts forge-thumb.spec.ts --project=chromium
+          pnpm exec playwright test ci-basic.spec.ts forge-thumb.spec.ts ui-smoke.spec.ts --project=chromium
           echo "Playwright tests completed successfully!"
 
           # Clean up server
@@ -353,7 +353,7 @@ jobs:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
 
       - name: UI Regression Tests
-        run: pnpm exec playwright test ci-basic.spec.ts forge-thumb.spec.ts --project=chromium
+        run: pnpm exec playwright test ci-basic.spec.ts forge-thumb.spec.ts ui-smoke.spec.ts --project=chromium
 
   # Export sample job (from ci-preview.yml)
   export-sample:
