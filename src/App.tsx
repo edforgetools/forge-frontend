@@ -12,6 +12,7 @@ const Terms = lazy(() => import("./pages/terms.tsx"));
 const Privacy = lazy(() => import("./pages/privacy.tsx"));
 const About = lazy(() => import("./pages/about.tsx"));
 const Docs = lazy(() => import("./pages/Docs.tsx"));
+const Api = lazy(() => import("./pages/Api.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const LoadingFallback = ({
@@ -110,6 +111,18 @@ export default function App() {
                   fallback={<LoadingFallback label="Loading documentation" />}
                 >
                   <Docs />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/api"
+              element={
+                <Suspense
+                  fallback={
+                    <LoadingFallback label="Loading API documentation" />
+                  }
+                >
+                  <Api />
                 </Suspense>
               }
             />

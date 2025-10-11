@@ -14,7 +14,7 @@ export default function Landing() {
           <LinkButton to="/app" variant="primary">
             Try Snapthumb
           </LinkButton>
-          <LinkButton to="/docs" variant="outline">
+          <LinkButton to="/api" variant="outline">
             Use API
           </LinkButton>
         </div>
@@ -23,7 +23,7 @@ export default function Landing() {
             Privacy
           </LinkButton>
           <LinkButton
-            href="https://canonical.com"
+            href="https://forge-layer.com/docs/canonical.md"
             variant="link"
             className="text-xs"
           >

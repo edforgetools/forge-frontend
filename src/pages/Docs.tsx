@@ -48,7 +48,7 @@ export default function DocsPage() {
   return (
     <Page>
       <Container>
-        <h1 className="text-xl text-center">Documentation</h1>
+        <h1 className="text-xl text-center">How to use Snapthumb</h1>
         <section className="mt-6 space-y-4 text-sm leading-6">
           <div>
             <h2 className="text-base font-medium">Quick Start</h2>
@@ -106,7 +106,10 @@ export default function DocsPage() {
               Read Privacy Policy
             </Link>
           </div>
-          <div className="pt-4">
+          <div className="pt-4 flex gap-4">
+            <Link to="/api" className="text-xs underline">
+              API Documentation
+            </Link>
             <Link to="/" className="text-xs underline">
               ← Back
             </Link>
