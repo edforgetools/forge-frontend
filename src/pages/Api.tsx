@@ -4,6 +4,8 @@ import { Container } from "@/components/ui/container";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 
+const BASE = import.meta.env.VITE_LAYER_BASE_URL || "http://localhost:3000";
+
 export default function ApiPage() {
   const [activeTab, setActiveTab] = useState<"curl" | "node" | "python">(
     "curl"
@@ -39,7 +41,7 @@ export default function ApiPage() {
     </Button>
   );
 
-  const curlExample = `curl -X POST https://forge-layer.com/api/thumb \\
+  const curlExample = `curl -X POST ${BASE}/api/thumb \\
   -H "Content-Type: application/json" \\
   -d '{
     "source": "https://example.com/video.mp4",
@@ -48,7 +50,7 @@ export default function ApiPage() {
     "height": 720
   }'`;
 
-  const nodeExample = `const response = await fetch('https://forge-layer.com/api/thumb', {
+  const nodeExample = `const response = await fetch('${BASE}/api/thumb', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -66,7 +68,7 @@ console.log(result.url);`;
 
   const pythonExample = `import requests
 
-response = requests.post('https://forge-layer.com/api/thumb', json={
+response = requests.post('${BASE}/api/thumb', json={
     'source': 'https://example.com/video.mp4',
     'timestamp': 5.2,
     'width': 1280,
@@ -103,9 +105,7 @@ print(result['url'])`;
           <div>
             <h2 className="text-base font-semibold mb-4">REST Endpoint</h2>
             <div className="bg-muted p-4 rounded-lg">
-              <code className="text-sm font-mono">
-                POST https://forge-layer.com/api/thumb
-              </code>
+              <code className="text-sm font-mono">POST {BASE}/api/thumb</code>
             </div>
           </div>
 
@@ -201,8 +201,8 @@ print(result['url'])`;
                 </Button>
                 <CopyButton text={getCurrentExample()} />
               </div>
-              <div className="p-4">
-                <pre className="text-sm overflow-auto max-h-80">
+              <div className="p-3">
+                <pre className="rounded-lg border p-3 overflow-auto max-h-80">
                   <code>{getCurrentExample()}</code>
                 </pre>
               </div>
@@ -215,7 +215,7 @@ print(result['url'])`;
               <pre className="text-sm overflow-auto max-h-80">
                 <code>{`{
   "success": true,
-  "url": "https://forge-layer.com/thumb/abc123.jpg",
+  "url": "${BASE}/thumb/abc123.jpg",
   "width": 1280,
   "height": 720,
   "size": 245760
@@ -227,18 +227,9 @@ print(result['url'])`;
           <div>
             <h2 className="text-base font-semibold mb-4">Rate Limits</h2>
             <ul className="space-y-2 text-sm">
-              <li className="flex items-start">
-                <span className="text-muted-foreground mr-2">•</span>
-                <span>Free tier: 10 generations per day</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-muted-foreground mr-2">•</span>
-                <span>Pro tier: 1000 generations per day</span>
-              </li>
-              <li className="flex items-start">
-                <span className="text-muted-foreground mr-2">•</span>
-                <span>Enterprise: Custom limits</span>
-              </li>
+              <li>Free tier: 10 generations per day</li>
+              <li>Pro tier: 1000 generations per day</li>
+              <li>Enterprise: Custom limits</li>
             </ul>
           </div>
         </section>
