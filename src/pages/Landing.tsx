@@ -7,36 +7,28 @@ export default function Landing() {
   return (
     <Page>
       <Container>
-        <div className="flex flex-col items-center gap-6">
-          <div className="flex flex-col items-center gap-3">
-            <h1 className="text-xl font-medium text-center">Forge Tools</h1>
-            <p className="text-center text-sm text-muted-foreground">
-              Fast in-browser creative tools powered by Forge Layer
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button asChild variant="primary">
-              <Link to="/app">
-                Try Snapthumb
-              </Link>
+        <h1 className="text-xl text-center">Forge Tools</h1>
+        <p className="mt-2 text-center text-sm text-muted-foreground">
+          Fast in-browser creative tools powered by Forge Layer
+        </p>
+        <div className="mt-6 flex flex-col items-center gap-3">
+          <Link to="/app" className="w-full sm:w-auto">
+            <Button variant="primary" className="w-full">
+              Try Snapthumb
             </Button>
-            <Button asChild variant="outline">
-              <a href="/docs">
-                Use API
-              </a>
+          </Link>
+          <Link to="/docs" className="w-full sm:w-auto">
+            <Button variant="outline" className="w-full">
+              Use API
             </Button>
-          </div>
-          <footer className="flex justify-center gap-4 text-xs text-muted-foreground">
-            <a href="/privacy">Privacy</a>
-            <a
-              href="https://github.com/forge-tools/forge-layer/docs/canonical.md"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Canonical Doc
-            </a>
-          </footer>
+          </Link>
         </div>
+        <footer className="mt-8 flex justify-center gap-4 text-xs text-muted-foreground">
+          <Link to="/privacy">Privacy</Link>
+          <a href="/docs" className="underline">
+            Canonical Doc
+          </a>
+        </footer>
       </Container>
     </Page>
   );
