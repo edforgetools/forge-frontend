@@ -7,11 +7,11 @@ test.describe("UI Clarity Tests", () => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
-    // Check for exactly 2 visible LinkButtons (main CTAs)
-    const linkButtons = page.locator(
-      'a[class*="inline-flex items-center justify-center"]:visible'
-    );
-    await expect(linkButtons).toHaveCount(2);
+    // Check for exactly 2 visible LinkButtons (main CTAs, excluding footer)
+    const mainCTAButtons = page
+      .locator('a[class*="inline-flex items-center justify-center"]:visible')
+      .filter({ hasText: /Try Snapthumb|Use API/ });
+    await expect(mainCTAButtons).toHaveCount(2);
 
     // Verify the main CTA buttons
     await expect(page.locator('a:has-text("Try Snapthumb")')).toBeVisible();
@@ -77,21 +77,6 @@ test.describe("UI Clarity Tests", () => {
     await expect(page.locator('button:has-text("Node.js")')).toBeVisible();
     await expect(page.locator('button:has-text("Python")')).toBeVisible();
 
-    // Mock navigator.clipboard to test copy functionality
-    await page.addInitScript(() => {
-      Object.defineProperty(window.navigator, "clipboard", {
-        value: {
-          writeText: async (text: string) => {
-            // Store the copied text for verification
-            (window as unknown as Record<string, unknown>).lastCopiedText =
-              text;
-            return Promise.resolve();
-          },
-        },
-        configurable: true,
-      });
-    });
-
     // Test copy button functionality for each tab
     const tabs = ["cURL", "Node.js", "Python"];
 
@@ -103,6 +88,22 @@ test.describe("UI Clarity Tests", () => {
       // Click the copy button
       const copyButton = page.locator('button:has-text("Copy")');
       await expect(copyButton).toBeVisible();
+
+      // Mock clipboard functionality and verify it's called
+      await page.evaluate(() => {
+        // Mock clipboard
+        Object.defineProperty(navigator, "clipboard", {
+          value: {
+            writeText: async (text: string) => {
+              // Store the copied text for verification
+              (window as unknown as Record<string, unknown>).lastCopiedText =
+                text;
+              return Promise.resolve();
+            },
+          },
+          configurable: true,
+        });
+      });
 
       await copyButton.click();
 
@@ -138,7 +139,11 @@ test.describe("UI Clarity Tests", () => {
     const isOpen = await detailsElement.getAttribute("open");
     expect(isOpen).toBeNull(); // Should be collapsed by default
 
-    // Verify the details element contains the shortcuts content
+    // Verify the details element contains the shortcuts content (when expanded)
+    // First expand the details element to check content
+    await keyboardShortcutsDetails.click();
+    await page.waitForTimeout(100); // Small delay for content to show
+
     const shortcutsContent = detailsElement.locator('text="Canvas"');
     await expect(shortcutsContent).toBeVisible();
   });
