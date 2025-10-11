@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/card";
 import { WireGenerate } from "@/components/WireGenerate";
 import { useCanvasStore } from "@/state/canvasStore";
-import { useSnapthumbStore } from "@/lib/snapthumb-state";
+// import { useSnapthumbStore } from "@/lib/snapthumb-state";
 
 export default function WireGenerateDemo() {
   const navigate = useNavigate();

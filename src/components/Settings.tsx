@@ -38,9 +38,9 @@ export function Settings({ onClearSession }: SettingsProps) {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
-      <h2 className="text-lg font-semibold mb-4">Settings</h2>
+      <h2 className="text-lg font-medium mb-4">Settings</h2>
 
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         {/* API Key Manager */}
         <ApiKeyManager onTierChange={updateTier} />
         {/* Session Restore Toggle */}
@@ -49,7 +49,7 @@ export function Settings({ onClearSession }: SettingsProps) {
             <label className="text-sm font-medium text-gray-700">
               Auto-restore session
             </label>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500">
               Automatically restore your last session when you reload the page
             </p>
           </div>
@@ -84,7 +84,7 @@ export function Settings({ onClearSession }: SettingsProps) {
 
         {/* Info */}
         <div className="text-xs text-gray-500 pt-2 border-t border-gray-100">
-          <p>
+          <p className="text-sm">
             Session data includes: uploaded files, canvas settings, overlays,
             and export preferences. Data is stored locally in your browser.
           </p>

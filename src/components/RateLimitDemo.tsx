@@ -25,7 +25,9 @@ export function RateLimitDemo() {
       <CardContent className="space-y-4">
         {/* Current rate limit display */}
         <div className="p-4 border rounded-lg">
-          <h3 className="font-medium mb-2">Current Rate Limit Status:</h3>
+          <h3 className="font-medium mb-2 text-sm">
+            Current Rate Limit Status:
+          </h3>
           <RateLimitDisplay />
         </div>
 

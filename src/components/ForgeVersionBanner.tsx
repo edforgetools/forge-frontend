@@ -23,6 +23,12 @@ export function ForgeVersionBanner() {
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Check if FORGE_LAYER_URL is set - if not, don't render anything
+  const forgeLayerUrl = import.meta.env.VITE_FORGE_LAYER_URL;
+  if (!forgeLayerUrl) {
+    return null;
+  }
+
   useEffect(() => {
     const checkConnection = async () => {
       try {
@@ -51,8 +57,8 @@ export function ForgeVersionBanner() {
 
   if (isLoading) {
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-        <div className="flex items-center space-x-2">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-center gap-2">
           <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
           <span className="text-sm text-blue-800">
             Connecting to Forge Layer v0.2...
@@ -64,8 +70,8 @@ export function ForgeVersionBanner() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-        <div className="flex items-center space-x-2">
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="flex items-center gap-2">
           <XCircle className="h-4 w-4 text-red-600" />
           <span className="text-sm text-red-800">
             Failed to connect to Forge Layer v0.2: {error}
@@ -77,9 +83,9 @@ export function ForgeVersionBanner() {
 
   if (isConnected && versionInfo) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-green-600" />
             <span className="text-sm font-medium text-green-800">
               Layer v0.2 connected

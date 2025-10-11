@@ -1,5 +1,7 @@
 # Snapthumb MVP
 
+[![CI Status](https://github.com/forge-tools/forge-frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/forge-tools/forge-frontend/actions/workflows/ci.yml)
+
 A modern thumbnail creation tool built with React, TypeScript, and Canvas API. Upload videos or images, capture frames, crop to 16:9, add overlays, and export optimized thumbnails under 2MB.
 
 **Powered by Forge Layer v0.2**
@@ -26,23 +28,93 @@ A modern thumbnail creation tool built with React, TypeScript, and Canvas API. U
 - **Canvas API** - Client-side image processing
 - **Playwright** - End-to-end testing
 
-## 📦 Installation
+## 🚀 Quick Start
+
+Get up and running in under 60 seconds:
+
+1. **Clone and Install**
+
+   ```bash
+   git clone https://github.com/forge-tools/forge-frontend.git
+   cd forge-frontend
+   pnpm install
+   ```
+
+2. **Start Development**
+
+   ```bash
+   pnpm dev
+   ```
+
+3. **Open in Browser**
+   Visit `http://localhost:5173` and start creating thumbnails!
+
+## 📦 Installation & Commands
+
+### Prerequisites
+
+- Node.js 20.11+ or 22+
+- pnpm (recommended) or npm
+
+### Environment Variables
+
+No environment variables required for basic functionality. Optional variables for advanced features:
 
 ```bash
-# Install dependencies
-npm install
+# API Configuration (optional)
+VITE_API_URL=https://api.forge.tools
+VITE_APP_VERSION=0.1.0
 
-# Start development server
-npm run dev
+# Analytics (optional)
+VITE_VERCEL_ANALYTICS_ID=your_analytics_id
 
-# Build for production
-npm run build
+# Feature Flags (optional)
+VITE_ENABLE_TELEMETRY=true
+VITE_ENABLE_RATE_LIMITING=true
+```
 
-# Run type checking
-npm run typecheck
+### Development Commands
 
-# Run tests
-npm run test
+```bash
+# Development
+pnpm dev                    # Start development server
+pnpm build                  # Build for production
+pnpm preview                # Preview production build
+
+# Code Quality
+pnpm typecheck              # Run TypeScript checks
+pnpm lint                   # Run ESLint
+pnpm lint:fix               # Fix ESLint issues
+pnpm format                 # Format with Prettier
+pnpm format:check           # Check formatting
+
+# Testing
+pnpm test                   # Run unit tests
+pnpm test:e2e               # Run Playwright tests
+pnpm test:ci                # Run tests for CI
+pnpm test:a11y              # Run accessibility tests
+
+# Performance & Quality
+pnpm lighthouse             # Run Lighthouse audit
+pnpm size-limit             # Check bundle size
+pnpm bundle-analyze         # Analyze bundle composition
+
+# CI & Deployment
+pnpm ci                     # Run full CI suite locally
+pnpm ci:full                # Run complete CI pipeline
+```
+
+### Production Commands
+
+```bash
+# Build and Deploy
+pnpm build                  # Create optimized production build
+pnpm preview                # Test production build locally
+
+# Version Management
+pnpm bump:patch             # Bump patch version (0.0.1 → 0.0.2)
+pnpm bump:minor             # Bump minor version (0.0.1 → 0.1.0)
+pnpm bump:major             # Bump major version (0.0.1 → 1.0.0)
 ```
 
 ## 🎯 Usage

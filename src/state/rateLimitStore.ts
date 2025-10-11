@@ -57,20 +57,37 @@ export const useRateLimitStore = create<RateLimitStore>()(
       ...defaultState,
 
       updateRateLimit: (headers: Headers) => {
-        const limit = parseInt(headers.get("X-RateLimit-Limit") || "10");
-        const remaining = parseInt(
-          headers.get("X-RateLimit-Remaining") || "10"
-        );
-        const reset = parseInt(headers.get("X-RateLimit-Reset") || "0");
+        const limitStr = headers.get("X-RateLimit-Limit");
+        const remainingStr = headers.get("X-RateLimit-Remaining");
+        const resetStr = headers.get("X-RateLimit-Reset");
         const retryAfter = headers.get("Retry-After");
         const tier = (headers.get("X-Forge-Tier") as Tier) || "free";
+
+        // Parse with fallbacks for invalid values
+        const limit = limitStr
+          ? isNaN(parseInt(limitStr))
+            ? 10
+            : parseInt(limitStr)
+          : 10;
+        const remaining = remainingStr
+          ? isNaN(parseInt(remainingStr))
+            ? 10
+            : parseInt(remainingStr)
+          : 10;
+        const reset = resetStr
+          ? isNaN(parseInt(resetStr))
+            ? 0
+            : parseInt(resetStr)
+          : 0;
 
         const newState = {
           limit,
           remaining,
           reset: reset > 0 ? reset * 1000 : Date.now() + 24 * 60 * 60 * 1000, // Convert to milliseconds
-          retryAfter: retryAfter ? parseInt(retryAfter) : undefined,
-          tier,
+          retryAfter: retryAfter
+            ? parseInt(retryAfter) || undefined
+            : undefined,
+          tier: tier === "pro" || tier === "free" ? tier : "free", // Validate tier
           isPro: tier === "pro",
           lastUpdated: Date.now(),
           showUpgradeCTA: remaining === 0 && tier === "free",

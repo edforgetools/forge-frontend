@@ -1,17 +1,17 @@
 import { Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
-import { Header } from "./components/Header";
 import { EditorSkeleton } from "./components/EditorSkeleton";
-import { ForgeVersionBanner } from "./components/ForgeVersionBanner";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // Lazy load pages for better performance
-const Home = lazy(() => import("./pages/Home.tsx"));
+const Landing = lazy(() => import("./pages/Landing.tsx"));
+const AppPage = lazy(() => import("./pages/App.tsx"));
 const Editor = lazy(() => import("./pages/Editor.tsx"));
 const WireGenerateDemo = lazy(() => import("./pages/WireGenerateDemo.tsx"));
 const Terms = lazy(() => import("./pages/terms.tsx"));
 const Privacy = lazy(() => import("./pages/privacy.tsx"));
 const About = lazy(() => import("./pages/about.tsx"));
+const Docs = lazy(() => import("./pages/Docs.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const LoadingFallback = ({
@@ -34,21 +34,27 @@ const LoadingFallback = ({
 export default function App() {
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-background flex flex-col">
-        <Header />
-        <ForgeVersionBanner />
-        <main className="flex-1">
+      <div className="min-h-screen bg-background">
+        <main>
           <Routes>
             <Route
               path="/"
               element={
                 <Suspense fallback={<LoadingFallback />}>
-                  <Home />
+                  <Landing />
                 </Suspense>
               }
             />
             <Route
               path="/app"
+              element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <AppPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/editor"
               element={
                 <Suspense fallback={<EditorSkeleton />}>
                   <Editor />
@@ -98,6 +104,16 @@ export default function App() {
               }
             />
             <Route
+              path="/docs"
+              element={
+                <Suspense
+                  fallback={<LoadingFallback label="Loading documentation" />}
+                >
+                  <Docs />
+                </Suspense>
+              }
+            />
+            <Route
               path="*"
               element={
                 <Suspense fallback={<LoadingFallback label="Loading page" />}>
@@ -107,14 +123,6 @@ export default function App() {
             />
           </Routes>
         </main>
-        <footer className="bg-white border-t border-gray-200 py-3 px-6">
-          <div className="max-w-7xl mx-auto flex items-center justify-center">
-            <p className="text-sm text-gray-500">
-              Powered by Forge Layer v
-              {import.meta.env.VITE_APP_VERSION || "0.1.0"}
-            </p>
-          </div>
-        </footer>
       </div>
     </ErrorBoundary>
   );

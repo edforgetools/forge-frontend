@@ -45,6 +45,7 @@ export function OptimizedImage({
         document.head.removeChild(link);
       };
     }
+    return undefined;
   }, [src, priority]);
 
   const handleLoad = () => {

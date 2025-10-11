@@ -18,7 +18,9 @@ test.describe("UI Visual Sanity Tests", () => {
     await expect(buttons).toHaveCount(2);
 
     // Verify button texts
-    await expect(page.locator('button:has-text("Try Snapthumb")')).toBeVisible();
+    await expect(
+      page.locator('button:has-text("Try Snapthumb")')
+    ).toBeVisible();
     await expect(page.locator('button:has-text("Use API")')).toBeVisible();
 
     // Expect footer with exactly 2 links
@@ -41,12 +43,16 @@ test.describe("UI Visual Sanity Tests", () => {
     await page.waitForTimeout(1000);
 
     // Expect exactly 2 main buttons (excluding toast dismiss buttons)
-    const mainButtons = page.locator("button").filter({ hasNotText: /dismiss/i });
+    const mainButtons = page
+      .locator("button")
+      .filter({ hasNotText: /dismiss/i });
     await expect(mainButtons).toHaveCount(2);
 
     // Verify button texts
     await expect(page.locator('button:has-text("Choose file")')).toBeVisible();
-    await expect(page.locator('button:has-text("Try sample image")')).toBeVisible();
+    await expect(
+      page.locator('button:has-text("Try sample image")')
+    ).toBeVisible();
 
     // Expect exactly one #dropzone element
     const dropzone = page.locator("#dropzone");
@@ -54,10 +60,14 @@ test.describe("UI Visual Sanity Tests", () => {
     await expect(dropzone).toBeVisible();
 
     // Expect formats line
-    await expect(page.locator('text="PNG, JPG, WebP • MP4, WebM"')).toBeVisible();
+    await expect(
+      page.locator('text="PNG, JPG, WebP • MP4, WebM"')
+    ).toBeVisible();
 
     // Expect no global banners (no persistent banners)
-    const globalBanners = page.locator('[class*="banner"]').filter({ hasNotText: /dismiss|close/i });
+    const globalBanners = page
+      .locator('[class*="banner"]')
+      .filter({ hasNotText: /dismiss|close/i });
     await expect(globalBanners).toHaveCount(0);
   });
 
@@ -78,7 +88,7 @@ test.describe("UI Visual Sanity Tests", () => {
     // Expect details element with open=false (collapsed by default)
     const detailsElement = page.locator("details");
     await expect(detailsElement).toBeVisible();
-    
+
     // Verify details is closed by default (open=false)
     const isOpen = await detailsElement.getAttribute("open");
     expect(isOpen).toBeNull(); // null means not open, which is the default state

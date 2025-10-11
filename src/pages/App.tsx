@@ -13,6 +13,8 @@ export default function App() {
   const [isDragActive, setIsDragActive] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [layerUnreachable, setLayerUnreachable] = useState(false);
+  const [sampleAvailable, setSampleAvailable] = useState(false);
+  const [sampleLoading, setSampleLoading] = useState(false);
   const { toast } = useToast();
 
   // Check Forge Layer connection status
@@ -36,11 +38,17 @@ export default function App() {
     checkLayerConnection();
   }, []);
 
-  const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
-      const file = acceptedFiles[0];
-      if (!file) return;
+  // Check if sample asset is available
+  useEffect(() => {
+    const SAMPLE_URL = "/samples/sample.jpg";
+    fetch(SAMPLE_URL, { method: "HEAD" })
+      .then((r) => setSampleAvailable(r.ok))
+      .catch(() => setSampleAvailable(false));
+  }, []);
 
+  // Unified file input handler used by both file picker and sample
+  const handleFileInput = useCallback(
+    async (file: File) => {
       setIsUploading(true);
 
       try {
@@ -53,6 +61,7 @@ export default function App() {
               description: validation.error,
               variant: "destructive",
             });
+            setIsUploading(false);
             return;
           }
 
@@ -132,6 +141,15 @@ export default function App() {
     [toast]
   );
 
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
+      await handleFileInput(file);
+    },
+    [handleFileInput]
+  );
+
   const {
     getRootProps,
     getInputProps,
@@ -147,117 +165,76 @@ export default function App() {
     onDragLeave: () => setIsDragActive(false),
   });
 
-  const handleSampleImage = useCallback(() => {
-    // Create a sample image for testing
-    const canvas = document.createElement("canvas");
-    canvas.width = 1920;
-    canvas.height = 1080;
-    const ctx = canvas.getContext("2d");
+  const onSampleClick = useCallback(async () => {
+    if (!sampleAvailable || sampleLoading) return;
 
-    if (ctx) {
-      // Create a gradient background
-      const gradient = ctx.createLinearGradient(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-      gradient.addColorStop(0, "#3b82f6");
-      gradient.addColorStop(1, "#1e40af");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const SAMPLE_URL = "/samples/sample.jpg";
 
-      // Add some text
-      ctx.fillStyle = "white";
-      ctx.font = "bold 48px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText("Sample Image", canvas.width / 2, canvas.height / 2);
-      ctx.font = "24px Arial";
-      ctx.fillText(
-        "1920x1080 - Perfect for thumbnails",
-        canvas.width / 2,
-        canvas.height / 2 + 60
-      );
+    try {
+      setSampleLoading(true);
+      const res = await fetch(SAMPLE_URL);
+      if (!res.ok) throw new Error("sample fetch failed");
+      const blob = await res.blob();
+      const file = new File([blob], "sample.jpg", {
+        type: blob.type || "image/jpeg",
+      });
+      await handleFileInput(file);
+    } catch {
+      // optional: toast('Sample unavailable');
+      setSampleAvailable(false);
+    } finally {
+      setSampleLoading(false);
     }
-
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const img = new Image();
-        img.onload = () => {
-          canvasActions.setImage(img);
-          toast({
-            title: "Sample image loaded",
-            description: "A sample image has been loaded for testing.",
-          });
-        };
-        img.src = URL.createObjectURL(blob);
-      }
-    }, "image/png");
-  }, [toast]);
+  }, [sampleAvailable, sampleLoading, handleFileInput]);
 
   const isActive = isDragActive || dropzoneActive;
 
   return (
     <Page>
       <Container>
-        <section className="w-full p-6 sm:p-8 rounded-2xl border flex flex-col gap-4">
-          {/* Choose file button */}
+        <section className="rounded-2xl border p-6 sm:p-8 shadow-sm">
           <Button
-            id="file-btn"
-            {...getRootProps()}
-            className="w-full"
+            id="choose"
             variant="primary"
+            className="w-full"
+            {...getRootProps()}
             disabled={isUploading}
           >
             <input {...getInputProps()} data-testid="upload-dropzone-input" />
             {isUploading ? "Uploading..." : "Choose file"}
           </Button>
-
-          {/* Dropzone */}
           <div
+            id="dropzone"
             {...getRootProps()}
-            className={`
-            h-[140px] border-2 border-dashed rounded-lg flex items-center justify-center cursor-pointer transition-colors text-sm
-            ${
+            className={`mt-4 h-36 rounded-lg border-2 border-dashed grid place-items-center text-sm text-muted-foreground cursor-pointer transition-colors ${
               isActive
                 ? "border-primary bg-primary/5"
                 : "border-muted-foreground/25 hover:border-muted-foreground/50"
-            }
-            ${isUploading ? "opacity-50 cursor-not-allowed" : ""}
-          `}
+            } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
           >
-            <div className="text-center">
-              <p className="text-muted-foreground">
-                {isActive ? "Drop to upload" : "Or drag & drop files here"}
-              </p>
-            </div>
+            {isActive ? "Drop to upload" : "Or drag & drop files here"}
           </div>
-
-          {/* Try sample image button */}
-          <Button
-            id="sample-btn"
-            variant="outline"
-            onClick={handleSampleImage}
-            className="w-full"
-            disabled={isUploading}
-          >
-            Try sample image
-          </Button>
-
-          {/* Formats line */}
-          <p className="text-xs text-muted-foreground text-center">
+          {sampleAvailable && (
+            <Button
+              id="sample"
+              variant="outline"
+              onClick={onSampleClick}
+              disabled={sampleLoading || isUploading}
+              className="mt-4 w-full"
+              data-testid="btn-sample"
+            >
+              {sampleLoading ? "Loading…" : "Try sample image"}
+            </Button>
+          )}
+          <p className="mt-4 text-center text-xs text-muted-foreground">
             PNG, JPG, WebP • MP4, WebM
           </p>
-
-          {/* Layer unreachable message - only show if FORGE_LAYER_URL is set and unreachable */}
-          {layerUnreachable && (
-            <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
-              <p className="text-sm text-orange-800 text-center">
-                Layer unreachable
-              </p>
-            </div>
-          )}
         </section>
+        {layerUnreachable && (
+          <p className="mt-2 text-xs text-muted-foreground text-center">
+            Layer unreachable
+          </p>
+        )}
       </Container>
     </Page>
   );

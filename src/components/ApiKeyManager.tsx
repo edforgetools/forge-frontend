@@ -141,7 +141,7 @@ export function ApiKeyManager({ onTierChange, className }: ApiKeyManagerProps) {
         {currentTier === "pro" && (
           <div className="rounded-md bg-green-50 p-3 text-sm text-green-800">
             <strong>Pro Features Active:</strong>
-            <ul className="mt-1 list-disc list-inside space-y-1">
+            <ul className="list-disc list-inside space-y-1">
               <li>Higher payload size limits (50MB vs 10MB)</li>
               <li>Rate limit bypass</li>
               <li>Priority processing</li>

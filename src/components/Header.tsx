@@ -2,20 +2,20 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { RateLimitDisplay } from "@/components/RateLimitDisplay";
-import { Camera, Menu } from "lucide-react";
+import { Camera } from "lucide-react";
 
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link to="/" className="flex items-center space-x-2">
+        <div className="flex items-center gap-4">
+          <Link to="/" className="flex items-center gap-2">
             <Camera className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">Snapthumb</span>
+            <span className="text-xl font-medium">Snapthumb</span>
           </Link>
         </div>
 
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className="hidden md:flex items-center gap-6">
           <Link
             to="/"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -27,6 +27,12 @@ export function Header() {
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Editor
+          </Link>
+          <Link
+            to="/docs"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Docs
           </Link>
           <Link
             to="/about"
@@ -41,14 +47,10 @@ export function Header() {
           <RateLimitDisplay />
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <ThemeToggle />
           <Button asChild>
             <Link to="/app">Get Started</Link>
-          </Button>
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-4 w-4" />
-            <span className="sr-only">Toggle menu</span>
           </Button>
         </div>
       </div>
