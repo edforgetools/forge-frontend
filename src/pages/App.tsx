@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Page } from "@/components/ui/page";
 import { Container } from "@/components/ui/container";
+import { Button } from "@/components/ui/Button";
 import { canvasActions } from "@/state/canvasStore";
 import { useToast } from "@/hooks/use-toast";
 import { validateImageFile } from "@/lib/image";
@@ -156,10 +157,26 @@ export default function App() {
 
   const isActive = isDragActive || dropzoneActive;
 
+  const handleButtonClick = () => {
+    if (!isUploading) {
+      const input = document.querySelector(
+        'input[data-testid="upload-dropzone-input"]'
+      ) as HTMLInputElement;
+      input?.click();
+    }
+  };
+
   return (
     <Page>
       <Container>
-        <section className="rounded-2xl border p-6 sm:p-8 shadow-sm">
+        <section className="w-full max-w-md rounded-2xl border p-6 sm:p-8 shadow-sm">
+          <h1 className="text-lg font-medium text-center">
+            Create a thumbnail
+          </h1>
+          <p className="mt-1 text-center text-sm text-muted-foreground">
+            Upload an image or video. We process locally.
+          </p>
+
           <div
             id="dropzone"
             {...getRootProps()}
@@ -168,27 +185,29 @@ export default function App() {
                 ? "border-primary bg-primary/5"
                 : "border-muted-foreground/25 hover:border-muted-foreground/50"
             } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
-            onClick={() => {
-              if (!isUploading) {
-                const input = document.querySelector(
-                  'input[data-testid="upload-dropzone-input"]'
-                ) as HTMLInputElement;
-                input?.click();
-              }
-            }}
           >
             <input {...getInputProps()} data-testid="upload-dropzone-input" />
             {isActive ? "Drop to upload" : "Drag & drop or click to choose"}
           </div>
-          <p className="mt-4 text-center text-xs text-muted-foreground">
+
+          <Button
+            className="w-full mt-4"
+            onClick={handleButtonClick}
+            disabled={isUploading}
+          >
+            Choose file
+          </Button>
+
+          <p className="mt-3 text-center text-xs text-muted-foreground">
             PNG, JPG, WebP • MP4, WebM
           </p>
+
+          {layerUnreachable && (
+            <p className="mt-2 text-center text-xs text-destructive">
+              Layer unreachable
+            </p>
+          )}
         </section>
-        {layerUnreachable && (
-          <p className="mt-2 text-xs text-muted-foreground text-center">
-            Layer unreachable
-          </p>
-        )}
       </Container>
     </Page>
   );
