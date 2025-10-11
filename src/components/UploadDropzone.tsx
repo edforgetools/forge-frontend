@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,15 +12,22 @@ import { VideoFrameScrubber } from "./VideoFrameScrubber";
 export function UploadDropzone() {
   const [isDragActive, setIsDragActive] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [sampleAvailable, setSampleAvailable] = useState(false);
+  const [sampleLoading, setSampleLoading] = useState(false);
   const { toast } = useToast();
   const { videoSrc } = useCanvasStore();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
-      const file = acceptedFiles[0];
-      if (!file) return;
+  // Check if sample asset is available
+  useEffect(() => {
+    const SAMPLE_URL = "/samples/sample.jpg";
+    fetch(SAMPLE_URL, { method: "HEAD" })
+      .then((r) => setSampleAvailable(r.ok))
+      .catch(() => setSampleAvailable(false));
+  }, []);
 
+  // Unified file input handler used by both file picker and sample
+  const handleFileInput = useCallback(
+    async (file: File) => {
       setIsUploading(true);
 
       try {
@@ -33,6 +40,7 @@ export function UploadDropzone() {
               description: validation.error,
               variant: "destructive",
             });
+            setIsUploading(false);
             return;
           }
 
@@ -112,6 +120,15 @@ export function UploadDropzone() {
     [toast]
   );
 
+  const onDrop = useCallback(
+    async (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
+      await handleFileInput(file);
+    },
+    [handleFileInput]
+  );
+
   const {
     getRootProps,
     getInputProps,
@@ -127,53 +144,27 @@ export function UploadDropzone() {
     onDragLeave: () => setIsDragActive(false),
   });
 
-  const handleSampleImage = useCallback(() => {
-    // Create a sample image for testing
-    const canvas = document.createElement("canvas");
-    canvas.width = 1920;
-    canvas.height = 1080;
-    const ctx = canvas.getContext("2d");
+  const onSampleClick = useCallback(async () => {
+    if (!sampleAvailable || sampleLoading) return;
 
-    if (ctx) {
-      // Create a gradient background
-      const gradient = ctx.createLinearGradient(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-      gradient.addColorStop(0, "#3b82f6");
-      gradient.addColorStop(1, "#1e40af");
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const SAMPLE_URL = "/samples/sample.jpg";
 
-      // Add some text
-      ctx.fillStyle = "white";
-      ctx.font = "bold 48px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText("Sample Image", canvas.width / 2, canvas.height / 2);
-      ctx.font = "24px Arial";
-      ctx.fillText(
-        "1920x1080 - Perfect for thumbnails",
-        canvas.width / 2,
-        canvas.height / 2 + 60
-      );
+    try {
+      setSampleLoading(true);
+      const res = await fetch(SAMPLE_URL);
+      if (!res.ok) throw new Error("sample fetch failed");
+      const blob = await res.blob();
+      const file = new File([blob], "sample.jpg", {
+        type: blob.type || "image/jpeg",
+      });
+      await handleFileInput(file);
+    } catch {
+      // optional: toast('Sample unavailable');
+      setSampleAvailable(false);
+    } finally {
+      setSampleLoading(false);
     }
-
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const img = new Image();
-        img.onload = () => {
-          canvasActions.setImage(img);
-          toast({
-            title: "Sample image loaded",
-            description: "A sample image has been loaded for testing.",
-          });
-        };
-        img.src = URL.createObjectURL(blob);
-      }
-    }, "image/png");
-  }, [toast]);
+  }, [sampleAvailable, sampleLoading, handleFileInput]);
 
   const isActive = isDragActive || dropzoneActive;
 
@@ -181,26 +172,7 @@ export function UploadDropzone() {
     <div className="space-y-4">
       <Card className="max-h-[48dvh] overflow-auto">
         <CardContent className="p-6 space-y-4">
-          {/* Primary Upload Button */}
-          <Button
-            {...getRootProps()}
-            className="w-full h-12"
-            variant="primary"
-            disabled={isUploading}
-            aria-label={
-              isUploading ? "Uploading file..." : "Choose file to upload"
-            }
-          >
-            <input
-              {...getInputProps()}
-              data-testid="upload-dropzone-input"
-              aria-label="File upload input"
-            />
-            <Upload className="w-5 h-5 mr-2" />
-            {isUploading ? "Uploading..." : "Choose File"}
-          </Button>
-
-          {/* Concise Dropzone */}
+          {/* Primary Dropzone - Clickable */}
           <div
             {...getRootProps()}
             className={`
@@ -217,17 +189,33 @@ export function UploadDropzone() {
             aria-label={
               isActive
                 ? "Drop files here to upload"
-                : "Drag and drop files here or click to upload"
+                : "Drag and drop files here or click to choose"
             }
+            onClick={() => {
+              if (!isUploading) {
+                const input = document.querySelector(
+                  'input[data-testid="upload-dropzone-input"]'
+                ) as HTMLInputElement;
+                input?.click();
+              }
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 if (!isUploading) {
-                  fileInputRef.current?.click();
+                  const input = document.querySelector(
+                    'input[data-testid="upload-dropzone-input"]'
+                  ) as HTMLInputElement;
+                  input?.click();
                 }
               }
             }}
           >
+            <input
+              {...getInputProps()}
+              data-testid="upload-dropzone-input"
+              aria-label="File upload input"
+            />
             <div className="flex flex-col items-center space-y-3">
               <Upload
                 className={`w-8 h-8 ${
@@ -236,7 +224,9 @@ export function UploadDropzone() {
               />
               <div>
                 <p className="text-sm font-medium text-gray-900">
-                  {isActive ? "Drop to upload" : "Or drag & drop"}
+                  {isActive
+                    ? "Drop to upload"
+                    : "Drag & drop files here or click to choose"}
                 </p>
                 <p className="text-xs text-gray-500">
                   Images & videos supported
@@ -262,17 +252,20 @@ export function UploadDropzone() {
             </div>
           </div>
 
-          {/* Quick Start */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSampleImage}
-            className="w-full"
-            disabled={isUploading}
-          >
-            <Zap className="w-4 h-4 mr-2" />
-            Try sample image
-          </Button>
+          {/* Sample Button */}
+          {sampleAvailable && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onSampleClick}
+              className="w-full"
+              disabled={isUploading || sampleLoading}
+              data-testid="btn-sample"
+            >
+              <Zap className="w-4 h-4 mr-2" />
+              {sampleLoading ? "Loading..." : "Try sample image"}
+            </Button>
+          )}
         </CardContent>
       </Card>
 

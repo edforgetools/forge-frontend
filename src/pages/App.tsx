@@ -201,6 +201,14 @@ export default function App() {
                 ? "border-primary bg-primary/5"
                 : "border-muted-foreground/25 hover:border-muted-foreground/50"
             } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
+            onClick={() => {
+              if (!isUploading) {
+                const input = document.querySelector(
+                  'input[data-testid="upload-dropzone-input"]'
+                ) as HTMLInputElement;
+                input?.click();
+              }
+            }}
           >
             <input {...getInputProps()} data-testid="upload-dropzone-input" />
             {isActive
@@ -208,21 +216,6 @@ export default function App() {
               : "Drag & drop files here or click to choose"}
           </div>
           <div className="mt-4 flex flex-col gap-3">
-            <Button
-              id="choose"
-              variant="primary"
-              className="w-full"
-              onClick={() =>
-                (
-                  document.querySelector(
-                    'input[data-testid="upload-dropzone-input"]'
-                  ) as HTMLInputElement
-                )?.click()
-              }
-              disabled={isUploading}
-            >
-              {isUploading ? "Uploading..." : "Choose file"}
-            </Button>
             {sampleAvailable && (
               <Button
                 id="sample"
