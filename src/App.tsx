@@ -3,6 +3,8 @@ import { Suspense, lazy } from "react";
 import { EditorSkeleton } from "./components/EditorSkeleton";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useDocumentTitle } from "./hooks/useDocumentTitle";
+import { Page } from "./components/ui/page";
+import { Container } from "./components/ui/container";
 
 // Lazy load pages for better performance
 const Landing = lazy(() => import("./pages/Landing.tsx"));
@@ -21,16 +23,14 @@ const LoadingFallback = ({
 }: {
   label?: string;
 }) => (
-  <div
-    className="h-[100dvh] bg-background flex items-center justify-center"
-    role="status"
-    aria-label={label}
-  >
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-      <p className="text-muted-foreground">Loading...</p>
-    </div>
-  </div>
+  <Page>
+    <Container>
+      <div className="text-center" role="status" aria-label={label}>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    </Container>
+  </Page>
 );
 
 export default function App() {
@@ -38,108 +38,96 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <div className="min-h-screen bg-background">
-        <main>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <Suspense fallback={<LoadingFallback />}>
-                  <Landing />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/app"
-              element={
-                <Suspense fallback={<LoadingFallback />}>
-                  <AppPage />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/editor"
-              element={
-                <Suspense fallback={<EditorSkeleton />}>
-                  <Editor />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/wire-generate-demo"
-              element={
-                <Suspense
-                  fallback={
-                    <LoadingFallback label="Loading wire generate demo" />
-                  }
-                >
-                  <WireGenerateDemo />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/terms"
-              element={
-                <Suspense
-                  fallback={<LoadingFallback label="Loading terms page" />}
-                >
-                  <Terms />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/privacy"
-              element={
-                <Suspense
-                  fallback={<LoadingFallback label="Loading privacy page" />}
-                >
-                  <Privacy />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/about"
-              element={
-                <Suspense
-                  fallback={<LoadingFallback label="Loading about page" />}
-                >
-                  <About />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/docs"
-              element={
-                <Suspense
-                  fallback={<LoadingFallback label="Loading documentation" />}
-                >
-                  <Docs />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/api"
-              element={
-                <Suspense
-                  fallback={
-                    <LoadingFallback label="Loading API documentation" />
-                  }
-                >
-                  <Api />
-                </Suspense>
-              }
-            />
-            <Route
-              path="*"
-              element={
-                <Suspense fallback={<LoadingFallback label="Loading page" />}>
-                  <NotFound />
-                </Suspense>
-              }
-            />
-          </Routes>
-        </main>
-      </div>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <Landing />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/app"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <AppPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/editor"
+          element={
+            <Suspense fallback={<EditorSkeleton />}>
+              <Editor />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/wire-generate-demo"
+          element={
+            <Suspense
+              fallback={<LoadingFallback label="Loading wire generate demo" />}
+            >
+              <WireGenerateDemo />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/terms"
+          element={
+            <Suspense fallback={<LoadingFallback label="Loading terms page" />}>
+              <Terms />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/privacy"
+          element={
+            <Suspense
+              fallback={<LoadingFallback label="Loading privacy page" />}
+            >
+              <Privacy />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <Suspense fallback={<LoadingFallback label="Loading about page" />}>
+              <About />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/docs"
+          element={
+            <Suspense
+              fallback={<LoadingFallback label="Loading documentation" />}
+            >
+              <Docs />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/api"
+          element={
+            <Suspense
+              fallback={<LoadingFallback label="Loading API documentation" />}
+            >
+              <Api />
+            </Suspense>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <Suspense fallback={<LoadingFallback label="Loading page" />}>
+              <NotFound />
+            </Suspense>
+          }
+        />
+      </Routes>
     </ErrorBoundary>
   );
 }

@@ -19,7 +19,7 @@ export default function NotFoundPage() {
   return (
     <Page>
       <Container>
-        <Card className="w-full max-w-md mx-auto text-center">
+        <Card className="text-center">
           <CardHeader>
             <div className="mx-auto mb-4 w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center">
               <Search className="w-8 h-8 text-destructive" />
