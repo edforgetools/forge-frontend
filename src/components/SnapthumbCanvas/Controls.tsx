@@ -70,9 +70,9 @@ export function Controls({ className = "" }: ControlsProps) {
               <Button
                 key={position}
                 variant={
-                  config.gridPosition === position ? "default" : "outline"
+                  config.gridPosition === position ? "primary" : "outline"
                 }
-                size="sm"
+                size="md"
                 onClick={() => updateConfig({ gridPosition: position })}
                 className="text-xs h-8"
               >
@@ -179,8 +179,8 @@ export function Controls({ className = "" }: ControlsProps) {
             {backgroundFitOptions.map(({ value, label }) => (
               <Button
                 key={value}
-                variant={config.backgroundFit === value ? "default" : "outline"}
-                size="sm"
+                variant={config.backgroundFit === value ? "primary" : "outline"}
+                size="md"
                 onClick={() => updateConfig({ backgroundFit: value })}
                 className="justify-start text-xs h-8"
               >
@@ -206,8 +206,8 @@ export function Controls({ className = "" }: ControlsProps) {
               return (
                 <Button
                   key={value}
-                  variant={config.quality === value ? "default" : "outline"}
-                  size="sm"
+                  variant={config.quality === value ? "primary" : "outline"}
+                  size="md"
                   onClick={() => updateConfig({ quality: value })}
                   className="justify-start text-xs h-8"
                 >
@@ -295,10 +295,10 @@ export function Controls({ className = "" }: ControlsProps) {
       <Card>
         <CardContent className="pt-6">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={resetConfig}
             className="w-full"
-            size="sm"
+            size="md"
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Reset to Defaults

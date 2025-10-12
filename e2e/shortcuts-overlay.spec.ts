@@ -5,7 +5,7 @@ test.describe("Shortcuts Overlay", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     // Navigate to the app page
-    await page.click("text=Start Creating");
+    await page.click("a:has-text('Launch Snapthumb')");
     // Wait for the app to load
     await page.waitForSelector('[data-testid="editor-layout"]', {
       timeout: 10000,

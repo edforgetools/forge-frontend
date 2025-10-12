@@ -153,7 +153,7 @@ export function AuthModal({
           {mode !== "forgot" && (
             <>
               <Button
-                variant="outline"
+                variant="secondary"
                 className="w-full"
                 onClick={handleGoogleSignIn}
                 disabled={loading}
@@ -271,17 +271,17 @@ export function AuthModal({
                   Don't have an account?{" "}
                 </span>
                 <Button
-                  variant="link"
+                  variant="ghost"
                   onClick={() => setMode("signup")}
-                  className="p-0 h-auto"
+                  className="p-0 h-auto text-blue-600 hover:text-blue-800"
                 >
                   Sign up
                 </Button>
                 <br />
                 <Button
-                  variant="link"
+                  variant="ghost"
                   onClick={() => setMode("forgot")}
-                  className="p-0 h-auto"
+                  className="p-0 h-auto text-blue-600 hover:text-blue-800"
                 >
                   Forgot your password?
                 </Button>
@@ -293,9 +293,9 @@ export function AuthModal({
                   Already have an account?{" "}
                 </span>
                 <Button
-                  variant="link"
+                  variant="ghost"
                   onClick={() => setMode("signin")}
-                  className="p-0 h-auto"
+                  className="p-0 h-auto text-blue-600 hover:text-blue-800"
                 >
                   Sign in
                 </Button>
@@ -307,9 +307,9 @@ export function AuthModal({
                   Remember your password?{" "}
                 </span>
                 <Button
-                  variant="link"
+                  variant="ghost"
                   onClick={() => setMode("signin")}
-                  className="p-0 h-auto"
+                  className="p-0 h-auto text-blue-600 hover:text-blue-800"
                 >
                   Sign in
                 </Button>

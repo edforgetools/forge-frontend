@@ -13,7 +13,7 @@ describe("SEO Meta Tags", () => {
       // Basic meta tags
       '<meta charset="UTF-8" />',
       'name="viewport"',
-      "<title>Snapthumb - Create Perfect 16:9 Thumbnails</title>",
+      "<title>Snapthumb - Create Thumbnails</title>",
       'name="description"',
 
       // OpenGraph tags
@@ -70,9 +70,7 @@ describe("SEO Meta Tags", () => {
       expect(structuredData["@context"]).toBe("https://schema.org");
       expect(structuredData["@type"]).toBe("SoftwareApplication");
       expect(structuredData.name).toBe("Snapthumb");
-      expect(structuredData.description).toContain(
-        "Create perfect 16:9 thumbnails"
-      );
+      expect(structuredData.description).toContain("Create thumbnails");
       expect(structuredData.url).toBe("https://snapthumb.tools/");
       expect(structuredData.applicationCategory).toBe("MultimediaApplication");
       expect(structuredData.operatingSystem).toBe("Web Browser");

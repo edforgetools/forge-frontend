@@ -128,9 +128,11 @@ test.describe("Snapthumb Overlay Regression Tests", () => {
         page,
       }) => {
         // Wait for content to load
-        await expect(page.locator("h1")).toContainText("Snapthumb");
+        await expect(page.locator("h1")).toContainText(
+          "Create Perfect Thumbnails"
+        );
         await expect(
-          page.locator('button:has-text("Start Creating")')
+          page.locator('a:has-text("Launch Snapthumb")')
         ).toBeVisible();
 
         // Assert: no element's bounding rect exceeds viewport
@@ -139,7 +141,9 @@ test.describe("Snapthumb Overlay Regression Tests", () => {
 
       test("should have proper layout at viewport size", async ({ page }) => {
         // Wait for content to load
-        await expect(page.locator("h1")).toContainText("Snapthumb");
+        await expect(page.locator("h1")).toContainText(
+          "Create Perfect Thumbnails"
+        );
 
         // Take screenshot for visual regression
         await expect(page).toHaveScreenshot(
@@ -182,7 +186,7 @@ test.describe("Snapthumb Overlay Regression Tests", () => {
         await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
         // Navigate to editor
-        await page.click('button:has-text("Start Creating")');
+        await page.click('a:has-text("Launch Snapthumb")');
         await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
       });
 
@@ -221,7 +225,7 @@ test.describe("Snapthumb Overlay Regression Tests", () => {
         await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
         // Navigate to editor
-        await page.click('button:has-text("Start Creating")');
+        await page.click('a:has-text("Launch Snapthumb")');
         await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
         // Open shortcuts overlay
@@ -282,7 +286,7 @@ test.describe("Snapthumb Overlay Regression Tests", () => {
         await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
         // Navigate to editor
-        await page.click('button:has-text("Start Creating")');
+        await page.click('a:has-text("Launch Snapthumb")');
         await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
         // Open a panel to trigger the bottom sheet
@@ -362,7 +366,7 @@ test.describe("Snapthumb Overlay Regression Tests", () => {
         await checkElementsInViewport(page);
 
         // Test Editor Idle
-        await page.click('button:has-text("Start Creating")');
+        await page.click('a:has-text("Launch Snapthumb")');
         await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
         await checkElementsInViewport(page);
 
@@ -399,7 +403,7 @@ test.describe("Snapthumb Overlay Regression Tests", () => {
       await page.setViewportSize({ width: 1366, height: 768 });
       await page.goto("/");
       await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
-      await page.click('button:has-text("Start Creating")');
+      await page.click('a:has-text("Launch Snapthumb")');
       await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
       // Open shortcuts overlay
@@ -447,7 +451,7 @@ test.describe("Snapthumb Overlay Regression Tests", () => {
           {
             name: "Editor Idle",
             action: async () => {
-              await page.click('button:has-text("Start Creating")');
+              await page.click('a:has-text("Launch Snapthumb")');
               await page.waitForLoadState("domcontentloaded", {
                 timeout: 10000,
               });

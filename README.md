@@ -10,7 +10,7 @@ A modern thumbnail creation tool built with React, TypeScript, and Canvas API. U
 
 - **Video & Image Support**: Upload MP4, WebM, JPG, PNG, WebP files
 - **Frame Extraction**: Extract frames from videos at any timestamp
-- **Smart Cropping**: Auto-crop to perfect 16:9 aspect ratio
+- **Smart Cropping**: Auto-crop to 16:9 aspect ratio
 - **Overlay System**: Add text and logo overlays with drag & drop
 - **Export Optimization**: Automatic quality adjustment to stay under 2MB
 - **Keyboard Shortcuts**: Full keyboard accessibility with shortcuts overlay

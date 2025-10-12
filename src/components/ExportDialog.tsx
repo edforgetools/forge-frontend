@@ -22,6 +22,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useTelemetry } from "@/hooks/useTelemetry";
 import { sendHeatmapData } from "@/lib/heatmap";
+import { sendLayerUIEvent } from "@/lib/telemetry-api";
 
 interface ExportDialogProps {
   children: React.ReactNode;
@@ -146,6 +147,30 @@ export function ExportDialog({
       // Track download click
       trackDownloadClick(result.format, "export-dialog", result.sizeBytes);
 
+      // Send Layer UI event for export success
+      try {
+        // Check if this is the first export
+        const isFirstExport = !localStorage.getItem(
+          "forge-first-export-completed"
+        );
+        if (isFirstExport) {
+          localStorage.setItem("forge-first-export-completed", "true");
+          await sendLayerUIEvent("first_export", {
+            format: result.format,
+            size_bytes: result.sizeBytes,
+            duration_ms: duration,
+          });
+        }
+
+        await sendLayerUIEvent("export_success", {
+          format: result.format,
+          size_bytes: result.sizeBytes,
+          duration_ms: duration,
+        });
+      } catch (error) {
+        console.debug("Failed to send Layer UI event:", error);
+      }
+
       // Show success toast with duration and size
       toast({
         title: "Export successful! 🎉",
@@ -201,7 +226,7 @@ export function ExportDialog({
                   id="auto-format"
                   checked={autoFormat}
                   onChange={(e) => setAutoFormat(e.target.checked)}
-                  className="rounded border-gray-300 focus:ring-2 focus:ring-blue-500"
+                  className="rounded border-neutral-200 focus:ring-2 focus:ring-blue-500"
                   aria-label="Enable automatic format selection"
                 />
                 <Label htmlFor="auto-format" className="text-xs text-gray-600">
@@ -211,8 +236,8 @@ export function ExportDialog({
             </div>
             <div className="grid grid-cols-2 gap-2">
               <Button
-                variant={autoFormat ? "default" : "outline"}
-                size="sm"
+                variant={autoFormat ? "primary" : "outline"}
+                size="md"
                 onClick={() => setAutoFormat(true)}
                 className="justify-start"
               >
@@ -221,9 +246,9 @@ export function ExportDialog({
               </Button>
               <Button
                 variant={
-                  !autoFormat && prefs.format === "jpeg" ? "default" : "outline"
+                  !autoFormat && prefs.format === "jpeg" ? "primary" : "outline"
                 }
-                size="sm"
+                size="md"
                 onClick={() => {
                   setAutoFormat(false);
                   handlePrefsChange({ format: "jpeg" });
@@ -234,9 +259,9 @@ export function ExportDialog({
               </Button>
               <Button
                 variant={
-                  !autoFormat && prefs.format === "png" ? "default" : "outline"
+                  !autoFormat && prefs.format === "png" ? "primary" : "outline"
                 }
-                size="sm"
+                size="md"
                 onClick={() => {
                   setAutoFormat(false);
                   handlePrefsChange({ format: "png" });
@@ -247,9 +272,9 @@ export function ExportDialog({
               </Button>
               <Button
                 variant={
-                  !autoFormat && prefs.format === "webp" ? "default" : "outline"
+                  !autoFormat && prefs.format === "webp" ? "primary" : "outline"
                 }
-                size="sm"
+                size="md"
                 onClick={() => {
                   setAutoFormat(false);
                   handlePrefsChange({ format: "webp" });

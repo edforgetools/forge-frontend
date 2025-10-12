@@ -3,10 +3,6 @@ import { test, expect } from "@playwright/test";
 test.describe("Wire Generate Comprehensive E2E Tests", () => {
   // Test configurations
   const viewport = { width: 1440, height: 900 };
-  const testImageUrl =
-    "https://via.placeholder.com/1920x1080/4F46E5/FFFFFF?text=Test+Background";
-  const testOverlayUrl =
-    "https://via.placeholder.com/400x300/EF4444/FFFFFF?text=Overlay";
 
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize(viewport);
@@ -14,7 +10,7 @@ test.describe("Wire Generate Comprehensive E2E Tests", () => {
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Navigate to editor
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Wait for editor to be ready - just wait for the page to load

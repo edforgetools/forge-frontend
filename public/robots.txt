@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://snapthumb.tools/sitemap.xml
+Sitemap: https://forge-frontend.vercel.app/sitemap.xml
 
 # Crawl-delay
 Crawl-delay: 1

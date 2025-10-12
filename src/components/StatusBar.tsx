@@ -70,7 +70,7 @@ export function StatusBar({ className = "" }: StatusBarProps) {
 
   return (
     <div
-      className={`absolute bottom-0 right-0 left-0 h-12 bg-white/95 backdrop-blur-sm border-t border-gray-200 px-4 flex items-center justify-between text-sm text-gray-600 whitespace-nowrap z-10 ${className}`}
+      className={`absolute bottom-0 right-0 left-0 h-12 bg-white/95 backdrop-blur-sm border-t border-neutral-200 px-4 flex items-center justify-between text-sm text-gray-600 whitespace-nowrap z-10 ${className}`}
     >
       {/* Left side - Rate limit for mobile */}
       <div className="lg:hidden">

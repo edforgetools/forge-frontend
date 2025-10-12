@@ -132,7 +132,7 @@ export function ShortcutsSheet({ isOpen, onClose }: ShortcutsSheetProps) {
         />
         <DialogContent
           ref={dialogRef}
-          className="max-w-3xl max-h-[85vh] overflow-y-auto bg-slate-50/95 backdrop-blur-sm border-slate-200 fixed left-[50%] top-[50%] z-dialog translate-x-[-50%] translate-y-[-50%] pointer-events-auto"
+          className="max-w-3xl max-h-[85vh] overflow-y-auto bg-slate-50/95 backdrop-blur-sm border-neutral-200 fixed left-[50%] top-[50%] z-dialog translate-x-[-50%] translate-y-[-50%] pointer-events-auto"
           onPointerDownOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
           role="dialog"
@@ -148,7 +148,7 @@ export function ShortcutsSheet({ isOpen, onClose }: ShortcutsSheetProps) {
               Keyboard Shortcuts
               <Button
                 variant="ghost"
-                size="sm"
+                size="md"
                 onClick={onClose}
                 className="ml-auto h-8 w-8 p-0 hover:bg-slate-200"
               >
@@ -160,14 +160,14 @@ export function ShortcutsSheet({ isOpen, onClose }: ShortcutsSheetProps) {
           <div className="space-y-8">
             {shortcuts.map((category) => (
               <div key={category.category} className="space-y-4">
-                <h3 className="text-lg font-semibold text-slate-700 border-b border-slate-200 pb-2">
+                <h3 className="text-lg font-semibold text-slate-700 border-b border-neutral-200 pb-2">
                   {category.category}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {category.items.map((item, index) => (
                     <div
                       key={index}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-slate-200/50 hover:bg-white/90 transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-neutral-200/50 hover:bg-white/90 transition-colors"
                     >
                       <div className="flex-1 mb-2 sm:mb-0 sm:mr-4">
                         <span className="text-sm font-medium text-slate-700 break-words">
@@ -175,7 +175,7 @@ export function ShortcutsSheet({ isOpen, onClose }: ShortcutsSheetProps) {
                         </span>
                       </div>
                       <div className="flex-shrink-0">
-                        <kbd className="inline-flex items-center px-2.5 py-1.5 text-xs font-mono font-semibold bg-slate-100 border border-slate-300 rounded-full shadow-sm text-slate-700 whitespace-nowrap">
+                        <kbd className="inline-flex items-center px-2.5 py-1.5 text-xs font-mono font-semibold bg-slate-100 border border-neutral-200 rounded-full shadow-sm text-slate-700 whitespace-nowrap">
                           {item.key}
                         </kbd>
                       </div>
@@ -186,7 +186,7 @@ export function ShortcutsSheet({ isOpen, onClose }: ShortcutsSheetProps) {
             ))}
           </div>
 
-          <div className="mt-8 pt-6 border-t border-slate-200">
+          <div className="mt-8 pt-6 border-t border-neutral-200">
             <div className="bg-slate-100/50 rounded-lg p-4">
               <div className="text-sm text-slate-600">
                 <p className="font-semibold mb-3 text-slate-700">💡 Tips</p>
@@ -211,7 +211,7 @@ export function ShortcutsSheet({ isOpen, onClose }: ShortcutsSheetProps) {
                     <span className="text-slate-400 mt-0.5">•</span>
                     <span>
                       Press{" "}
-                      <kbd className="px-1.5 py-0.5 text-xs font-mono bg-white border border-slate-300 rounded text-slate-600">
+                      <kbd className="px-1.5 py-0.5 text-xs font-mono bg-white border border-neutral-200 rounded text-slate-600">
                         ?
                       </kbd>{" "}
                       anytime to show this help

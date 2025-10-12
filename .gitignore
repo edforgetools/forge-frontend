@@ -18,6 +18,7 @@ build/
 .temp/
 .tmp/
 .vercel/
+.turbo/
 
 # Screenshots and test artifacts
 screenshots/
@@ -55,6 +56,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+dev.log
+
+# Debug artifacts
+debug-*.png
 
 # Runtime data
 pids
@@ -122,6 +127,8 @@ playwright-report/
 
 # Lighthouse
 lighthouse-results/
+lighthouse-reports/
+lighthouse-report.json
 
 # Bundle analyzer
 bundle-analysis.html

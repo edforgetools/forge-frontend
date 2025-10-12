@@ -1,7 +1,7 @@
 import { useRateLimitStore } from "@/state/rateLimitStore";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/badge";
-import { UpgradeModal } from "@/components/UpgradeModal";
+import { LazyUpgradeModal } from "@/components/LazyUpgradeModal";
 import { X, Zap, Crown } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -107,17 +107,17 @@ export function RateLimitDisplay({
           </div>
 
           <div className="flex items-center gap-1">
-            <UpgradeModal>
+            <LazyUpgradeModal>
               <Button
-                size="sm"
+                size="md"
                 className="bg-amber-600 hover:bg-amber-700 text-white h-7 px-3 text-xs"
               >
                 Upgrade
               </Button>
-            </UpgradeModal>
+            </LazyUpgradeModal>
 
             <Button
-              size="sm"
+              size="md"
               variant="ghost"
               className="h-7 w-7 p-0 text-amber-600 hover:text-amber-700"
               onClick={dismissUpgradeCTA}

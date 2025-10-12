@@ -7,7 +7,7 @@ test.describe("Wire Generate Basic E2E Tests", () => {
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Navigate to editor
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Wait for editor to load

@@ -1,7 +1,6 @@
-import { useCallback, useState, useEffect } from "react";
-import { useDropzone } from "react-dropzone";
-import { Page } from "@/components/ui/page";
-import { Container } from "@/components/ui/container";
+import { useCallback, useState, useEffect, useRef } from "react";
+import { Layout } from "@/components/Layout";
+import Container from "@/components/layout/Container";
 import { Card } from "@/components/ui/card";
 import { canvasActions } from "@/state/canvasStore";
 import { useInlineToast, InlineToast } from "@/components/ui/inline-toast";
@@ -10,10 +9,9 @@ import { validateVideoFile } from "@/lib/video";
 import { healthCheck } from "@/lib/api";
 
 export default function App() {
-  const [isDragActive, setIsDragActive] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [layerUnreachable, setLayerUnreachable] = useState(false);
   const { toasts, addToast } = useInlineToast();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Check Forge Layer connection status
   useEffect(() => {
@@ -37,9 +35,10 @@ export default function App() {
   }, []);
 
   // Unified file input handler
-  const handleFileInput = useCallback(
-    async (file: File) => {
-      setIsUploading(true);
+  const onSelectFile = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
 
       try {
         if (file.type.startsWith("image/")) {
@@ -51,7 +50,6 @@ export default function App() {
               description: validation.error,
               variant: "destructive",
             });
-            setIsUploading(false);
             return;
           }
 
@@ -63,9 +61,8 @@ export default function App() {
               addToast({
                 title: "Image loaded",
                 description: "Your image has been loaded successfully.",
-                variant: "success",
+                variant: "default",
               });
-              setIsUploading(false);
             };
             img.onerror = () => {
               addToast({
@@ -73,7 +70,6 @@ export default function App() {
                 description: "The image file appears to be corrupted.",
                 variant: "destructive",
               });
-              setIsUploading(false);
             };
             img.src = e.target?.result as string;
           };
@@ -87,7 +83,6 @@ export default function App() {
               description: validation.error,
               variant: "destructive",
             });
-            setIsUploading(false);
             return;
           }
 
@@ -99,9 +94,8 @@ export default function App() {
               title: "Video loaded",
               description:
                 "Your video has been loaded successfully. Use the scrubber below to extract frames.",
-              variant: "success",
+              variant: "default",
             });
-            setIsUploading(false);
           };
           reader.onerror = () => {
             addToast({
@@ -109,7 +103,6 @@ export default function App() {
               description: "The video file appears to be corrupted.",
               variant: "destructive",
             });
-            setIsUploading(false);
           };
           reader.readAsDataURL(file);
         } else {
@@ -118,7 +111,6 @@ export default function App() {
             description: "Please upload an image or video file.",
             variant: "destructive",
           });
-          setIsUploading(false);
         }
       } catch (error) {
         console.error("Upload error:", error);
@@ -127,82 +119,101 @@ export default function App() {
           description: "An error occurred while processing the file.",
           variant: "destructive",
         });
-        setIsUploading(false);
       }
     },
     [addToast]
   );
 
-  const onDrop = useCallback(
-    async (acceptedFiles: File[]) => {
-      const file = acceptedFiles[0];
-      if (!file) return;
-      await handleFileInput(file);
-    },
-    [handleFileInput]
-  );
-
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive: dropzoneActive,
-  } = useDropzone({
-    onDrop,
-    accept: {
-      "image/*": [".png", ".jpg", ".jpeg", ".webp"],
-      "video/*": [".mp4", ".webm"],
-    },
-    multiple: false,
-    onDragEnter: () => setIsDragActive(true),
-    onDragLeave: () => setIsDragActive(false),
-  });
-
-  const isActive = isDragActive || dropzoneActive;
-
   return (
-    <Page>
+    <Layout>
       <Container>
-        <Card className="w-full max-w-md">
-          <h1 className="text-lg font-medium text-center">
-            Create a thumbnail
-          </h1>
-          <p className="mt-1 text-center text-sm text-neutral-600">
-            Upload an image or video. Processing happens locally.
-          </p>
-
-          <div className="mt-6">
-            <div
-              id="dropzone"
-              {...getRootProps()}
-              className={`h-40 rounded border-2 border-dashed grid place-items-center text-sm text-neutral-600 cursor-pointer transition-colors ${
-                isActive
-                  ? "border-primary bg-primary/5"
-                  : "border-neutral-300 hover:border-neutral-400"
-              } ${isUploading ? "opacity-50 cursor-not-allowed" : ""}`}
-            >
-              <input {...getInputProps()} data-testid="upload-dropzone-input" />
-              {isActive ? "Drop to upload" : "Drag & drop or click to choose"}
-            </div>
-          </div>
-
-          <p className="mt-3 text-center text-xs text-neutral-500">
-            PNG, JPG, WebP • MP4, WebM
-          </p>
-
-          {layerUnreachable && (
-            <p className="mt-2 text-center text-xs text-red-600">
-              Layer unreachable
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight mb-2">
+              Create a thumbnail
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Upload a file, position your overlay, export.
             </p>
-          )}
-
-          {/* Render inline toasts */}
-          <div className="mt-4 space-y-2">
-            {toasts.map((toast) => (
-              <InlineToast key={toast.id} {...toast} />
-            ))}
           </div>
-        </Card>
+
+          <Card className="space-y-6">
+            <div>
+              <h2 className="font-medium mb-3">Upload your media</h2>
+
+              {/* Dropzone */}
+              <div
+                role="button"
+                aria-label="Upload file"
+                tabIndex={0}
+                onClick={() => inputRef.current?.click()}
+                onKeyDown={(e) =>
+                  (e.key === "Enter" || e.key === " ") &&
+                  inputRef.current?.click()
+                }
+                className="h-44 rounded-2xl border-2 border-dashed border-neutral-300 bg-muted/30 grid place-items-center cursor-pointer transition hover:border-forge hover:bg-forge/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <div className="text-center">
+                  <div className="font-medium">Upload image or video</div>
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    Drag & drop or click to upload
+                  </div>
+                </div>
+              </div>
+              <input
+                ref={inputRef}
+                type="file"
+                accept="image/*,video/*"
+                hidden
+                onChange={onSelectFile}
+              />
+
+              <p className="mt-3 text-xs text-muted-foreground">
+                PNG, JPG, WebP • MP4, WebM • Max 50MB
+              </p>
+            </div>
+
+            {/* Next Steps */}
+            <div className="space-y-3">
+              <h3 className="font-medium text-sm">Next steps:</h3>
+              <div className="flex items-center space-x-3 text-xs text-muted-foreground">
+                <div className="flex items-center space-x-2">
+                  <div className="w-5 h-5 bg-forge/10 rounded-full flex items-center justify-center">
+                    <span className="text-forge text-xs">1</span>
+                  </div>
+                  <span>Choose frame</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-5 h-5 bg-forge/10 rounded-full flex items-center justify-center">
+                    <span className="text-forge text-xs">2</span>
+                  </div>
+                  <span>Add logo</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-5 h-5 bg-forge/10 rounded-full flex items-center justify-center">
+                    <span className="text-forge text-xs">3</span>
+                  </div>
+                  <span>Export &lt;2MB</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Optional inline health message */}
+            {layerUnreachable && (
+              <p className="text-xs text-red-600">
+                Layer unreachable. You can still export locally.
+              </p>
+            )}
+
+            {/* Render inline toasts */}
+            <div className="space-y-2">
+              {toasts.map((toast) => (
+                <InlineToast key={toast.id} {...toast} />
+              ))}
+            </div>
+          </Card>
+        </div>
       </Container>
-    </Page>
+    </Layout>
   );
 }

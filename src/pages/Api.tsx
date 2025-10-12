@@ -1,46 +1,19 @@
 import { Button } from "@/components/ui/Button";
-import { Container } from "@/components/ui/container";
+import { Layout } from "@/components/Layout";
+import Container from "@/components/layout/Container";
 import { Card } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useEffect } from "react";
 
-const BASE = import.meta.env.VITE_LAYER_BASE_URL || "http://localhost:3000";
+const BASE =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_LAYER_BASE_URL ||
+  "http://localhost:3000";
 
 export default function ApiPage() {
-  const [activeTab, setActiveTab] = useState<"curl" | "node" | "python">(
-    "curl"
-  );
-  const [copiedStates, setCopiedStates] = useState<Record<string, boolean>>({});
-
   useEffect(() => {
     document.title = "API • Forge";
   }, []);
-
-  const copyToClipboard = async (text: string, key: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedStates((prev) => ({ ...prev, [key]: true }));
-      setTimeout(() => {
-        setCopiedStates((prev) => ({ ...prev, [key]: false }));
-      }, 2000);
-    } catch (err) {
-      console.error("Failed to copy: ", err);
-    }
-  };
-
-  const CopyButton = ({ text, copyKey }: { text: string; copyKey: string }) => (
-    <div className="flex flex-col items-end">
-      <Button
-        variant="outline"
-        onClick={() => copyToClipboard(text, copyKey)}
-        className="ml-auto"
-      >
-        Copy
-      </Button>
-      {copiedStates[copyKey] && (
-        <span className="text-xs text-muted-foreground mt-1">Copied</span>
-      )}
-    </div>
-  );
 
   const curlExample = `curl -X POST ${BASE}/api/thumb \\
   -H "Content-Type: application/json" \\
@@ -79,174 +52,160 @@ response = requests.post('${BASE}/api/thumb', json={
 result = response.json()
 print(result['url'])`;
 
-  const getCurrentExample = () => {
-    switch (activeTab) {
-      case "curl":
-        return curlExample;
-      case "node":
-        return nodeExample;
-      case "python":
-        return pythonExample;
-      default:
-        return curlExample;
-    }
-  };
-
   return (
-    <Container className="max-w-[720px]">
-      <h1 className="text-center text-2xl font-bold mb-2">API Documentation</h1>
-      <p className="text-center text-muted-foreground mb-8">
-        Generate thumbnails using Forge Layer.
-      </p>
-
-      <Card className="space-y-6">
-        <div>
-          <h2 className="text-lg font-semibold mb-3">REST endpoint</h2>
-          <div className="bg-muted p-3 rounded border">
-            <code className="text-sm font-mono">POST {BASE}/api/thumb</code>
+    <Layout>
+      <Container>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight mb-2">
+              API Documentation
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Generate thumbnails using Forge Layer.
+            </p>
           </div>
-        </div>
 
-        <div>
-          <h2 className="text-lg font-semibold mb-3">Parameters</h2>
-          <dl className="space-y-3">
-            <div>
-              <dt className="font-medium text-sm">
-                <code className="bg-muted px-2 py-1 rounded text-xs">
-                  source
+          {/* Sticky Endpoint Card */}
+          <Card className="sticky top-20 z-40">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-semibold mb-1">REST endpoint</h2>
+                <code className="text-sm text-muted-foreground font-mono">
+                  POST {`${BASE}/api/thumb`}
                 </code>
-                <span className="text-muted-foreground ml-2">(required)</span>
-              </dt>
-              <dd className="text-sm text-muted-foreground ml-0 mt-1">
-                URL to video or image file
-              </dd>
-            </div>
-            <div>
-              <dt className="font-medium text-sm">
-                <code className="bg-muted px-2 py-1 rounded text-xs">
-                  timestamp
-                </code>
-                <span className="text-muted-foreground ml-2">(optional)</span>
-              </dt>
-              <dd className="text-sm text-muted-foreground ml-0 mt-1">
-                Time in seconds for video frames
-              </dd>
-            </div>
-            <div>
-              <dt className="font-medium text-sm">
-                <code className="bg-muted px-2 py-1 rounded text-xs">
-                  width
-                </code>
-                <span className="text-muted-foreground ml-2">(optional)</span>
-              </dt>
-              <dd className="text-sm text-muted-foreground ml-0 mt-1">
-                Output width in pixels
-              </dd>
-            </div>
-            <div>
-              <dt className="font-medium text-sm">
-                <code className="bg-muted px-2 py-1 rounded text-xs">
-                  height
-                </code>
-                <span className="text-muted-foreground ml-2">(optional)</span>
-              </dt>
-              <dd className="text-sm text-muted-foreground ml-0 mt-1">
-                Output height in pixels
-              </dd>
-            </div>
-          </dl>
-        </div>
-
-        <div>
-          <h2 className="text-lg font-semibold mb-3">Examples</h2>
-          <div className="border rounded-lg overflow-hidden">
-            <div className="flex border-b bg-muted/50">
+              </div>
               <Button
-                variant={activeTab === "curl" ? "primary" : "outline"}
+                variant="secondary"
                 size="sm"
-                onClick={() => setActiveTab("curl")}
-                className={`px-4 py-2 text-sm font-medium transition-colors rounded-none border-r-0 ${
-                  activeTab === "curl"
-                    ? "bg-background text-foreground border-b-2 border-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                onClick={() =>
+                  navigator.clipboard.writeText(`${BASE}/api/thumb`)
+                }
               >
-                cURL
-              </Button>
-              <Button
-                variant={activeTab === "node" ? "primary" : "outline"}
-                size="sm"
-                onClick={() => setActiveTab("node")}
-                className={`px-4 py-2 text-sm font-medium transition-colors rounded-none border-r-0 ${
-                  activeTab === "node"
-                    ? "bg-background text-foreground border-b-2 border-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Node.js
-              </Button>
-              <Button
-                variant={activeTab === "python" ? "primary" : "outline"}
-                size="sm"
-                onClick={() => setActiveTab("python")}
-                className={`px-4 py-2 text-sm font-medium transition-colors rounded-none ${
-                  activeTab === "python"
-                    ? "bg-background text-foreground border-b-2 border-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Python
+                Copy
               </Button>
             </div>
-            <div className="relative">
-              <pre className="rounded border p-3 overflow-auto max-h-80">
-                <code>{getCurrentExample()}</code>
-              </pre>
-              <CopyButton
-                text={getCurrentExample()}
-                copyKey={`example-${activeTab}`}
-              />
-            </div>
-          </div>
-        </div>
+          </Card>
 
-        <div>
-          <h2 className="text-lg font-semibold mb-3">Response</h2>
-          <div className="relative">
-            <pre className="rounded border p-3 overflow-auto max-h-80 bg-muted">
-              <code>{`{
-  "success": true,
-  "url": "${BASE}/thumb/abc123.jpg",
-  "width": 1280,
-  "height": 720,
-  "size": 245760
-}`}</code>
-            </pre>
-            <CopyButton
-              text={`{
-  "success": true,
-  "url": "${BASE}/thumb/abc123.jpg",
-  "width": 1280,
-  "height": 720,
-  "size": 245760
-}`}
-              copyKey="response"
-            />
-          </div>
-        </div>
+          <Card className="space-y-6">
+            <section>
+              <h2 className="font-semibold mb-3">Parameters</h2>
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                <div>
+                  <dt className="font-medium">
+                    source <span className="text-red-600">(required)</span>
+                  </dt>
+                  <dd className="text-muted-foreground">URL to image/video</dd>
+                </div>
+                <div>
+                  <dt className="font-medium">timestamp</dt>
+                  <dd className="text-muted-foreground">
+                    Seconds from start (video)
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-medium">width</dt>
+                  <dd className="text-muted-foreground">Output width (px)</dd>
+                </div>
+                <div>
+                  <dt className="font-medium">height</dt>
+                  <dd className="text-muted-foreground">Output height (px)</dd>
+                </div>
+              </dl>
+            </section>
 
-        <div>
-          <h2 className="text-lg font-semibold mb-3">Rate limits</h2>
-          <ul className="space-y-2 text-sm">
-            <li>Free: 10/day</li>
-            <li>Pro: unlimited* if key</li>
-            <li>Reset: daily UTC</li>
-          </ul>
-          <p className="text-xs text-muted-foreground mt-2">
-            *subject to fair use
-          </p>
+            <section>
+              <h2 className="font-semibold mb-3">Examples</h2>
+              <Tabs defaultValue="curl" className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="curl">cURL</TabsTrigger>
+                  <TabsTrigger value="node">Node.js</TabsTrigger>
+                  <TabsTrigger value="python">Python</TabsTrigger>
+                </TabsList>
+                <TabsContent value="curl" className="mt-4">
+                  <div className="relative">
+                    <div className="bg-muted/50 rounded-lg p-4 overflow-x-auto">
+                      <pre className="text-sm font-mono whitespace-pre">
+                        {curlExample}
+                      </pre>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={() => navigator.clipboard.writeText(curlExample)}
+                    >
+                      Copy
+                    </Button>
+                  </div>
+                </TabsContent>
+                <TabsContent value="node" className="mt-4">
+                  <div className="relative">
+                    <div className="bg-muted/50 rounded-lg p-4 overflow-x-auto">
+                      <pre className="text-sm font-mono whitespace-pre">
+                        {nodeExample}
+                      </pre>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={() => navigator.clipboard.writeText(nodeExample)}
+                    >
+                      Copy
+                    </Button>
+                  </div>
+                </TabsContent>
+                <TabsContent value="python" className="mt-4">
+                  <div className="relative">
+                    <div className="bg-muted/50 rounded-lg p-4 overflow-x-auto">
+                      <pre className="text-sm font-mono whitespace-pre">
+                        {pythonExample}
+                      </pre>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={() =>
+                        navigator.clipboard.writeText(pythonExample)
+                      }
+                    >
+                      Copy
+                    </Button>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </section>
+
+            <section>
+              <h2 className="font-semibold mb-3">Response</h2>
+              <div className="code bg-muted/50">
+                <pre className="whitespace-pre">
+                  {`{ "success": true, "url": "https://…/thumb/abc123.jpg", "width": 1280, "height": 720, "size": 245760 }`}
+                </pre>
+              </div>
+            </section>
+
+            <section>
+              <h2 className="font-semibold mb-3">Rate limits</h2>
+              <ul className="lists text-sm text-muted-foreground">
+                <li>Free: 10 generations/day</li>
+                <li>Pro: key-enabled, fair use</li>
+                <li>Reset: daily at 00:00 UTC</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="font-semibold mb-3">Privacy</h2>
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                UI processing is local. API calls send only your provided source
+                URL and transform options to the Forge Layer service; no uploads
+                are stored.
+              </p>
+            </section>
+          </Card>
         </div>
-      </Card>
-    </Container>
+      </Container>
+    </Layout>
   );
 }

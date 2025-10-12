@@ -145,8 +145,8 @@ export function ProjectManager({
         <h3 className="text-lg font-semibold">My Projects</h3>
         <div className="flex gap-2">
           <Button
-            variant="outline"
-            size="sm"
+            variant="secondary"
+            size="md"
             onClick={() => setLoadDialogOpen(true)}
             disabled={projects.length === 0}
           >
@@ -154,7 +154,7 @@ export function ProjectManager({
             Load
           </Button>
           <Button
-            size="sm"
+            size="md"
             onClick={() => setSaveDialogOpen(true)}
             disabled={!onSaveProject}
           >
@@ -197,7 +197,7 @@ export function ProjectManager({
                   <div className="flex gap-1">
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="md"
                       className="h-8 w-8 p-0"
                       onClick={() => handleLoadProject(project.id)}
                       aria-label="Load project"
@@ -206,7 +206,7 @@ export function ProjectManager({
                     </Button>
                     <Button
                       variant="ghost"
-                      size="sm"
+                      size="md"
                       className="h-8 w-8 p-0"
                       onClick={() => handleDeleteProject(project.id)}
                       aria-label="Delete project"
@@ -273,7 +273,7 @@ export function ProjectManager({
             )}
             <div className="flex justify-end gap-2">
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={() => setSaveDialogOpen(false)}
                 disabled={saving}
               >

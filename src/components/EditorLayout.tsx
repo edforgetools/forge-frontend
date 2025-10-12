@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, HelpCircle, Upload, Camera } from "lucide-react";
 import { UploadDropzone } from "./UploadDropzone";
-import { CanvasStage } from "./CanvasStage";
+import { UnifiedCanvas } from "./UnifiedCanvas";
 import { StickyFooter } from "./StickyFooter";
 import { ShortcutsSheet } from "./ShortcutsSheet";
 import { UserProfile } from "./UserProfile";
@@ -124,7 +124,7 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
-                size="sm"
+                size="md"
                 onClick={onBack}
                 className="text-text-secondary hover:text-text-primary"
                 aria-label="Go back to previous page"
@@ -135,14 +135,14 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
               <div className="flex items-center gap-2">
                 <Camera className="w-5 h-5 text-text-primary" />
                 <h1 className="text-lg font-medium text-text-primary">
-                  Snapthumb
+                  Create a thumbnail
                 </h1>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
-                size="sm"
+                size="md"
                 onClick={() => modalActions.openShortcuts()}
                 className="text-text-secondary hover:text-text-primary"
                 aria-label="Show keyboard shortcuts"
@@ -177,7 +177,7 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
                         Upload your media
                       </h2>
                       <p className="text-sm text-text-secondary">
-                        Drag and drop images or videos to create thumbnails
+                        Upload an image or video. Processing happens locally.
                       </p>
                     </div>
                     <UploadDropzone />
@@ -200,7 +200,7 @@ export function EditorLayout({ onBack }: EditorLayoutProps) {
                       minHeight: "400px",
                     }}
                   >
-                    <CanvasStage onDragStateChange={setIsDragging} />
+                    <UnifiedCanvas onDragStateChange={setIsDragging} />
                   </div>
                 </div>
               </div>

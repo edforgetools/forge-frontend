@@ -25,7 +25,7 @@ export function UserProfile({ onSignInClick }: UserProfileProps) {
 
   if (!isAuthenticated || !user) {
     return (
-      <Button variant="outline" onClick={onSignInClick}>
+      <Button variant="secondary" onClick={onSignInClick}>
         <User className="w-[18px] h-[18px] mr-2" />
         Sign In
       </Button>
@@ -62,7 +62,7 @@ export function UserProfile({ onSignInClick }: UserProfileProps) {
       </div>
       <Button
         variant="ghost"
-        size="sm"
+        size="md"
         onClick={handleSignOut}
         disabled={loading}
         aria-label={loading ? "Signing out..." : "Sign out"}

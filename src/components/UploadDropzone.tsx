@@ -176,11 +176,11 @@ export function UploadDropzone() {
           <div
             {...getRootProps()}
             className={`
-              relative border border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors
+              relative border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-colors mt-6 bg-muted/30
               ${
                 isActive
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-300 hover:border-gray-400"
+                  ? "border-forge bg-forge/5"
+                  : "border-neutral-300 hover:border-forge hover:bg-forge/5"
               }
               ${isUploading ? "opacity-50 cursor-not-allowed" : ""}
             `}
@@ -219,16 +219,16 @@ export function UploadDropzone() {
             <div className="flex flex-col items-center space-y-3">
               <Upload
                 className={`w-8 h-8 ${
-                  isActive ? "text-blue-600" : "text-gray-600"
+                  isActive ? "text-forge" : "text-muted-foreground"
                 }`}
               />
               <div>
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-foreground">
                   {isActive
                     ? "Drop to upload"
                     : "Drag & drop or click to choose"}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Images & videos supported
                 </p>
               </div>
@@ -248,8 +248,8 @@ export function UploadDropzone() {
           {/* Sample Button */}
           {sampleAvailable && (
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={onSampleClick}
               className="w-full"
               disabled={isUploading || sampleLoading}

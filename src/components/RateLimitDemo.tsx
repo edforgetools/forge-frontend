@@ -34,28 +34,28 @@ export function RateLimitDemo() {
         {/* Test buttons */}
         <div className="grid grid-cols-2 gap-2">
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => rateLimitTestScenarios.normal()}
             className="text-xs"
           >
             Normal (8/10)
           </Button>
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => rateLimitTestScenarios.low()}
             className="text-xs"
           >
             Low (2/10)
           </Button>
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => rateLimitTestScenarios.zero()}
             className="text-xs"
           >
             Zero (0/10)
           </Button>
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => rateLimitTestScenarios.resetSoon()}
             className="text-xs"
           >

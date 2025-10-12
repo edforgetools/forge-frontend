@@ -77,7 +77,7 @@ export function CanvasToolbar() {
 
   return (
     <div
-      className="z-20 sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 md:px-6 py-2 md:py-3"
+      className="z-20 sticky top-0 bg-white/95 backdrop-blur-sm border-b border-neutral-200 px-4 md:px-6 py-2 md:py-3"
       data-testid="canvas-z-20"
     >
       <div className="max-w-7xl mx-auto">
@@ -93,8 +93,8 @@ export function CanvasToolbar() {
               {aspectRatioOptions.map((option) => (
                 <Button
                   key={option.value}
-                  variant={aspect === option.value ? "default" : "outline"}
-                  size="sm"
+                  variant={aspect === option.value ? "primary" : "outline"}
+                  size="md"
                   onClick={() => handleAspectRatioChange(option.value)}
                   className="h-8 px-2 text-xs"
                   data-testid={`ratio-${option.value}`}
@@ -110,8 +110,8 @@ export function CanvasToolbar() {
           {/* Center - Toggle buttons */}
           <div className="flex items-center space-x-2">
             <Button
-              variant={showGrid ? "default" : "outline"}
-              size="sm"
+              variant={showGrid ? "primary" : "outline"}
+              size="md"
               onClick={handleToggleGrid}
               className="h-8 px-3"
               data-testid="grid-toggle"
@@ -123,8 +123,8 @@ export function CanvasToolbar() {
               Grid
             </Button>
             <Button
-              variant={showSafeZone ? "default" : "outline"}
-              size="sm"
+              variant={showSafeZone ? "primary" : "outline"}
+              size="md"
               onClick={handleToggleSafeZone}
               className="h-8 px-3"
               data-testid="safe-zone-toggle"
@@ -144,8 +144,8 @@ export function CanvasToolbar() {
               {zoomPresets.map((preset) => (
                 <Button
                   key={preset}
-                  variant={zoom === preset ? "default" : "outline"}
-                  size="sm"
+                  variant={zoom === preset ? "primary" : "outline"}
+                  size="md"
                   onClick={() => setZoomPreset(preset)}
                   className="h-8 px-2 text-xs"
                   data-testid={`zoom-preset-${preset}`}
@@ -159,8 +159,8 @@ export function CanvasToolbar() {
 
             <div className="flex items-center space-x-2">
               <Button
-                variant="outline"
-                size="sm"
+                variant="secondary"
+                size="md"
                 onClick={handleZoomOut}
                 className="h-8 w-8 p-0"
                 data-testid="zoom-out"
@@ -182,8 +182,8 @@ export function CanvasToolbar() {
                 />
               </div>
               <Button
-                variant="outline"
-                size="sm"
+                variant="secondary"
+                size="md"
                 onClick={handleZoomIn}
                 className="h-8 w-8 p-0"
                 data-testid="zoom-in"
@@ -193,8 +193,8 @@ export function CanvasToolbar() {
                 <ZoomIn className="w-[18px] h-[18px]" />
               </Button>
               <Button
-                variant="outline"
-                size="sm"
+                variant="secondary"
+                size="md"
                 onClick={handleResetView}
                 className="h-8 px-2"
                 data-testid="reset-view"
@@ -224,8 +224,8 @@ export function CanvasToolbar() {
               {aspectRatioOptions.map((option) => (
                 <Button
                   key={option.value}
-                  variant={aspect === option.value ? "default" : "outline"}
-                  size="sm"
+                  variant={aspect === option.value ? "primary" : "outline"}
+                  size="md"
                   onClick={() => handleAspectRatioChange(option.value)}
                   className="min-h-[44px] px-2 text-xs min-w-[44px]"
                   data-testid={`ratio-${option.value}`}
@@ -241,8 +241,8 @@ export function CanvasToolbar() {
           {/* Toggle Buttons */}
           <div className="flex items-center space-x-2">
             <Button
-              variant={showGrid ? "default" : "outline"}
-              size="sm"
+              variant={showGrid ? "primary" : "outline"}
+              size="md"
               onClick={handleToggleGrid}
               className="min-h-[44px] min-w-[44px] p-0"
               data-testid="grid-toggle"
@@ -253,8 +253,8 @@ export function CanvasToolbar() {
               <Grid3X3 className="w-[18px] h-[18px]" />
             </Button>
             <Button
-              variant={showSafeZone ? "default" : "outline"}
-              size="sm"
+              variant={showSafeZone ? "primary" : "outline"}
+              size="md"
               onClick={handleToggleSafeZone}
               className="min-h-[44px] min-w-[44px] p-0"
               data-testid="safe-zone-toggle"
@@ -273,8 +273,8 @@ export function CanvasToolbar() {
               {zoomPresets.map((preset) => (
                 <Button
                   key={preset}
-                  variant={zoom === preset ? "default" : "outline"}
-                  size="sm"
+                  variant={zoom === preset ? "primary" : "outline"}
+                  size="md"
                   onClick={() => setZoomPreset(preset)}
                   className="min-h-[44px] px-1 text-xs min-w-[44px]"
                   data-testid={`zoom-preset-${preset}`}
@@ -287,8 +287,8 @@ export function CanvasToolbar() {
             </div>
 
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={zoomOut}
               className="min-h-[44px] min-w-[44px] p-0"
               data-testid="zoom-out"
@@ -310,8 +310,8 @@ export function CanvasToolbar() {
               />
             </div>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={zoomIn}
               className="min-h-[44px] min-w-[44px] p-0"
               data-testid="zoom-in"

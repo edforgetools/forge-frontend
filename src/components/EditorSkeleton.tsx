@@ -4,7 +4,7 @@ export function EditorSkeleton() {
   return (
     <div className="h-[100dvh] bg-gray-50 flex flex-col">
       {/* Sticky Top Toolbar Skeleton */}
-      <div className="sticky top-0 z-header bg-white/95 backdrop-blur-sm border-b border-gray-200 px-6 py-4 flex-shrink-0">
+      <div className="sticky top-0 z-header bg-white/95 backdrop-blur-sm border-b border-neutral-200 px-6 py-4 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-6">
             <div className="w-16 h-8 bg-gray-200 rounded animate-pulse" />
@@ -20,9 +20,9 @@ export function EditorSkeleton() {
       {/* Main Content Skeleton */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel Skeleton */}
-        <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+        <div className="w-80 bg-white border-r border-neutral-200 flex flex-col">
           {/* Toolbar Buttons Skeleton */}
-          <div className="p-6 border-b border-gray-200">
+          <div className="p-6 border-b border-neutral-200">
             <div className="grid grid-cols-2 gap-3">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div
@@ -52,7 +52,7 @@ export function EditorSkeleton() {
         {/* Right Panel Skeleton */}
         <div className="flex-1 flex flex-col bg-gray-100">
           {/* Canvas Toolbar Skeleton */}
-          <div className="p-4 border-b border-gray-200">
+          <div className="p-4 border-b border-neutral-200">
             <div className="flex items-center justify-between">
               <div className="flex space-x-2">
                 {Array.from({ length: 4 }).map((_, i) => (

@@ -5,7 +5,7 @@ test.describe("Geometry Helper Demo", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     // Navigate to the app page
-    await page.click("text=Start Creating");
+    await page.click("a:has-text('Launch Snapthumb')");
     await page.waitForLoadState("domcontentloaded");
   });
 

@@ -5,7 +5,8 @@ export type TelemetryEventType =
   | "generate_click"
   | "generate_success"
   | "generate_error"
-  | "download_click";
+  | "download_click"
+  | "ui_event";
 
 export interface TelemetryEvent {
   type: TelemetryEventType;
@@ -80,5 +81,14 @@ export interface PageViewEvent extends TelemetryEvent {
   metadata: {
     referrer?: string;
     previousPage?: string;
+  };
+}
+
+export interface UIEvent extends TelemetryEvent {
+  type: "ui_event";
+  metadata: {
+    event: string;
+    plan?: string;
+    timestamp: string;
   };
 }

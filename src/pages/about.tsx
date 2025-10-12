@@ -6,8 +6,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/Button";
-import { Page } from "@/components/ui/page";
-import { Container } from "@/components/ui/container";
+import Page from "@/components/layout/Page";
+import Container from "@/components/layout/Container";
 import {
   ArrowLeft,
   Camera,

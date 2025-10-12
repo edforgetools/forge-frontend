@@ -10,7 +10,11 @@ const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
     return (
       <div
         ref={ref}
-        className={cn("mx-auto w-full max-w-screen-sm p-6 sm:p-8", className)}
+        className={cn(
+          "mx-auto w-full p-6 sm:p-8 py-12 container-max-width",
+          className
+        )}
+        style={{ maxWidth: "640px" }}
         {...props}
       >
         {children}

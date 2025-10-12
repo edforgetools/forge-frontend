@@ -71,7 +71,7 @@ export function V2BetaCTA({ className, onDismiss }: V2BetaCTAProps) {
 
           <Button
             variant="ghost"
-            size="sm"
+            size="md"
             onClick={handleDismiss}
             className="h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
           >
@@ -136,7 +136,7 @@ export function V2BetaCTA({ className, onDismiss }: V2BetaCTAProps) {
           </Button>
 
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={handleLearnMore}
             className="flex-1"
           >

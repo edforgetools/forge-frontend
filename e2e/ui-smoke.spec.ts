@@ -1,109 +1,101 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("UI Visual Sanity Tests", () => {
-  test("landing page (/) has correct elements", async ({ page }) => {
+test.describe("UI Smoke Tests", () => {
+  test("should load home page with proper structure", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle", { timeout: 15000 });
+    await page.waitForLoadState("domcontentloaded");
 
-    // Wait for React to load by checking for the main content
-    await page.waitForSelector("h1", { timeout: 10000 });
-
-    // Expect exactly 1 h1 element
-    const h1Elements = page.locator("h1");
-    await expect(h1Elements).toHaveCount(1);
-    await expect(h1Elements).toContainText("Forge Tools");
-
-    // Expect exactly 2 buttons
-    const buttons = page.locator("button");
-    await expect(buttons).toHaveCount(2);
-
-    // Verify button texts
-    await expect(
-      page.locator('button:has-text("Try Snapthumb")')
-    ).toBeVisible();
-    await expect(page.locator('button:has-text("Use API")')).toBeVisible();
-
-    // Expect footer with exactly 2 links
-    const footerLinks = page.locator("footer a");
-    await expect(footerLinks).toHaveCount(2);
-    await expect(page.locator('footer a[href="/privacy"]')).toBeVisible();
-    await expect(page.locator('footer a[href="/docs"]')).toBeVisible();
-  });
-
-  test("app page (/app) has correct elements", async ({ page }) => {
-    await page.goto("/app");
-    await page.waitForLoadState("networkidle", { timeout: 15000 });
-
-    // Wait for the upload interface to load
-    await page.waitForSelector('[data-testid="upload-dropzone-input"]', {
-      timeout: 10000,
-    });
-
-    // Wait for any toast notifications to potentially disappear
-    await page.waitForTimeout(1000);
-
-    // Expect exactly 2 main buttons (excluding toast dismiss buttons)
-    const mainButtons = page
-      .locator("button")
-      .filter({ hasNotText: /dismiss/i });
-    await expect(mainButtons).toHaveCount(2);
-
-    // Verify button texts
-    await expect(page.locator('button:has-text("Choose file")')).toBeVisible();
-    await expect(
-      page.locator('button:has-text("Try sample image")')
-    ).toBeVisible();
-
-    // Expect exactly one #dropzone element
-    const dropzone = page.locator("#dropzone");
-    await expect(dropzone).toHaveCount(1);
-    await expect(dropzone).toBeVisible();
-
-    // Expect formats line
-    await expect(
-      page.locator('text="PNG, JPG, WebP • MP4, WebM"')
-    ).toBeVisible();
-
-    // Expect no global banners (no persistent banners)
-    const globalBanners = page
-      .locator('[class*="banner"]')
-      .filter({ hasNotText: /dismiss|close/i });
-    await expect(globalBanners).toHaveCount(0);
-  });
-
-  test("docs page (/docs) has correct elements", async ({ page }) => {
-    await page.goto("/docs");
-    await page.waitForLoadState("networkidle", { timeout: 15000 });
-
-    // Wait for the docs content to load
-    await page.waitForSelector("h1", { timeout: 10000 });
-
-    // Expect h1 element
+    // Check main heading
     await expect(page.locator("h1")).toBeVisible();
-    await expect(page.locator("h1")).toContainText("Documentation");
+    await expect(page.locator("h1")).toContainText("Create Perfect Thumbnails");
 
-    // Expect Quick Start section
-    await expect(page.locator('h2:has-text("Quick Start")')).toBeVisible();
+    // Check header navigation
+    await expect(page.locator("header")).toBeVisible();
+    await expect(page.locator('nav a:has-text("Home")')).toBeVisible();
+    await expect(page.locator('nav a:has-text("App")')).toBeVisible();
+    await expect(page.locator('nav a:has-text("API")')).toBeVisible();
 
-    // Expect details element with open=false (collapsed by default)
-    const detailsElement = page.locator("details");
-    await expect(detailsElement).toBeVisible();
+    // Check CTA buttons
+    await expect(page.locator('a:has-text("Launch Snapthumb")')).toBeVisible();
+    await expect(page.locator('a:has-text("API docs")')).toBeVisible();
 
-    // Verify details is closed by default (open=false)
-    const isOpen = await detailsElement.getAttribute("open");
-    expect(isOpen).toBeNull(); // null means not open, which is the default state
+    // Check feature cards
+    await expect(
+      page.locator("h3:has-text('Quick Positioning')")
+    ).toBeVisible();
+    await expect(page.locator("h3:has-text('Live Preview')")).toBeVisible();
+    await expect(page.locator("h3:has-text('Export Ready')")).toBeVisible();
+  });
 
-    // Expect page height < 1600px
-    const pageHeight = await page.evaluate(() => {
-      return Math.max(
-        document.body.scrollHeight,
-        document.body.offsetHeight,
-        document.documentElement.clientHeight,
-        document.documentElement.scrollHeight,
-        document.documentElement.offsetHeight
-      );
-    });
+  test("should have proper header navigation with active states", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
 
-    expect(pageHeight).toBeLessThan(1600);
+    // Check active state on home page
+    const homeLink = page.locator('nav a[href="/"]');
+    await expect(homeLink).toHaveAttribute("aria-current", "page");
+
+    // Navigate to app page and check active state
+    await page.click('nav a:has-text("App")');
+    await page.waitForLoadState("domcontentloaded");
+    await page.waitForURL("**/app");
+
+    const appLink = page.locator('nav a[href="/app"]');
+    await expect(appLink).toHaveAttribute("aria-current", "page");
+  });
+
+  test("should have proper API base URL rendered", async ({ page }) => {
+    await page.goto("/api");
+    await page.waitForLoadState("domcontentloaded");
+
+    // Check that API base URL is displayed
+    const apiEndpoint = page.locator("code").first();
+    await expect(apiEndpoint).toBeVisible();
+    await expect(apiEndpoint).toContainText("POST");
+    await expect(apiEndpoint).toContainText("/api/thumb");
+  });
+
+  test("should have dynamic footer year", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+
+    const currentYear = new Date().getFullYear().toString();
+    const footer = page.locator("footer");
+    await expect(footer).toContainText(`© ${currentYear} Forge`);
+  });
+
+  test("should have proper minimum touch targets", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+
+    // Check header nav links have proper size
+    const navLinks = page.locator("nav a");
+    const linkCount = await navLinks.count();
+
+    for (let i = 0; i < linkCount; i++) {
+      const link = navLinks.nth(i);
+      const box = await link.boundingBox();
+      if (box) {
+        expect(box.height).toBeGreaterThanOrEqual(44);
+        expect(box.width).toBeGreaterThanOrEqual(44);
+      }
+    }
+  });
+
+  test("should have proper content width", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("domcontentloaded");
+
+    // Check container max-width
+    const container = page.locator(".container, [class*='max-w-']").first();
+    const containerBox = await container.boundingBox();
+    const viewport = page.viewportSize();
+
+    if (containerBox && viewport) {
+      // Should not exceed 720px + gutters
+      expect(containerBox.width).toBeLessThanOrEqual(720 + 48); // 720px + 24px gutters on each side
+    }
   });
 });

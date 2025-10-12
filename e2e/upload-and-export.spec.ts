@@ -7,7 +7,7 @@ test.describe("Upload and Export Flow", () => {
     await page.goto("/");
 
     // Click start creating button
-    await page.click("text=Start Creating");
+    await page.click("a:has-text('Launch Snapthumb')");
 
     // Wait for app to load with timeout
     await page.waitForSelector('[data-testid="app-shell"]', { timeout: 15000 });
@@ -55,7 +55,7 @@ test.describe("Upload and Export Flow", () => {
     await page.goto("/");
 
     // Click start creating button
-    await page.click("text=Start Creating");
+    await page.click("a:has-text('Launch Snapthumb')");
 
     // Wait for app to load with timeout
     await page.waitForSelector('[data-testid="app-shell"]', { timeout: 15000 });

@@ -10,7 +10,7 @@ export function useToast() {
     toast: (props: {
       title?: string;
       description?: string;
-      variant?: "default" | "destructive" | "success" | "warning";
+      variant?: "default" | "destructive";
     }) => {
       // Map old toast variants to new ones
       const variantMap = {

@@ -14,8 +14,8 @@ const Analytics = lazy(() =>
   import("@vercel/analytics/react").then((m) => ({ default: m.Analytics }))
 );
 
-// Register service worker for caching
-if ("serviceWorker" in navigator) {
+// Register service worker for caching (disabled in development)
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("/sw.js")

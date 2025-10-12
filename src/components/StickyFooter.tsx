@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { Download } from "lucide-react";
 import { useCanvasStore } from "@/state/canvasStore";
-import { ExportDialog } from "./ExportDialog";
+import { LazyExportDialog } from "./LazyExportDialog";
 
 interface StickyFooterProps {
   isDragging?: boolean;
@@ -17,7 +17,7 @@ export function StickyFooter({ isDragging = false }: StickyFooterProps) {
   const isReadyForExport = hasContent && is16to9;
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-4">
+    <div className="bg-white rounded-2xl shadow-lg border border-neutral-200 p-4">
       <div className="flex items-center space-x-4">
         <div className="text-sm text-gray-600">
           <span className="font-medium">16:9</span>
@@ -38,7 +38,7 @@ export function StickyFooter({ isDragging = false }: StickyFooterProps) {
       </div>
 
       <div className="mt-3">
-        <ExportDialog isDragging={isDragging}>
+        <LazyExportDialog isDragging={isDragging}>
           <Button
             disabled={!isReadyForExport || isDragging}
             className="w-full h-10 rounded-xl"
@@ -60,7 +60,7 @@ export function StickyFooter({ isDragging = false }: StickyFooterProps) {
                 ? "Export"
                 : "Not Ready"}
           </Button>
-        </ExportDialog>
+        </LazyExportDialog>
       </div>
 
       {!isReadyForExport && (

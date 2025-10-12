@@ -119,13 +119,13 @@ export function TextToolbar({ overlayId, onClose }: TextToolbarProps) {
   return (
     <div
       ref={toolbarRef}
-      className="bg-white border border-gray-200 rounded-lg shadow-lg p-3 flex items-center gap-3 min-w-max"
+      className="bg-white border border-neutral-200 rounded-lg shadow-lg p-3 flex items-center gap-3 min-w-max"
       style={{ position: "fixed" }}
     >
       {/* Close button */}
       <Button
         variant="ghost"
-        size="sm"
+        size="md"
         onClick={onClose}
         className="h-8 w-8 p-0 hover:bg-gray-100"
         aria-label="Close text toolbar"
@@ -140,8 +140,8 @@ export function TextToolbar({ overlayId, onClose }: TextToolbarProps) {
           {["Arial", "Helvetica", "Georgia", "Verdana"].map((font) => (
             <Button
               key={font}
-              variant={textOverlay.font === font ? "default" : "outline"}
-              size="sm"
+              variant={textOverlay.font === font ? "primary" : "outline"}
+              size="md"
               onClick={() => handleUpdate({ font })}
               className="text-xs h-8 px-2"
             >
@@ -182,9 +182,9 @@ export function TextToolbar({ overlayId, onClose }: TextToolbarProps) {
             <Button
               key={weight.value}
               variant={
-                textOverlay.weight === weight.value ? "default" : "outline"
+                textOverlay.weight === weight.value ? "primary" : "outline"
               }
-              size="sm"
+              size="md"
               onClick={() => handleUpdate({ weight: weight.value })}
               className="text-xs h-8 px-2"
             >
@@ -202,9 +202,9 @@ export function TextToolbar({ overlayId, onClose }: TextToolbarProps) {
             <Button
               key={alignment.value}
               variant={
-                textOverlay.align === alignment.value ? "default" : "ghost"
+                textOverlay.align === alignment.value ? "primary" : "ghost"
               }
-              size="sm"
+              size="md"
               onClick={() =>
                 handleUpdate({
                   align: alignment.value as "left" | "center" | "right",
@@ -227,7 +227,7 @@ export function TextToolbar({ overlayId, onClose }: TextToolbarProps) {
           type="color"
           value={textOverlay.color}
           onChange={(e) => handleUpdate({ color: e.target.value })}
-          className="h-8 w-12 p-1 border-gray-300"
+          className="h-8 w-12 p-1 border-neutral-200"
           aria-label="Select text color"
         />
       </div>

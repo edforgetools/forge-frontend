@@ -1,0 +1,17 @@
+# Global code owners
+* @forge-team
+
+# CI/CD and deployment configuration
+/.github/ @forge-team @devops-team
+/render.yaml @forge-team @devops-team
+/vercel.json @forge-team @devops-team
+/package.json @forge-team @devops-team
+
+# Environment and secrets
+/.env* @forge-team @devops-team @security-team
+/secrets/ @forge-team @security-team
+
+# Documentation
+/docs/ @forge-team @docs-team
+/README.md @forge-team @docs-team
+/CHANGELOG.md @forge-team @docs-team

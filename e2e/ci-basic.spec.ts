@@ -24,7 +24,7 @@ test.describe("CI Basic Smoke Tests", () => {
 
     // Check for any button with "Start" text (more flexible matching)
     await expect(
-      page.locator('button:has-text("Start Creating")').first()
+      page.locator('a:has-text("Launch Snapthumb")').first()
     ).toBeVisible({
       timeout: 10000,
     });

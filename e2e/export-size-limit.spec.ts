@@ -5,7 +5,7 @@ test.describe("Snapthumb Export Size Limit", () => {
     // Navigate to the app page
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
     await page.waitForLoadState("networkidle");
   });
 

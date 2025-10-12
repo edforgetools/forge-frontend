@@ -211,8 +211,8 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
       {/* Controls */}
       <div className="flex items-center justify-center gap-2">
         <Button
-          variant="outline"
-          size="sm"
+          variant="secondary"
+          size="md"
           onClick={() => handleSkip("back")}
           disabled={!video || isLoading}
         >
@@ -220,8 +220,8 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
         </Button>
 
         <Button
-          variant="outline"
-          size="sm"
+          variant="secondary"
+          size="md"
           onClick={handlePlayPause}
           disabled={!video || isLoading}
         >
@@ -233,8 +233,8 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
         </Button>
 
         <Button
-          variant="outline"
-          size="sm"
+          variant="secondary"
+          size="md"
           onClick={() => handleSkip("forward")}
           disabled={!video || isLoading}
         >
@@ -247,7 +247,7 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
         onClick={handleExtractFrame}
         disabled={!video || isLoading}
         className="w-full"
-        size="sm"
+        size="md"
       >
         <Download className="w-4 h-4 mr-2" />
         {isLoading ? "Extracting..." : "Extract Frame"}
@@ -256,8 +256,8 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
       {/* Quick Time Buttons */}
       <div className="flex gap-2">
         <Button
-          variant="outline"
-          size="sm"
+          variant="secondary"
+          size="md"
           onClick={() => handleSeek([0])}
           disabled={!video || isLoading}
           className="flex-1"
@@ -265,8 +265,8 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
           0%
         </Button>
         <Button
-          variant="outline"
-          size="sm"
+          variant="secondary"
+          size="md"
           onClick={() => handleSeek([duration * 0.25])}
           disabled={!video || isLoading}
           className="flex-1"
@@ -274,8 +274,8 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
           25%
         </Button>
         <Button
-          variant="outline"
-          size="sm"
+          variant="secondary"
+          size="md"
           onClick={() => handleSeek([duration * 0.5])}
           disabled={!video || isLoading}
           className="flex-1"
@@ -283,8 +283,8 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
           50%
         </Button>
         <Button
-          variant="outline"
-          size="sm"
+          variant="secondary"
+          size="md"
           onClick={() => handleSeek([duration * 0.75])}
           disabled={!video || isLoading}
           className="flex-1"
@@ -292,8 +292,8 @@ export function VideoFrameScrubber({ className }: VideoFrameScrubberProps) {
           75%
         </Button>
         <Button
-          variant="outline"
-          size="sm"
+          variant="secondary"
+          size="md"
           onClick={() => handleSeek([duration])}
           disabled={!video || isLoading}
           className="flex-1"

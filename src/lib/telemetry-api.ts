@@ -1,4 +1,5 @@
 import type { TelemetryEvent } from "@/types/telemetry";
+import { env } from "@/env";
 
 // Mock API endpoint for telemetry
 // In a real implementation, this would be replaced with actual API calls
@@ -53,6 +54,48 @@ export const sendBatchedTelemetryEvents = async (
   await Promise.allSettled(promises);
 };
 
+// Send UI event to Layer API endpoint
+export const sendLayerUIEvent = async (
+  event: string,
+  metadata: Record<string, unknown> = {}
+): Promise<void> => {
+  try {
+    const layerUrl = env.VITE_FORGE_LAYER_URL;
+    if (!layerUrl) {
+      // No endpoint exists, queue no-op as requested
+      if (import.meta.env.DEV) {
+        console.debug("📊 Layer UI event queued (no-op):", { event, metadata });
+      }
+      return;
+    }
+
+    const response = await fetch(`${layerUrl}/forge/telemetry/ui-event`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        event,
+        ...metadata,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    if (import.meta.env.DEV) {
+      console.debug("📊 Layer UI event sent:", { event, metadata });
+    }
+  } catch (error) {
+    // Don't block UX if telemetry fails
+    if (import.meta.env.DEV) {
+      console.debug("📊 Layer UI event failed (silent):", error);
+    }
+  }
+};
+
 // Utility to validate telemetry events
 export const validateTelemetryEvent = (event: TelemetryEvent): boolean => {
   if (!event.type || !event.timestamp || !event.sessionId) {
@@ -90,6 +133,12 @@ export const validateTelemetryEvent = (event: TelemetryEvent): boolean => {
         event.metadata &&
           typeof event.metadata.format === "string" &&
           typeof event.metadata.source === "string"
+      );
+    case "ui_event":
+      return Boolean(
+        event.metadata &&
+          typeof event.metadata.event === "string" &&
+          typeof event.metadata.timestamp === "string"
       );
     default:
       return false;

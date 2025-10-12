@@ -3,6 +3,7 @@
 :root {
   /* === CORE DESIGN TOKENS === */
   --radius: 12px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.06);
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -125,8 +126,28 @@
 }
 
 /* Base body styles */
-body {
-  font-size: 14px;
+html {
+  font-size: 16px;
+}
+
+/* Typography styles */
+h1 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 18px;
+}
+
+p,
+li {
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 /* Dark theme overrides */
@@ -182,4 +203,15 @@ body {
 }
 .border-neutral-strong {
   border-color: rgb(var(--color-border-strong));
+}
+
+/* Vertical rhythm utilities */
+.vertical-rhythm-2 > * + * {
+  margin-top: var(--space-2);
+}
+.vertical-rhythm-3 > * + * {
+  margin-top: var(--space-3);
+}
+.vertical-rhythm-4 > * + * {
+  margin-top: var(--space-4);
 }

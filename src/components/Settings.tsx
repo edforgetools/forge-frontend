@@ -37,7 +37,7 @@ export function Settings({ onClearSession }: SettingsProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4">
+    <div className="bg-white rounded-lg border border-neutral-200 p-4">
       <h2 className="text-lg font-medium mb-4">Settings</h2>
 
       <div className="flex flex-col gap-6">
@@ -71,10 +71,10 @@ export function Settings({ onClearSession }: SettingsProps) {
         </div>
 
         {/* Clear Session Button */}
-        <div className="pt-2 border-t border-gray-100">
+        <div className="pt-2 border-t border-neutral-100">
           <Button
-            variant="outline"
-            size="sm"
+            variant="secondary"
+            size="md"
             onClick={handleClearSession}
             className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
           >
@@ -83,7 +83,7 @@ export function Settings({ onClearSession }: SettingsProps) {
         </div>
 
         {/* Info */}
-        <div className="text-xs text-gray-500 pt-2 border-t border-gray-100">
+        <div className="text-xs text-gray-500 pt-2 border-t border-neutral-100">
           <p className="text-sm">
             Session data includes: uploaded files, canvas settings, overlays,
             and export preferences. Data is stored locally in your browser.

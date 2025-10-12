@@ -3,8 +3,8 @@ import { Suspense, lazy } from "react";
 import { EditorSkeleton } from "./components/EditorSkeleton";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { useDocumentTitle } from "./hooks/useDocumentTitle";
-import { Page } from "./components/ui/page";
-import { Container } from "./components/ui/container";
+import Page from "./components/layout/Page";
+import Container from "./components/layout/Container";
 
 // Lazy load pages for better performance
 const Landing = lazy(() => import("./pages/Landing.tsx"));
@@ -16,6 +16,9 @@ const Privacy = lazy(() => import("./pages/privacy.tsx"));
 const About = lazy(() => import("./pages/about.tsx"));
 const Docs = lazy(() => import("./pages/Docs.tsx"));
 const Api = lazy(() => import("./pages/Api.tsx"));
+const Pricing = lazy(() => import("./pages/Pricing.tsx"));
+const PricingSuccess = lazy(() => import("./pages/PricingSuccess.tsx"));
+const PricingCancel = lazy(() => import("./pages/PricingCancel.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 const LoadingFallback = ({
@@ -116,6 +119,34 @@ export default function App() {
               fallback={<LoadingFallback label="Loading API documentation" />}
             >
               <Api />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/pricing"
+          element={
+            <Suspense fallback={<LoadingFallback label="Loading pricing" />}>
+              <Pricing />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/pricing/success"
+          element={
+            <Suspense
+              fallback={<LoadingFallback label="Loading success page" />}
+            >
+              <PricingSuccess />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/pricing/cancel"
+          element={
+            <Suspense
+              fallback={<LoadingFallback label="Loading cancel page" />}
+            >
+              <PricingCancel />
             </Suspense>
           }
         />

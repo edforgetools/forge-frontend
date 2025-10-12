@@ -24,7 +24,7 @@ export function PanelSection({
           {title}
         </h4>
       </div>
-      {showDivider && <div className="border-t border-gray-200" />}
+      {showDivider && <div className="border-t border-neutral-200" />}
       {children && <div className="pt-1">{children}</div>}
     </div>
   );

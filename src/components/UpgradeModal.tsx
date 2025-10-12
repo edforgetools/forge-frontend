@@ -131,7 +131,7 @@ export function UpgradeModal({ children }: UpgradeModalProps) {
                 <Button
                   type="button"
                   variant="ghost"
-                  size="sm"
+                  size="md"
                   className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                   onClick={() => setShowKey(!showKey)}
                 >
@@ -178,7 +178,7 @@ export function UpgradeModal({ children }: UpgradeModalProps) {
             </h3>
             <div className="grid gap-3">
               {proBenefits.map((benefit, index) => (
-                <Card key={index} className="border-l-4 border-l-blue-500">
+                <Card key={index}>
                   <CardContent className="p-3">
                     <div className="flex items-start space-x-3">
                       <div className="flex-shrink-0 mt-1">{benefit.icon}</div>

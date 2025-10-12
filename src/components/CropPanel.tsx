@@ -85,8 +85,8 @@ export function CropPanel() {
 
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               disabled={true}
               className="h-8 w-8 p-0 opacity-50"
               title="16:9 aspect ratio is locked for Snapthumb"
@@ -94,8 +94,8 @@ export function CropPanel() {
               <Lock className="w-4 h-4" />
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={resetToAutoCrop}
               className="h-8 px-2"
             >
@@ -235,8 +235,8 @@ export function CropPanel() {
           <div className="text-sm font-medium text-gray-900">Quick Presets</div>
           <div className="grid grid-cols-2 gap-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() => {
                 const targetRatio = 16 / 9;
                 const newHeight = crop.w / targetRatio;
@@ -247,8 +247,8 @@ export function CropPanel() {
               16:9
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() => {
                 const targetRatio = 1;
                 const newHeight = crop.w / targetRatio;

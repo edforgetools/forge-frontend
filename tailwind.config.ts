@@ -6,7 +6,10 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: {
+        DEFAULT: "1rem",
+        sm: "1.5rem",
+      },
       screens: {
         "2xl": "1400px",
       },
@@ -96,6 +99,8 @@ export default {
         "error-foreground": "rgb(var(--color-error-foreground))",
         info: "rgb(var(--color-info))",
         "info-foreground": "rgb(var(--color-info-foreground))",
+        // Brand colors
+        forge: "#0EA5E9",
         // Legacy shadcn colors for compatibility
         primary: {
           DEFAULT: "rgb(var(--color-interactive))",

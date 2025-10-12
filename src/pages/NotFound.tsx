@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Page } from "@/components/ui/page";
-import { Container } from "@/components/ui/container";
+import Page from "@/components/layout/Page";
+import Container from "@/components/layout/Container";
 import { Home, ArrowLeft, Search } from "lucide-react";
 
 export default function NotFoundPage() {
@@ -36,7 +36,7 @@ export default function NotFoundPage() {
                 Go Home
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={handleGoBack}
                 className="flex-1"
               >

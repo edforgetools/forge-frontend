@@ -4,7 +4,7 @@ test.describe("Canvas Toolbar", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     // Navigate to app page
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Upload a test image first

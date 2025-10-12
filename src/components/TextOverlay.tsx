@@ -194,8 +194,8 @@ export function TextOverlay({ className }: TextOverlayProps) {
               {FONT_FAMILIES.slice(0, 6).map((font) => (
                 <Button
                   key={font}
-                  variant={fontFamily === font ? "default" : "outline"}
-                  size="sm"
+                  variant={fontFamily === font ? "primary" : "outline"}
+                  size="md"
                   onClick={() => setFontFamily(font)}
                   className="text-xs h-8"
                 >
@@ -211,8 +211,8 @@ export function TextOverlay({ className }: TextOverlayProps) {
               {FONT_WEIGHTS.map((weight) => (
                 <Button
                   key={weight.value}
-                  variant={fontWeight === weight.value ? "default" : "outline"}
-                  size="sm"
+                  variant={fontWeight === weight.value ? "primary" : "outline"}
+                  size="md"
                   onClick={() => setFontWeight(weight.value)}
                   className="text-xs h-8"
                 >
@@ -265,8 +265,8 @@ export function TextOverlay({ className }: TextOverlayProps) {
               return (
                 <Button
                   key={align.value}
-                  variant={textAlign === align.value ? "default" : "outline"}
-                  size="sm"
+                  variant={textAlign === align.value ? "primary" : "outline"}
+                  size="md"
                   onClick={() =>
                     setTextAlign(align.value as "left" | "center" | "right")
                   }
@@ -284,11 +284,22 @@ export function TextOverlay({ className }: TextOverlayProps) {
         <div className="space-y-2">
           <Label className="text-xs">Text Color</Label>
           <div className="flex items-center gap-2">
-            <input
-              type="color"
-              value={textColor}
-              onChange={(e) => setTextColor(e.target.value)}
-              className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              className="w-8 h-8 p-0 border border-neutral-200"
+              onClick={() => {
+                const input = document.createElement("input");
+                input.type = "color";
+                input.value = textColor;
+                input.onchange = (e) =>
+                  setTextColor((e.target as HTMLInputElement).value);
+                input.click();
+              }}
+              style={{
+                backgroundColor: textColor,
+              }}
             />
             <Input
               value={textColor}
@@ -305,7 +316,9 @@ export function TextOverlay({ className }: TextOverlayProps) {
                 key={color}
                 onClick={() => setTextColor(color)}
                 className={`w-6 h-6 rounded border-2 ${
-                  textColor === color ? "border-gray-900" : "border-gray-300"
+                  textColor === color
+                    ? "border-neutral-800"
+                    : "border-neutral-200"
                 }`}
                 style={{ backgroundColor: color }}
                 title={color}
@@ -321,7 +334,7 @@ export function TextOverlay({ className }: TextOverlayProps) {
             id="text-shadow"
             checked={hasShadow}
             onChange={(e) => setHasShadow(e.target.checked)}
-            className="rounded border-gray-300"
+            className="rounded border-neutral-200"
           />
           <Label htmlFor="text-shadow" className="text-xs">
             Add text shadow for better visibility
@@ -333,7 +346,7 @@ export function TextOverlay({ className }: TextOverlayProps) {
           onClick={handleAddText}
           disabled={!newText.trim()}
           className="w-full"
-          size="sm"
+          size="md"
         >
           <Type className="w-4 h-4 mr-2" />
           Add Text Overlay
@@ -346,8 +359,8 @@ export function TextOverlay({ className }: TextOverlayProps) {
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium">Edit Text</h3>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() => {
                 if (selectedId) {
                   // Remove overlay logic would go here
@@ -442,15 +455,31 @@ export function TextOverlay({ className }: TextOverlayProps) {
           <div className="space-y-2">
             <Label className="text-xs">Text Color</Label>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={
-                  selectedOverlay.type === "text"
-                    ? selectedOverlay.color
-                    : "#FFFFFF"
-                }
-                onChange={(e) => handleUpdateText("color", e.target.value)}
-                className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                className="w-8 h-8 p-0 border border-neutral-200"
+                onClick={() => {
+                  const input = document.createElement("input");
+                  input.type = "color";
+                  input.value =
+                    selectedOverlay.type === "text"
+                      ? selectedOverlay.color
+                      : "#FFFFFF";
+                  input.onchange = (e) =>
+                    handleUpdateText(
+                      "color",
+                      (e.target as HTMLInputElement).value
+                    );
+                  input.click();
+                }}
+                style={{
+                  backgroundColor:
+                    selectedOverlay.type === "text"
+                      ? selectedOverlay.color
+                      : "#FFFFFF",
+                }}
               />
               <Input
                 value={
@@ -468,8 +497,8 @@ export function TextOverlay({ className }: TextOverlayProps) {
           {/* Quick Actions */}
           <div className="flex gap-2 pt-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() =>
                 handleUpdateText("locked", !selectedOverlay.locked)
               }
@@ -478,8 +507,8 @@ export function TextOverlay({ className }: TextOverlayProps) {
               {selectedOverlay.locked ? "Unlock" : "Lock"}
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() =>
                 handleUpdateText("hidden", !selectedOverlay.hidden)
               }
@@ -504,7 +533,7 @@ export function TextOverlay({ className }: TextOverlayProps) {
                   className={`flex items-center justify-between p-2 rounded border cursor-pointer transition-colors ${
                     selectedId === text.id
                       ? "bg-blue-50 border-blue-300"
-                      : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                      : "bg-gray-50 border-neutral-200 hover:bg-gray-100"
                   }`}
                   onClick={() => useCanvasStore.getState().select(text.id)}
                 >

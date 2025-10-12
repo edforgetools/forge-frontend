@@ -4,30 +4,24 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const linkButtonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 w-full sm:w-auto min-h-[40px]",
+  "inline-flex items-center justify-center rounded-[var(--radius)] px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/20 disabled:opacity-50 disabled:pointer-events-none",
   {
     variants: {
       variant: {
-        primary: "bg-primary text-primary-foreground hover:bg-primary/90",
+        primary: "bg-black text-white hover:bg-black/90 active:scale-[.99]",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "border border-neutral-300 bg-white text-black hover:bg-neutral-50 active:scale-[.99]",
       },
       size: {
-        default: "px-4 py-2",
         sm: "px-3 py-1.5 text-xs",
-        lg: "px-8 py-3",
+        md: "px-4 py-2 text-sm",
+        lg: "px-5 py-2.5 text-[15px]",
         icon: "h-9 w-9",
       },
     },
     defaultVariants: {
       variant: "primary",
-      size: "default",
+      size: "md",
     },
   }
 );
@@ -46,7 +40,7 @@ const LinkButton = React.forwardRef<HTMLAnchorElement, LinkButtonProps>(
     if (isExternal) {
       return (
         <a
-          className={cn(linkButtonVariants({ variant, size, className }))}
+          className={cn(linkButtonVariants({ variant, size }), className)}
           href={href}
           ref={ref}
           {...props}
@@ -60,7 +54,7 @@ const LinkButton = React.forwardRef<HTMLAnchorElement, LinkButtonProps>(
 
     return (
       <Link
-        className={cn(linkButtonVariants({ variant, size, className }))}
+        className={cn(linkButtonVariants({ variant, size }), className)}
         to={linkTo || "#"}
         ref={ref}
         {...props}

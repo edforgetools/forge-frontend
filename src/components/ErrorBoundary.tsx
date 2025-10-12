@@ -85,7 +85,7 @@ export class ErrorBoundary extends Component<Props, State> {
                     Try Again
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="secondary"
                     onClick={this.handleGoHome}
                     className="flex-1"
                   >

@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Undo/Redo Functionality", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await page.click("text=Start Creating");
+    await page.click("a:has-text('Launch Snapthumb')");
     await page.waitForSelector('[data-testid="app-shell"]', { timeout: 10000 });
     await page.click("text=Try sample image");
     await page.waitForSelector("canvas", { timeout: 5000 });

@@ -69,7 +69,7 @@ export function Overlay({ onOverlayComplete }: OverlayProps) {
   // Keyboard shortcuts are handled in CanvasStage component
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4">
+    <div className="bg-white rounded-lg border border-neutral-200 p-4">
       <h2 className="text-lg font-semibold mb-4">Overlays</h2>
 
       <div className="space-y-4">
@@ -78,16 +78,16 @@ export function Overlay({ onOverlayComplete }: OverlayProps) {
           <div className="flex space-x-2">
             <Button
               onClick={addLogoOverlay}
-              size="sm"
-              variant="outline"
+              size="md"
+              variant="secondary"
               className="flex-1"
             >
               Add Logo
             </Button>
             <Button
               onClick={addTextOverlay}
-              size="sm"
-              variant="outline"
+              size="md"
+              variant="secondary"
               className="flex-1"
               disabled={!textInput.trim()}
             >
@@ -142,7 +142,7 @@ export function Overlay({ onOverlayComplete }: OverlayProps) {
                       className={`p-3 border rounded-lg cursor-pointer transition-colors ${
                         selectedId === overlay.id
                           ? "border-blue-500 bg-blue-50"
-                          : "border-gray-200 hover:border-gray-300"
+                          : "border-neutral-200 hover:border-neutral-300"
                       }`}
                       onClick={() => select(overlay.id)}
                     >
@@ -227,8 +227,8 @@ export function Overlay({ onOverlayComplete }: OverlayProps) {
         {overlays.length > 0 && (
           <div className="flex space-x-2 pt-2 border-t">
             <Button
-              size="sm"
-              variant="outline"
+              size="md"
+              variant="secondary"
               onClick={() => overlays.forEach((overlay) => remove(overlay.id))}
               className="flex-1 text-xs text-red-600 hover:text-red-700"
             >

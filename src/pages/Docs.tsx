@@ -1,4 +1,5 @@
-import { Container } from "@/components/ui/container";
+import Page from "@/components/layout/Page";
+import Container from "@/components/layout/Container";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
@@ -50,70 +51,74 @@ export default function DocsPage() {
   ];
 
   return (
-    <Container>
-      <h1 className="text-center mb-6">Snapthumb Help</h1>
+    <Page>
+      <Container>
+        <h1 className="text-center mb-6">Snapthumb Help</h1>
 
-      <Card>
-        <h2 className="text-lg font-semibold mb-4">Quick Start</h2>
-        <ul className="space-y-2">
-          <li>• Upload an image or video file to get started</li>
-          <li>• If using video, pick the perfect frame to capture</li>
-          <li>• Add your logo or text overlay to the canvas</li>
-          <li>• Adjust position, size, and styling as needed</li>
-          <li>• Export your finished thumbnail image</li>
-        </ul>
-      </Card>
-
-      <Card className="mt-4">
-        <h2 className="text-lg font-semibold mb-4">Supported Formats</h2>
-        <ul className="space-y-1">
-          <li>Input: MP4, WebM, JPG, PNG, WebP</li>
-          <li>Output: JPG, PNG, WebP</li>
-        </ul>
-      </Card>
-
-      <Card className="mt-4">
-        <h2 className="text-lg font-semibold mb-4">Limits</h2>
-        <ul className="space-y-1">
-          <li>Free tier: 10 generations per day</li>
-          <li>Export size: Optimized files under 2 MB</li>
-        </ul>
-      </Card>
-
-      <Card className="mt-4">
-        <h2 className="text-lg font-semibold mb-4">Privacy Note</h2>
-        <p>
-          All processing happens locally in your browser.{" "}
-          <Link to="/privacy" className="underline">
-            Read our full Privacy Policy
-          </Link>
-        </p>
-      </Card>
-
-      <details className="mt-4">
-        <summary className="cursor-pointer text-lg font-medium">
-          Keyboard shortcuts
-        </summary>
-        <div className="mt-2 max-h-64 overflow-y-auto text-sm leading-6">
-          <div className="space-y-4">
-            {shortcuts.map((category) => (
-              <div key={category.category}>
-                <h4 className="font-medium">{category.category}</h4>
-                <ul className="mt-1 space-y-1">
-                  {category.items.map((item, index) => (
-                    <li key={index} className="flex justify-between">
-                      <span>{item.description}</span>
-                      <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 rounded">
-                        {item.key}
-                      </kbd>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+        <Card className="space-y-6">
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Quick Start</h2>
+            <ul className="space-y-2">
+              <li>• Upload an image or video file to get started</li>
+              <li>• For videos, pick the frame you want to use</li>
+              <li>• Add text or logo overlays to your image</li>
+              <li>• Adjust position, size, and styling</li>
+              <li>• Export your finished thumbnail</li>
+            </ul>
           </div>
-        </div>
-      </details>
-    </Container>
+
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Supported Formats</h2>
+            <ul className="space-y-1">
+              <li>Input: MP4, WebM, JPG, PNG, WebP</li>
+              <li>Output: JPG, PNG, WebP</li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Limits</h2>
+            <ul className="space-y-1">
+              <li>Free tier: 10 generations per day</li>
+              <li>Export size: Optimized files under 2 MB</li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold mb-4">Privacy Note</h2>
+            <p>
+              All processing happens locally in your browser.{" "}
+              <Link to="/privacy" className="underline">
+                Read our full Privacy Policy
+              </Link>
+            </p>
+          </div>
+
+          <details>
+            <summary className="cursor-pointer text-lg font-medium">
+              Keyboard shortcuts
+            </summary>
+            <div className="mt-2 max-h-64 overflow-y-auto text-sm leading-6">
+              <div className="space-y-4">
+                {shortcuts.map((category) => (
+                  <div key={category.category}>
+                    <h4 className="font-medium">{category.category}</h4>
+                    <ul className="mt-1 space-y-1">
+                      {category.items.map((item, index) => (
+                        <li key={index} className="flex justify-between">
+                          <span>{item.description}</span>
+                          <kbd className="px-1.5 py-0.5 text-xs bg-gray-100 rounded">
+                            {item.key}
+                          </kbd>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </details>
+        </Card>
+      </Container>
+    </Page>
   );
 }

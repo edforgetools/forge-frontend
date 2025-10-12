@@ -394,7 +394,7 @@ export function SnapthumbCanvas({
     <div className={`relative ${className}`}>
       <canvas
         ref={canvasRef}
-        className="border border-gray-300 rounded-lg cursor-move touch-none"
+        className="border border-neutral-200 rounded-lg cursor-move touch-none"
         style={{ maxWidth: "100%", height: "auto" }}
         tabIndex={0}
         onPointerDown={handlePointerDown}

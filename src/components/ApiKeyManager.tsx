@@ -94,7 +94,7 @@ export function ApiKeyManager({ onTierChange, className }: ApiKeyManagerProps) {
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
+                size="md"
                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                 onClick={() => setShowKey(!showKey)}
               >
@@ -108,7 +108,7 @@ export function ApiKeyManager({ onTierChange, className }: ApiKeyManagerProps) {
             <Button onClick={handleSaveKey} disabled={!apiKey.trim()}>
               Save
             </Button>
-            <Button variant="outline" onClick={handleClearKey}>
+            <Button variant="secondary" onClick={handleClearKey}>
               Clear
             </Button>
           </div>

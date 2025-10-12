@@ -341,7 +341,7 @@ export function WireGenerate({ className, onResult }: WireGenerateProps) {
 
             {result && (
               <Button
-                variant="outline"
+                variant="secondary"
                 onClick={handleReset}
                 disabled={isGenerating}
               >
@@ -354,8 +354,8 @@ export function WireGenerate({ className, onResult }: WireGenerateProps) {
           <div className="flex gap-2">
             {hasLastSettings && (
               <Button
-                variant="outline"
-                size="sm"
+                variant="secondary"
+                size="md"
                 onClick={handleUseLastSettings}
                 disabled={isGenerating}
                 className="flex-1"
@@ -366,8 +366,8 @@ export function WireGenerate({ className, onResult }: WireGenerateProps) {
             )}
 
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={handleResetToDefaults}
               disabled={isGenerating}
               className="flex-1"
@@ -381,7 +381,7 @@ export function WireGenerate({ className, onResult }: WireGenerateProps) {
           {canRegenerate && (
             <Button
               variant="secondary"
-              size="sm"
+              size="md"
               onClick={handleRegenerateWithNewFrame}
               disabled={isGenerating}
               className="w-full"
@@ -478,7 +478,7 @@ export function WireGenerate({ className, onResult }: WireGenerateProps) {
 
               {result.previewUrl && (
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   onClick={handleCopyUrl}
                   disabled={isCopying}
                   className="flex-1"

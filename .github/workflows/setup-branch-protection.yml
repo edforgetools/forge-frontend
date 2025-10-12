@@ -1,0 +1,102 @@
+name: Setup Branch Protection
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: 'Repository name (owner/repo)'
+        required: true
+        default: 'forge/forge-frontend'
+      branch:
+        description: 'Branch to protect'
+        required: true
+        default: 'main'
+
+jobs:
+  setup-protection:
+    name: Setup Branch Protection
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup GitHub CLI
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const [owner, repo] = '${{ github.event.inputs.repository }}'.split('/');
+            
+            // Define required status checks
+            const requiredStatusChecks = [
+              // Frontend CI Pipeline
+              'Frontend CI - Build',
+              'Frontend CI - Typecheck',
+              'Frontend CI - Unit Tests',
+              'Frontend CI - Playwright Tests',
+              'Frontend CI - Lighthouse CI',
+              'Frontend CI - Size Limit Check',
+              'Frontend CI Status',
+              // Layer CI Pipeline
+              'Layer CI - Build',
+              'Layer CI - Unit Tests',
+              'Layer CI - Integration Tests',
+              'Layer CI - Playwright Tests',
+              'Layer CI Status'
+            ];
+
+            try {
+              // Set up branch protection
+              await github.rest.repos.updateBranchProtection({
+                owner: owner,
+                repo: repo,
+                branch: '${{ github.event.inputs.branch }}',
+                required_status_checks: {
+                  strict: true,
+                  contexts: requiredStatusChecks
+                },
+                enforce_admins: true,
+                required_pull_request_reviews: {
+                  required_approving_review_count: 1,
+                  dismiss_stale_reviews: true,
+                  require_code_owner_reviews: true,
+                  require_last_push_approval: true
+                },
+                restrictions: {
+                  users: [],
+                  teams: []
+                },
+                allow_force_pushes: false,
+                allow_deletions: false
+              });
+
+              console.log(`✅ Branch protection configured for ${owner}/${repo}:${branch}`);
+              console.log(`Required status checks: ${requiredStatusChecks.join(', ')}`);
+              
+            } catch (error) {
+              console.error('❌ Failed to setup branch protection:', error.message);
+              throw error;
+            }
+
+      - name: Verify protection
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const [owner, repo] = '${{ github.event.inputs.repository }}'.split('/');
+            
+            try {
+              const protection = await github.rest.repos.getBranchProtection({
+                owner: owner,
+                repo: repo,
+                branch: '${{ github.event.inputs.branch }}'
+              });
+
+              console.log('✅ Branch protection verified:');
+              console.log(`- Required status checks: ${protection.data.required_status_checks.contexts.length}`);
+              console.log(`- Required reviews: ${protection.data.required_pull_request_reviews.required_approving_review_count}`);
+              console.log(`- Code owner reviews: ${protection.data.required_pull_request_reviews.require_code_owner_reviews}`);
+              
+            } catch (error) {
+              console.error('❌ Failed to verify branch protection:', error.message);
+              throw error;
+            }

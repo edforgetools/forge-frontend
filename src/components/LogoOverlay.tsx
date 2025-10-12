@@ -117,8 +117,8 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
         </Label>
         <div className="flex gap-2">
           <Button
-            variant="outline"
-            size="sm"
+            variant="secondary"
+            size="md"
             onClick={() => fileInputRef.current?.click()}
             className="flex-1"
           >
@@ -144,16 +144,16 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
             <h3 className="text-sm font-medium">Logo Controls</h3>
             <div className="flex gap-2">
               <Button
-                variant="outline"
-                size="sm"
+                variant="secondary"
+                size="md"
                 onClick={resetLogoTransform}
                 className="h-8 w-8 p-0"
               >
                 <RotateCw className="w-4 h-4" />
               </Button>
               <Button
-                variant="outline"
-                size="sm"
+                variant="secondary"
+                size="md"
                 onClick={() => {
                   if (selectedId) {
                     // Remove overlay logic would go here
@@ -265,8 +265,8 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
           {/* Quick Actions */}
           <div className="flex gap-2 pt-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() =>
                 updateOverlay(selectedId!, { locked: !selectedOverlay.locked })
               }
@@ -275,8 +275,8 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
               {selectedOverlay.locked ? "Unlock" : "Lock"}
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() =>
                 updateOverlay(selectedId!, { hidden: !selectedOverlay.hidden })
               }
@@ -313,7 +313,7 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
                   className={`flex items-center justify-between p-2 rounded border cursor-pointer transition-colors ${
                     selectedId === logo.id
                       ? "bg-blue-50 border-blue-300"
-                      : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                      : "bg-gray-50 border-neutral-200 hover:bg-gray-100"
                   }`}
                   onClick={() => useCanvasStore.getState().select(logo.id)}
                 >
