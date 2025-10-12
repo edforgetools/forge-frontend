@@ -164,12 +164,17 @@ class SessionDB {
     });
   }
 
-  private isValidSession(data: any): data is SessionData {
+  private isValidSession(data: unknown): data is SessionData {
+    if (!data || typeof data !== "object" || data === null) {
+      return false;
+    }
+
+    const obj = data as Record<string, unknown>;
     return (
-      data &&
-      typeof data === "object" &&
-      typeof data.lastSaved === "number" &&
-      typeof data.version === "string"
+      "lastSaved" in obj &&
+      "version" in obj &&
+      typeof obj.lastSaved === "number" &&
+      typeof obj.version === "string"
     );
   }
 

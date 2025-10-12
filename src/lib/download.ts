@@ -80,10 +80,8 @@ export function downloadCanvas(
 export function downloadMultipleFiles(
   files: Array<{ blob: Blob; filename: string }>
 ): void {
-  // TODO: Implement ZIP creation and download
-  // TODO: Use a library like JSZip for client-side ZIP creation
-
   // For now, download files individually
+  // See GitHub issue #26 for ZIP implementation
   files.forEach(({ blob, filename }) => {
     downloadBlob(blob, filename);
   });

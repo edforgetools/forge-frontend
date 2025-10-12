@@ -29,20 +29,4 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-/**
- * Hook to get the portal container for dialogs
- * @returns The portal container element
- */
-export function usePortalContainer(): HTMLElement {
-  return React.useMemo(() => {
-    return getPortalRoot() || ensurePortalRoot();
-  }, []);
-}
-
-/**
- * Hook to access dialog context
- * @returns The dialog context value
- */
-export function useDialogContext() {
-  return React.useContext(DialogContext);
-}
+// Unused hooks removed - no imports found in codebase

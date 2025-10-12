@@ -2,78 +2,212 @@ name: Frontend CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '10.18.1'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: frontend-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # Step 1: Build
   build:
+    name: Build
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist/
+          retention-days: 7
+
+  # Step 2: Typecheck
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "pnpm"
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: Verify pnpm installation
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
         run: |
-          which pnpm
-          pnpm --version
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm i --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
+        run: pnpm install --frozen-lockfile
 
       - name: Type check
         run: pnpm typecheck
 
-      - name: Build
-        run: pnpm build
-
-  unit:
+  # Step 3: Unit Tests
+  unit-tests:
+    name: Unit Tests
     runs-on: ubuntu-latest
-    needs: build
-
+    needs: typecheck
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run unit tests with coverage
+        run: pnpm test:unit --run --coverage
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-results
+          path: |
+            coverage/
+            test-results/
+          retention-days: 30
+
+  # Step 4: Playwright E2E Tests
+  playwright:
+    name: Playwright Tests
+    runs-on: ubuntu-latest
+    needs: unit-tests
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "pnpm"
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm i --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm build
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            playwright-
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build application
+        run: pnpm build
 
       - name: Start server and run Playwright tests
         run: |
           echo "Starting preview server..."
-          # Start server directly with vite to have full control over arguments
           npx vite preview --port 4173 --host 127.0.0.1 &
           SERVER_PID=$!
           echo "Server PID: $SERVER_PID"
@@ -89,18 +223,17 @@ jobs:
             sleep 2
             if [ $i -eq 30 ]; then
               echo "Server failed to start after 60 seconds"
-              echo "Checking if server process is still running..."
               ps aux | grep preview || echo "No preview process found"
               exit 1
             fi
           done
 
           echo "Server health check passed!"
-          echo "Running minimal e2e tests..."
+          echo "Running Playwright tests..."
 
-          # Run minimal e2e tests: basic CI test + forge thumb endpoint test
-          pnpm exec playwright test ci-basic.spec.ts forge-thumb.spec.ts --project=chromium
-          echo "Minimal e2e tests completed successfully!"
+          # Run comprehensive Playwright test suite
+          pnpm exec playwright test --project=chromium
+          echo "Playwright tests completed successfully!"
 
           # Clean up server
           echo "Stopping server..."
@@ -108,16 +241,73 @@ jobs:
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
 
-      - name: UI Regression Tests
-        run: pnpm exec playwright test ci-basic.spec.ts forge-thumb.spec.ts --project=chromium
+      - name: Run accessibility tests
+        run: pnpm test:a11y:ci
+        env:
+          CI: true
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
 
-      - name: Lighthouse Audit
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-results
+          path: test-results/
+          retention-days: 30
+
+  # Step 5: Lighthouse Performance Tests
+  lighthouse:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    needs: playwright
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm build
+
+      - name: Run Lighthouse Audit
         run: pnpm test:lighthouse
 
       - name: Run Lighthouse CI
         run: |
           echo "Starting preview server for Lighthouse..."
-          # Start server directly with vite
           npx vite preview --port 4173 --host 127.0.0.1 &
           SERVER_PID=$!
           echo "Server PID: $SERVER_PID"
@@ -147,95 +337,93 @@ jobs:
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
-  ui:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm i --frozen-lockfile
-
-      - name: Build
-        run: pnpm build
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            playwright-
-
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
-
-      - name: Start server for UI tests
-        run: |
-          echo "Starting preview server..."
-          # Start server directly with vite to have full control over arguments
-          npx vite preview --port 4173 --host 127.0.0.1 &
-          SERVER_PID=$!
-          echo "Server PID: $SERVER_PID"
-
-          # Wait for server to start
-          echo "Waiting for server to start..."
-          for i in {1..30}; do
-            if curl -f http://127.0.0.1:4173 > /dev/null 2>&1; then
-              echo "Server is ready after $((i*2)) seconds!"
-              break
-            fi
-            echo "Attempt $i: Server not ready yet, waiting..."
-            sleep 2
-            if [ $i -eq 30 ]; then
-              echo "Server failed to start after 60 seconds"
-              echo "Checking if server process is still running..."
-              ps aux | grep preview || echo "No preview process found"
-              exit 1
-            fi
-          done
-
-          echo "Server health check passed!"
-          echo "Server ready for UI tests!"
-        env:
-          PLAYWRIGHT_BASE_URL: http://127.0.0.1:4173
-
-      - name: Upload Playwright snapshots
+      - name: Upload Lighthouse results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-snapshots
-          path: test-results/
+          name: lighthouse-results
+          path: .lighthouseci/
           retention-days: 30
 
-  deploy:
-    needs: [build, unit, ui]
+  # Step 6: Size Limit Check
+  size-limit:
+    name: Size Limit Check
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: lighthouse
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Vercel CLI
-        run: pnpm install -g vercel@latest
+      - name: Build application
+        run: pnpm build
 
-      - name: Deploy to Vercel
-        run: vercel --token=${{ secrets.VERCEL_TOKEN }} --prod --confirm --force
+      - name: Run size-limit check
+        run: pnpm size-limit
+
+      - name: Generate bundle analysis
+        run: pnpm bundle-analyze
+
+      - name: Upload bundle analysis
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bundle-analysis
+          path: |
+            dist/bundle-analysis.html
+            size-limit-report.html
+          retention-days: 30
+
+  # Final status check job - reports as 'frontend-ci' for branch protection
+  frontend-ci:
+    name: Frontend CI Status
+    runs-on: ubuntu-latest
+    needs: [build, typecheck, unit-tests, playwright, lighthouse, size-limit]
+    if: always()
+    steps:
+      - name: Frontend CI Status Check
+        run: |
+          if [[ "${{ needs.build.result }}" == "success" && 
+                "${{ needs.typecheck.result }}" == "success" && 
+                "${{ needs.unit-tests.result }}" == "success" && 
+                "${{ needs.playwright.result }}" == "success" && 
+                "${{ needs.lighthouse.result }}" == "success" && 
+                "${{ needs.size-limit.result }}" == "success" ]]; then
+            echo "✅ All Frontend CI checks passed"
+            exit 0
+          else
+            echo "❌ One or more Frontend CI checks failed:"
+            echo "  build: ${{ needs.build.result }}"
+            echo "  typecheck: ${{ needs.typecheck.result }}"
+            echo "  unit-tests: ${{ needs.unit-tests.result }}"
+            echo "  playwright: ${{ needs.playwright.result }}"
+            echo "  lighthouse: ${{ needs.lighthouse.result }}"
+            echo "  size-limit: ${{ needs.size-limit.result }}"
+            exit 1
+          fi

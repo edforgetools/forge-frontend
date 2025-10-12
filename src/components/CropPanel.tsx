@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { useCanvasStore } from "@/state/canvasStore";
 import { Lock, RotateCcw } from "lucide-react";
 
@@ -85,8 +85,8 @@ export function CropPanel() {
 
           <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               disabled={true}
               className="h-8 w-8 p-0 opacity-50"
               title="16:9 aspect ratio is locked for Snapthumb"
@@ -94,8 +94,8 @@ export function CropPanel() {
               <Lock className="w-4 h-4" />
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={resetToAutoCrop}
               className="h-8 px-2"
             >
@@ -128,6 +128,7 @@ export function CropPanel() {
                   max={image ? image.width - crop.w : 1920 - crop.w}
                   step={1}
                   className="w-full"
+                  aria-label={`Crop X position: ${Math.round(crop.x)} pixels`}
                 />
               </div>
             </div>
@@ -152,6 +153,7 @@ export function CropPanel() {
                   max={image ? image.height - crop.h : 1080 - crop.h}
                   step={1}
                   className="w-full"
+                  aria-label={`Crop Y position: ${Math.round(crop.y)} pixels`}
                 />
               </div>
             </div>
@@ -179,6 +181,7 @@ export function CropPanel() {
                   min={100}
                   step={1}
                   className="w-full"
+                  aria-label={`Crop width: ${Math.round(crop.w)} pixels`}
                 />
               </div>
             </div>
@@ -204,6 +207,7 @@ export function CropPanel() {
                   min={100}
                   step={1}
                   className="w-full"
+                  aria-label={`Crop height: ${Math.round(crop.h)} pixels`}
                 />
               </div>
             </div>
@@ -231,8 +235,8 @@ export function CropPanel() {
           <div className="text-sm font-medium text-gray-900">Quick Presets</div>
           <div className="grid grid-cols-2 gap-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() => {
                 const targetRatio = 16 / 9;
                 const newHeight = crop.w / targetRatio;
@@ -243,8 +247,8 @@ export function CropPanel() {
               16:9
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() => {
                 const targetRatio = 1;
                 const newHeight = crop.w / targetRatio;

@@ -14,18 +14,6 @@
 }
 
 /* Legacy class mappings for backward compatibility */
-.navbar {
-  z-index: var(--z-header);
-}
-
-.toolbar {
-  z-index: var(--z-toolbar);
-}
-
-.canvas {
-  z-index: var(--z-base);
-}
-
 .popover,
 .dropdown,
 .tooltip {

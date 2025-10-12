@@ -1,6 +1,6 @@
 # Forge Frontend Docs
 
-This repo references the canonical progress record at:
-[`forge-layer/docs/canonical.md`](https://github.com/edforgetools/forge-layer/blob/main/docs/canonical.md)
+This repo's canonical progress record is maintained at:
+[`docs/canonical.md`](./canonical.md)
 
-That keeps frontend contributors aware without duplicating the file.
+This is the single source of truth for project status, decisions, and progress tracking.

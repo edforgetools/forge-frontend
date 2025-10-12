@@ -5,7 +5,7 @@ test.describe("Compression Selector (FE-012)", () => {
     await page.goto("/");
 
     // Navigate to app page
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Upload a test image

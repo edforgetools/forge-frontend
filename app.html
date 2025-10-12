@@ -4,10 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Content Security Policy -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' blob: data: https:; media-src 'self' blob: https:; 
+                   script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; 
+                   connect-src 'self' https://forge-layer.onrender.com https://*.vercel.app;"
+    />
+
     <title>Snapthumb Editor</title>
     <meta
       name="description"
-      content="Create perfect 16:9 thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB."
+      content="Create thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB."
     />
 
     <!-- Preconnect to external domains -->
@@ -17,7 +26,7 @@
     <link rel="dns-prefetch" href="https://vitals.vercel-insights.com" />
 
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://snapthumb.tools/app" />
+    <link rel="canonical" href="https://forge-frontend.vercel.app/app" />
 
     <!-- JSON-LD Schema -->
     <script type="application/ld+json">
@@ -25,8 +34,8 @@
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
         "name": "Snapthumb",
-        "description": "Create perfect 16:9 thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB.",
-        "url": "https://snapthumb.tools/",
+        "description": "Create thumbnails from videos and images. Upload, crop, add overlays, and export optimized thumbnails under 2MB.",
+        "url": "https://forge-frontend.vercel.app/",
         "applicationCategory": "MultimediaApplication",
         "operatingSystem": "Web Browser",
         "offers": {
@@ -48,7 +57,7 @@
           "Keyboard shortcuts",
           "Responsive design"
         ],
-        "screenshot": "https://snapthumb.tools/og-image.png",
+        "screenshot": "https://forge-frontend.vercel.app/og-image.png",
         "softwareVersion": "1.0.0",
         "datePublished": "2024-01-01",
         "dateModified": "2024-01-01",

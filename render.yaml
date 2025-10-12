@@ -1,0 +1,73 @@
+services:
+  - type: web
+    name: forge-frontend
+    env: node
+    plan: starter
+    buildCommand: pnpm install && pnpm build
+    startCommand: pnpm preview --port $PORT --host 0.0.0.0
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Core Application Secrets
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: PUBLIC_BASE
+        sync: false
+      - key: ADMIN
+        sync: false
+      # Stripe Configuration
+      - key: STRIPE_SECRET
+        sync: false
+      - key: STRIPE_PRICE_PRO
+        sync: false
+      - key: STRIPE_PRICE_TEAM
+        sync: false
+      - key: BILLING_WEBHOOK_SECRET
+        sync: false
+      # Build-time variables (VITE_ prefix for client-side)
+      - key: VITE_SUPABASE_URL
+        fromService:
+          type: web
+          name: forge-frontend
+          property: env.SUPABASE_URL
+      - key: VITE_SUPABASE_ANON_KEY
+        sync: false
+      - key: VITE_STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: VITE_PUBLIC_BASE
+        fromService:
+          type: web
+          name: forge-frontend
+          property: env.PUBLIC_BASE
+
+  # Optional: Add a background service for webhook handling
+  - type: worker
+    name: forge-webhooks
+    env: node
+    plan: starter
+    buildCommand: pnpm install
+    startCommand: pnpm run webhook-handler
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Core Application Secrets for webhook handling
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: ADMIN
+        sync: false
+      # Stripe Configuration for webhook processing
+      - key: STRIPE_SECRET
+        sync: false
+      - key: STRIPE_PRICE_PRO
+        sync: false
+      - key: STRIPE_PRICE_TEAM
+        sync: false
+      - key: BILLING_WEBHOOK_SECRET
+        sync: false
+      - key: PUBLIC_BASE
+        sync: false

@@ -8,7 +8,7 @@ import {
   generateFilename,
   getExtensionFromMimeType,
 } from "./download";
-import { compressCanvasWithSSIM } from "./compression";
+import { compressWithSSIM } from "./ssim-compression";
 import type { CompressionSettings } from "@/components/CompressionSelector";
 import { estimateSize } from "./estimateSize";
 import { sendTelemetry } from "./telemetry";
@@ -166,13 +166,14 @@ export async function exportCanvas(
   let result: ExportResult;
 
   try {
-    // Use advanced compression for JPEG/WebP
+    // Use enhanced SSIM compression for JPEG/WebP
     if (selectedFormat === "jpeg" || selectedFormat === "webp") {
-      const compressionResult = await compressCanvasWithSSIM(canvas, {
+      const compressionResult = await compressWithSSIM(canvas, {
         format: mimeType as "image/jpeg" | "image/webp",
         settings: defaultCompressionSettings,
         maxIterations: 20,
         enableSSIM: true,
+        targetSizeBytes: targetSizeMB * 1024 * 1024,
       });
 
       result = {

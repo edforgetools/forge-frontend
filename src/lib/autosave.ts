@@ -122,8 +122,9 @@ class AutosaveManager {
       }
 
       return false;
-    } catch (_error) {
-      console.error("Failed to save canvas state:", _error);
+    } catch {
+      // Ignore storage errors
+      console.error("Failed to save canvas state");
       return false;
     }
   }
@@ -158,8 +159,9 @@ class AutosaveManager {
       useCanvasStore.setState(newState);
 
       return true;
-    } catch (_error) {
-      console.error("Failed to load saved state:", _error);
+    } catch {
+      // Ignore storage errors
+      console.error("Failed to load saved state");
       return false;
     }
   }
@@ -193,8 +195,9 @@ class AutosaveManager {
       }
 
       localStorage.setItem(historyKey, JSON.stringify(history));
-    } catch (_error) {
-      console.error("Failed to save to history:", _error);
+    } catch {
+      // Ignore storage errors
+      console.error("Failed to save to history");
     }
   }
 
@@ -213,8 +216,9 @@ class AutosaveManager {
       const historyKey = `${this.options.keyPrefix}_history`;
       const existingHistory = localStorage.getItem(historyKey);
       return existingHistory ? JSON.parse(existingHistory) : [];
-    } catch (_error) {
-      console.error("Failed to get history:", _error);
+    } catch {
+      // Ignore storage errors
+      console.error("Failed to get history");
       return [];
     }
   }
@@ -239,8 +243,9 @@ class AutosaveManager {
       useCanvasStore.setState(newState);
 
       return true;
-    } catch (_error) {
-      console.error("Failed to restore from history:", _error);
+    } catch {
+      // Ignore storage errors
+      console.error("Failed to restore from history");
       return false;
     }
   }
@@ -270,7 +275,8 @@ class AutosaveManager {
       localStorage.setItem(test, test);
       localStorage.removeItem(test);
       return true;
-    } catch (_error) {
+    } catch {
+      // Ignore storage errors
       return false;
     }
   }
@@ -296,7 +302,8 @@ class AutosaveManager {
         available,
         total: estimatedTotal,
       };
-    } catch (_error) {
+    } catch {
+      // Ignore storage errors
       return { used: 0, available: 0, total: 0 };
     }
   }

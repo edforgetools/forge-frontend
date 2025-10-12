@@ -1,47 +1,75 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { type OverlayState, type OverlayActions } from "@/hooks/useOverlay";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCanvasStore } from "@/state/canvasStore";
 
 interface OverlayProps {
-  overlayState: OverlayState;
-  overlayActions: OverlayActions;
   onOverlayComplete?: () => void;
 }
 
-export function Overlay({
-  overlayState,
-  overlayActions,
-  onOverlayComplete,
-}: OverlayProps) {
+export function Overlay({ onOverlayComplete }: OverlayProps) {
   const [textInput, setTextInput] = useState("");
+  const { addOverlay, overlays, updateOverlay, remove, selectedId, select } =
+    useCanvasStore();
 
   const addTextOverlay = () => {
     const content = textInput.trim() || "Your Text Here";
-    overlayActions.addOverlay("text", content);
+    addOverlay({
+      type: "text",
+      x: 50,
+      y: 50,
+      w: 200,
+      h: 40,
+      rot: 0,
+      locked: false,
+      hidden: false,
+      opacity: 1,
+      text: content,
+      font: "Arial",
+      size: 24,
+      weight: 400,
+      letter: 0,
+      shadow: false,
+      align: "left",
+      color: "#000000",
+    } as Omit<import("@/state/canvasStore").TextOverlay, "id" | "z">);
     setTextInput("");
     onOverlayComplete?.();
   };
 
   const addLogoOverlay = () => {
-    overlayActions.addOverlay("logo");
+    addOverlay({
+      type: "logo",
+      x: 50,
+      y: 50,
+      w: 100,
+      h: 100,
+      rot: 0,
+      locked: false,
+      hidden: false,
+      opacity: 1,
+      src: "",
+    } as Omit<import("@/state/canvasStore").LogoOverlay, "id" | "z">);
     onOverlayComplete?.();
   };
 
   const updateOverlayContent = (id: string, content: string) => {
-    overlayActions.updateOverlay(id, { content });
+    updateOverlay(id, { text: content });
   };
 
   const toggleOverlayVisibility = (id: string) => {
-    overlayActions.toggleVisibility(id);
+    const overlay = overlays.find((o) => o.id === id);
+    if (overlay) {
+      updateOverlay(id, { hidden: !overlay.hidden });
+    }
   };
 
   // Keyboard shortcuts are handled in CanvasStage component
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4">
+    <div className="bg-white rounded-lg border border-neutral-200 p-4">
       <h2 className="text-lg font-semibold mb-4">Overlays</h2>
 
       <div className="space-y-4">
@@ -50,16 +78,16 @@ export function Overlay({
           <div className="flex space-x-2">
             <Button
               onClick={addLogoOverlay}
-              size="sm"
-              variant="outline"
+              size="md"
+              variant="secondary"
               className="flex-1"
             >
               Add Logo
             </Button>
             <Button
               onClick={addTextOverlay}
-              size="sm"
-              variant="outline"
+              size="md"
+              variant="secondary"
               className="flex-1"
               disabled={!textInput.trim()}
             >
@@ -93,11 +121,11 @@ export function Overlay({
         {/* Active Overlays List */}
         <div className="space-y-2">
           <h3 className="text-sm font-medium text-gray-700">
-            Active Overlays ({overlayState.items.length})
+            Active Overlays ({overlays.length})
           </h3>
 
           <AnimatePresence>
-            {overlayState.items.length > 0 && (
+            {overlays.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
@@ -105,18 +133,18 @@ export function Overlay({
                 className="space-y-2"
               >
                 <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {overlayState.items.map((overlay) => (
+                  {overlays.map((overlay) => (
                     <motion.div
                       key={overlay.id}
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                        overlayState.selectedId === overlay.id
+                        selectedId === overlay.id
                           ? "border-blue-500 bg-blue-50"
-                          : "border-gray-200 hover:border-gray-300"
+                          : "border-neutral-200 hover:border-neutral-300"
                       }`}
-                      onClick={() => overlayActions.selectOverlay(overlay.id)}
+                      onClick={() => select(overlay.id)}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
@@ -129,16 +157,18 @@ export function Overlay({
                               toggleOverlayVisibility(overlay.id);
                             }}
                             className={`w-2 h-2 rounded-full ${
-                              overlay.visible ? "bg-green-500" : "bg-gray-400"
+                              !overlay.hidden ? "bg-green-500" : "bg-gray-400"
                             }`}
                             aria-label={`${
-                              overlay.visible ? "Hide" : "Show"
+                              !overlay.hidden ? "Hide" : "Show"
                             } overlay`}
                           />
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              overlayActions.toggleLock(overlay.id);
+                              updateOverlay(overlay.id, {
+                                locked: !overlay.locked,
+                              });
                             }}
                             className={`ml-1 text-xs ${
                               overlay.locked ? "text-blue-600" : "text-gray-400"
@@ -157,7 +187,7 @@ export function Overlay({
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              overlayActions.removeOverlay(overlay.id);
+                              remove(overlay.id);
                             }}
                             className="text-xs text-red-500 hover:text-red-700 ml-2"
                             aria-label="Remove overlay"
@@ -170,7 +200,7 @@ export function Overlay({
                       {overlay.type === "text" && (
                         <Input
                           type="text"
-                          value={overlay.content}
+                          value={overlay.text}
                           onChange={(e) =>
                             updateOverlayContent(overlay.id, e.target.value)
                           }
@@ -194,12 +224,12 @@ export function Overlay({
         </div>
 
         {/* Quick Actions */}
-        {overlayState.items.length > 0 && (
+        {overlays.length > 0 && (
           <div className="flex space-x-2 pt-2 border-t">
             <Button
-              size="sm"
-              variant="outline"
-              onClick={overlayActions.clearAll}
+              size="md"
+              variant="secondary"
+              onClick={() => overlays.forEach((overlay) => remove(overlay.id))}
               className="flex-1 text-xs text-red-600 hover:text-red-700"
             >
               Clear All

@@ -6,14 +6,14 @@
 export interface WorkerMessage {
   id: string;
   type: "resize" | "crop" | "compress" | "extract-frame" | "apply-filter";
-  data: any;
+  data: unknown;
 }
 
 export interface WorkerResponse {
   id: string;
   type: string;
   success: boolean;
-  data?: any;
+  data?: unknown;
   error?: string;
 }
 
@@ -276,7 +276,7 @@ class ImageWorker {
       type: "resize",
       data: { imageData, width, height, quality },
     });
-    return response.data;
+    return response.data as ImageBitmap;
   }
 
   /**
@@ -293,7 +293,7 @@ class ImageWorker {
       type: "crop",
       data: { imageData, x, y, width, height },
     });
-    return response.data;
+    return response.data as ImageBitmap;
   }
 
   /**
@@ -309,7 +309,12 @@ class ImageWorker {
       type: "compress",
       data: { imageData, format, quality, maxSizeBytes },
     });
-    return response.data;
+    return response.data as {
+      blob: Blob;
+      size: number;
+      format: string;
+      quality: number;
+    };
   }
 
   /**
@@ -330,7 +335,7 @@ class ImageWorker {
       type: "apply-filter",
       data: { imageData, filter, intensity },
     });
-    return response.data;
+    return response.data as ImageData;
   }
 
   /**

@@ -1,18 +1,27 @@
 import { useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Trash2, Type, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
 import { useCanvasStore } from "@/state/canvasStore";
 import { useToast } from "@/hooks/use-toast";
+import { z } from "zod";
+
+// Validation schemas for text overlay
+const textOverlaySchema = z.object({
+  text: z
+    .string()
+    .min(1, "Text is required")
+    .max(100, "Text must be 100 characters or less"),
+  fontSize: z
+    .number()
+    .min(8, "Font size must be at least 8px")
+    .max(200, "Font size must be 200px or less"),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format"),
+  x: z.number().min(0, "X position must be non-negative"),
+  y: z.number().min(0, "Y position must be non-negative"),
+});
 
 interface TextOverlayProps {
   className?: string;
@@ -82,42 +91,52 @@ export function TextOverlay({ className }: TextOverlayProps) {
   );
 
   const handleAddText = useCallback(() => {
-    if (!newText.trim()) {
+    try {
+      // Validate text input
+      textOverlaySchema.pick({ text: true }).parse({ text: newText.trim() });
+
+      addOverlay({
+        type: "text",
+        text: newText.trim(),
+        x: 100,
+        y: 100,
+        w: newText.length * 20, // Estimate width
+        h: fontSize + 10, // Estimate height
+        rot: 0,
+        locked: false,
+        hidden: false,
+        opacity: 1,
+        font: fontFamily,
+        size: fontSize,
+        weight: fontWeight,
+        letter: letterSpacing,
+        shadow: hasShadow,
+        align: textAlign,
+        color: textColor,
+      } as Omit<import("@/state/canvasStore").TextOverlay, "id" | "z">);
+
       toast({
-        title: "No text entered",
-        description: "Please enter some text to add.",
-        variant: "destructive",
+        title: "Text added",
+        description: "Text overlay has been added to the canvas.",
       });
-      return;
+
+      // Reset form
+      setNewText("");
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.issues[0]?.message || "Invalid input",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to add text overlay",
+          variant: "destructive",
+        });
+      }
     }
-
-    addOverlay({
-      type: "text",
-      text: newText.trim(),
-      x: 100,
-      y: 100,
-      w: newText.length * 20, // Estimate width
-      h: fontSize + 10, // Estimate height
-      rot: 0,
-      locked: false,
-      hidden: false,
-      opacity: 1,
-      font: fontFamily,
-      size: fontSize,
-      weight: fontWeight,
-      letter: letterSpacing,
-      shadow: hasShadow,
-      align: textAlign,
-      color: textColor,
-    } as Omit<import("@/state/canvasStore").TextOverlay, "id" | "z">);
-
-    toast({
-      title: "Text added",
-      description: "Text overlay has been added to the canvas.",
-    });
-
-    // Reset form
-    setNewText("");
   }, [
     newText,
     fontFamily,
@@ -171,40 +190,36 @@ export function TextOverlay({ className }: TextOverlayProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label className="text-xs">Font Family</Label>
-            <Select value={fontFamily} onValueChange={setFontFamily}>
-              <SelectTrigger className="h-8 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {FONT_FAMILIES.map((font) => (
-                  <SelectItem key={font} value={font} className="text-sm">
-                    {font}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-1">
+              {FONT_FAMILIES.slice(0, 6).map((font) => (
+                <Button
+                  key={font}
+                  variant={fontFamily === font ? "primary" : "outline"}
+                  size="md"
+                  onClick={() => setFontFamily(font)}
+                  className="text-xs h-8"
+                >
+                  {font}
+                </Button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label className="text-xs">Font Weight</Label>
-            <Select
-              value={fontWeight.toString()}
-              onValueChange={(v) => setFontWeight(Number(v))}
-            >
-              <SelectTrigger className="h-8 text-sm">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {FONT_WEIGHTS.map((weight) => (
-                  <SelectItem
-                    key={weight.value}
-                    value={weight.value.toString()}
-                  >
-                    {weight.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="grid grid-cols-2 gap-1">
+              {FONT_WEIGHTS.map((weight) => (
+                <Button
+                  key={weight.value}
+                  variant={fontWeight === weight.value ? "primary" : "outline"}
+                  size="md"
+                  onClick={() => setFontWeight(weight.value)}
+                  className="text-xs h-8"
+                >
+                  {weight.label}
+                </Button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -250,8 +265,8 @@ export function TextOverlay({ className }: TextOverlayProps) {
               return (
                 <Button
                   key={align.value}
-                  variant={textAlign === align.value ? "default" : "outline"}
-                  size="sm"
+                  variant={textAlign === align.value ? "primary" : "outline"}
+                  size="md"
                   onClick={() =>
                     setTextAlign(align.value as "left" | "center" | "right")
                   }
@@ -269,11 +284,22 @@ export function TextOverlay({ className }: TextOverlayProps) {
         <div className="space-y-2">
           <Label className="text-xs">Text Color</Label>
           <div className="flex items-center gap-2">
-            <input
-              type="color"
-              value={textColor}
-              onChange={(e) => setTextColor(e.target.value)}
-              className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+            <Button
+              type="button"
+              variant="secondary"
+              size="md"
+              className="w-8 h-8 p-0 border border-neutral-200"
+              onClick={() => {
+                const input = document.createElement("input");
+                input.type = "color";
+                input.value = textColor;
+                input.onchange = (e) =>
+                  setTextColor((e.target as HTMLInputElement).value);
+                input.click();
+              }}
+              style={{
+                backgroundColor: textColor,
+              }}
             />
             <Input
               value={textColor}
@@ -290,7 +316,9 @@ export function TextOverlay({ className }: TextOverlayProps) {
                 key={color}
                 onClick={() => setTextColor(color)}
                 className={`w-6 h-6 rounded border-2 ${
-                  textColor === color ? "border-gray-900" : "border-gray-300"
+                  textColor === color
+                    ? "border-neutral-800"
+                    : "border-neutral-200"
                 }`}
                 style={{ backgroundColor: color }}
                 title={color}
@@ -306,7 +334,7 @@ export function TextOverlay({ className }: TextOverlayProps) {
             id="text-shadow"
             checked={hasShadow}
             onChange={(e) => setHasShadow(e.target.checked)}
-            className="rounded border-gray-300"
+            className="rounded border-neutral-200"
           />
           <Label htmlFor="text-shadow" className="text-xs">
             Add text shadow for better visibility
@@ -318,7 +346,7 @@ export function TextOverlay({ className }: TextOverlayProps) {
           onClick={handleAddText}
           disabled={!newText.trim()}
           className="w-full"
-          size="sm"
+          size="md"
         >
           <Type className="w-4 h-4 mr-2" />
           Add Text Overlay
@@ -331,8 +359,8 @@ export function TextOverlay({ className }: TextOverlayProps) {
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium">Edit Text</h3>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() => {
                 if (selectedId) {
                   // Remove overlay logic would go here
@@ -427,15 +455,31 @@ export function TextOverlay({ className }: TextOverlayProps) {
           <div className="space-y-2">
             <Label className="text-xs">Text Color</Label>
             <div className="flex items-center gap-2">
-              <input
-                type="color"
-                value={
-                  selectedOverlay.type === "text"
-                    ? selectedOverlay.color
-                    : "#FFFFFF"
-                }
-                onChange={(e) => handleUpdateText("color", e.target.value)}
-                className="w-8 h-8 rounded border border-gray-300 cursor-pointer"
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                className="w-8 h-8 p-0 border border-neutral-200"
+                onClick={() => {
+                  const input = document.createElement("input");
+                  input.type = "color";
+                  input.value =
+                    selectedOverlay.type === "text"
+                      ? selectedOverlay.color
+                      : "#FFFFFF";
+                  input.onchange = (e) =>
+                    handleUpdateText(
+                      "color",
+                      (e.target as HTMLInputElement).value
+                    );
+                  input.click();
+                }}
+                style={{
+                  backgroundColor:
+                    selectedOverlay.type === "text"
+                      ? selectedOverlay.color
+                      : "#FFFFFF",
+                }}
               />
               <Input
                 value={
@@ -453,8 +497,8 @@ export function TextOverlay({ className }: TextOverlayProps) {
           {/* Quick Actions */}
           <div className="flex gap-2 pt-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() =>
                 handleUpdateText("locked", !selectedOverlay.locked)
               }
@@ -463,8 +507,8 @@ export function TextOverlay({ className }: TextOverlayProps) {
               {selectedOverlay.locked ? "Unlock" : "Lock"}
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() =>
                 handleUpdateText("hidden", !selectedOverlay.hidden)
               }
@@ -489,7 +533,7 @@ export function TextOverlay({ className }: TextOverlayProps) {
                   className={`flex items-center justify-between p-2 rounded border cursor-pointer transition-colors ${
                     selectedId === text.id
                       ? "bg-blue-50 border-blue-300"
-                      : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                      : "bg-gray-50 border-neutral-200 hover:bg-gray-100"
                   }`}
                   onClick={() => useCanvasStore.getState().select(text.id)}
                 >

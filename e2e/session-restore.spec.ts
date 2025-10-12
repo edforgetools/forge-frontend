@@ -28,7 +28,7 @@ test.describe("Session Restore", () => {
     await page.goto("/");
 
     // Navigate to the app page
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
 
     // Add a text overlay
     await page.fill(
@@ -60,7 +60,7 @@ test.describe("Session Restore", () => {
     await page.goto("/");
 
     // Navigate to the app page
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
 
     // Find the session restore toggle
     const toggle = page.locator('button[role="switch"]');
@@ -91,7 +91,7 @@ test.describe("Session Restore", () => {
     await page.goto("/");
 
     // Navigate to the app page
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
 
     // Add some data
     await page.fill(
@@ -128,7 +128,7 @@ test.describe("Session Restore", () => {
     await page.goto("/");
 
     // Navigate to the app page
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
 
     // App should still load without errors
     await expect(page.locator("text=Snapthumb Editor")).toBeVisible();
@@ -142,7 +142,7 @@ test.describe("Session Restore", () => {
     await page.goto("/");
 
     // Navigate to the app page
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
 
     // Disable session restore
     const toggle = page.locator('button[role="switch"]');
@@ -162,7 +162,7 @@ test.describe("Session Restore", () => {
     await page.goto("/");
 
     // Navigate to the app page
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
 
     // Add some data to restore
     await page.fill(
@@ -192,7 +192,7 @@ test.describe("Session Restore", () => {
     await page.goto("/");
 
     // Navigate to the app page
-    await page.click('button:has-text("Start Creating")');
+    await page.click('a:has-text("Launch Snapthumb")');
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Use sample image to have content on canvas

@@ -14,21 +14,6 @@ export type EditorState = {
   isLoading: boolean;
   isDirty: boolean;
   lastSaved?: number;
-
-  // Editor-specific settings
-  showRulers: boolean;
-  showGuides: boolean;
-  snapToGrid: boolean;
-  gridSize: number;
-
-  // Performance settings
-  enableAnimations: boolean;
-  enableTransitions: boolean;
-
-  // Editor history
-  historyIndex: number;
-  canUndo: boolean;
-  canRedo: boolean;
 };
 
 export type EditorActions = {
@@ -40,21 +25,6 @@ export type EditorActions = {
   setLoading: (loading: boolean) => void;
   setDirty: (dirty: boolean) => void;
   markSaved: () => void;
-
-  // Editor settings actions
-  setShowRulers: (show: boolean) => void;
-  setShowGuides: (show: boolean) => void;
-  setSnapToGrid: (snap: boolean) => void;
-  setGridSize: (size: number) => void;
-
-  // Performance actions
-  setEnableAnimations: (enable: boolean) => void;
-  setEnableTransitions: (enable: boolean) => void;
-
-  // History actions
-  setHistoryIndex: (index: number) => void;
-  setCanUndo: (canUndo: boolean) => void;
-  setCanRedo: (canRedo: boolean) => void;
 
   // Reset actions
   resetEditor: () => void;
@@ -68,20 +38,11 @@ const defaultState: EditorState = {
   isLoading: false,
   isDirty: false,
   lastSaved: undefined,
-  showRulers: false,
-  showGuides: false,
-  snapToGrid: false,
-  gridSize: 20,
-  enableAnimations: true,
-  enableTransitions: true,
-  historyIndex: 0,
-  canUndo: false,
-  canRedo: false,
 };
 
 export const useEditorStore = create<EditorStore>()(
   devtools(
-    (set, get) => ({
+    (set) => ({
       ...defaultState,
 
       // Mode and view actions
@@ -109,52 +70,10 @@ export const useEditorStore = create<EditorStore>()(
         });
       },
 
-      // Editor settings actions
-      setShowRulers: (show) => {
-        set({ showRulers: show });
-      },
-
-      setShowGuides: (show) => {
-        set({ showGuides: show });
-      },
-
-      setSnapToGrid: (snap) => {
-        set({ snapToGrid: snap });
-      },
-
-      setGridSize: (size) => {
-        set({ gridSize: Math.max(5, Math.min(100, size)) });
-      },
-
-      // Performance actions
-      setEnableAnimations: (enable) => {
-        set({ enableAnimations: enable });
-      },
-
-      setEnableTransitions: (enable) => {
-        set({ enableTransitions: enable });
-      },
-
-      // History actions
-      setHistoryIndex: (index) => {
-        set({ historyIndex: index });
-      },
-
-      setCanUndo: (canUndo) => {
-        set({ canUndo });
-      },
-
-      setCanRedo: (canRedo) => {
-        set({ canRedo });
-      },
-
       // Reset actions
       resetEditor: () => {
         set({
           ...defaultState,
-          // Preserve some settings that shouldn't reset
-          enableAnimations: get().enableAnimations,
-          enableTransitions: get().enableTransitions,
         });
       },
     }),
@@ -171,26 +90,6 @@ export const editorActions = {
     useEditorStore.getState().setLoading(loading),
   setDirty: (dirty: boolean) => useEditorStore.getState().setDirty(dirty),
   markSaved: () => useEditorStore.getState().markSaved(),
-
-  setShowRulers: (show: boolean) =>
-    useEditorStore.getState().setShowRulers(show),
-  setShowGuides: (show: boolean) =>
-    useEditorStore.getState().setShowGuides(show),
-  setSnapToGrid: (snap: boolean) =>
-    useEditorStore.getState().setSnapToGrid(snap),
-  setGridSize: (size: number) => useEditorStore.getState().setGridSize(size),
-
-  setEnableAnimations: (enable: boolean) =>
-    useEditorStore.getState().setEnableAnimations(enable),
-  setEnableTransitions: (enable: boolean) =>
-    useEditorStore.getState().setEnableTransitions(enable),
-
-  setHistoryIndex: (index: number) =>
-    useEditorStore.getState().setHistoryIndex(index),
-  setCanUndo: (canUndo: boolean) =>
-    useEditorStore.getState().setCanUndo(canUndo),
-  setCanRedo: (canRedo: boolean) =>
-    useEditorStore.getState().setCanRedo(canRedo),
 
   resetEditor: () => useEditorStore.getState().resetEditor(),
 };

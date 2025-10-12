@@ -1,22 +1,31 @@
-import { forgeRequest } from "./forge-layer-sdk";
+/**
+ * Unified API surface for Forge Layer operations
+ * All API interactions should go through this module
+ */
 
-export const thumb = (payload: unknown) => forgeRequest("thumb", payload);
+import {
+  forgeRequest,
+  healthCheck,
+  getVersionInfo,
+  type ThumbResponse,
+  type HealthCheckResponse,
+  type VersionInfoResponse,
+  type ApiError,
+} from "./forge-layer-sdk";
 
-const FORGE_LAYER_URL =
-  import.meta.env.VITE_FORGE_LAYER_URL || "https://forge-layer.onrender.com";
-
-export const healthCheck = async () => {
-  const response = await fetch(`${FORGE_LAYER_URL}/health`);
-  if (!response.ok) {
-    throw new Error(`Health check failed: ${response.statusText}`);
-  }
-  return await response.json();
+// Re-export types for consumers
+export type {
+  ThumbResponse,
+  HealthCheckResponse,
+  VersionInfoResponse,
+  ApiError,
 };
 
-export const getVersionInfo = async () => {
-  const response = await fetch(`${FORGE_LAYER_URL}/version`);
-  if (!response.ok) {
-    throw new Error(`Version check failed: ${response.statusText}`);
-  }
-  return await response.json();
-};
+// Re-export all API functions
+export { forgeRequest, healthCheck, getVersionInfo };
+
+/**
+ * Thumbnail generation endpoint
+ */
+export const thumb = (payload: unknown): Promise<ThumbResponse> =>
+  forgeRequest("thumb", payload);

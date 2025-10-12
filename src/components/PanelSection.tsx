@@ -20,9 +20,11 @@ export function PanelSection({
     <div className={cn("space-y-3", className)}>
       <div className="flex items-center gap-2">
         {icon && <div className="text-gray-500">{icon}</div>}
-        <h4 className="panel-title text-gray-700">{title}</h4>
+        <h4 className="text-lg font-semibold leading-tight text-gray-700">
+          {title}
+        </h4>
       </div>
-      {showDivider && <div className="border-t border-gray-200" />}
+      {showDivider && <div className="border-t border-neutral-200" />}
       {children && <div className="pt-1">{children}</div>}
     </div>
   );

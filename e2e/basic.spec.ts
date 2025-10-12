@@ -6,23 +6,20 @@ test.describe("Snapthumb Basic Tests", () => {
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Check main elements are present
-    await expect(page.locator("h1")).toContainText("Snapthumb");
-    await expect(
-      page.locator('button:has-text("Start Creating")')
-    ).toBeVisible();
+    await expect(page.locator("h1")).toContainText("Create Perfect Thumbnails");
+    await expect(page.locator('a:has-text("Launch Snapthumb")')).toBeVisible();
 
     // Check feature cards
-    await expect(page.locator("text=Video Frames")).toBeVisible();
-    await expect(page.locator("text=Smart Cropping")).toBeVisible();
-    await expect(page.locator("text=Export Ready")).toBeVisible();
+    await expect(page.locator("h3:has-text('Controls')")).toBeVisible();
+    await expect(page.locator("h3:has-text('Features')")).toBeVisible();
   });
 
   test("should navigate to app page", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
-    // Click start button
-    await page.click('button:has-text("Start Creating")');
+    // Click start link
+    await page.click('a:has-text("Launch Snapthumb")');
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Check app page loaded - wait for navigation and look for the editor layout

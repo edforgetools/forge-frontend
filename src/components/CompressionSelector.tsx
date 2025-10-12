@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Slider } from "@/components/ui/slider";
 
 export type CompressionPreset = "high" | "medium" | "low";
@@ -98,8 +98,8 @@ export function CompressionSelector({
           {(["high", "medium", "low"] as CompressionPreset[]).map((preset) => (
             <Button
               key={preset}
-              variant={value.preset === preset ? "default" : "outline"}
-              size="sm"
+              variant={value.preset === preset ? "primary" : "outline"}
+              size="md"
               onClick={() => handlePresetChange(preset)}
               disabled={disabled}
               className="text-xs px-2 py-1"
@@ -119,7 +119,7 @@ export function CompressionSelector({
       <div className="flex items-center justify-between">
         <Button
           variant="ghost"
-          size="sm"
+          size="md"
           onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
           disabled={disabled}
           className="text-xs p-1 h-auto"
@@ -130,7 +130,7 @@ export function CompressionSelector({
 
       {/* Advanced Settings */}
       {isAdvancedOpen && (
-        <div className="space-y-3 pl-2 border-l-2 border-gray-200">
+        <div className="space-y-3 pl-2 border-l-2 border-neutral-200">
           {/* Quality Slider */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">

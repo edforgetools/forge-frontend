@@ -9,7 +9,7 @@ import { CropOverlay } from "./CropOverlay";
 import { LayerHost } from "./LayerHost";
 import { startHeatmapTracking, stopHeatmapTracking } from "@/lib/heatmap";
 import { useViewportScale } from "@/hooks/useViewportScale";
-import { useSessionRestoreGuardEffect } from "@/state/session";
+import { checkAndRestoreViewport, saveViewportState } from "@/state/session";
 import { modalActions } from "@/state/modalStore";
 
 interface CanvasStageProps {
@@ -63,7 +63,15 @@ export function CanvasStage({ onDragStateChange }: CanvasStageProps) {
   });
 
   // Session restore guard
-  const { checkAndSaveViewport } = useSessionRestoreGuardEffect();
+  // Session restore functionality
+  const checkAndSaveViewport = async (viewport: {
+    width: number;
+    height: number;
+  }) => {
+    const wasRestored = await checkAndRestoreViewport(viewport);
+    await saveViewportState(viewport);
+    return wasRestored;
+  };
 
   // Animation frame ref for smooth redraws
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -450,13 +458,13 @@ export function CanvasStage({ onDragStateChange }: CanvasStageProps) {
 
   return (
     <div
-      className="canvas w-full h-full flex items-center justify-center"
+      className="w-full h-full flex items-center justify-center"
       data-testid="canvas-stage"
     >
       <div className="relative bg-gray-100 rounded-2xl shadow-lg p-4 md:p-6 w-full max-w-4xl h-full">
         <div
           ref={containerRef}
-          className="border border-gray-200 rounded-xl shadow-sm bg-white overflow-hidden relative mx-auto h-full flex items-center justify-center"
+          className="border border-neutral-200 rounded-xl shadow-sm bg-white overflow-hidden relative mx-auto h-full flex items-center justify-center"
           style={{
             position: "relative",
             width: "100%",
@@ -580,7 +588,7 @@ export function CanvasStage({ onDragStateChange }: CanvasStageProps) {
       {hasContent && (
         <div
           id="canvas-description"
-          className="hidden md:block mt-4 text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200"
+          className="hidden md:block mt-4 text-sm text-gray-600 bg-white px-4 py-2 rounded-full shadow-sm border border-neutral-200"
           role="status"
           aria-live="polite"
         >

@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Text Overlay Functionality", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await page.click("button:has-text('Start Creating')");
+    await page.click("a:has-text('Launch Snapthumb')");
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Upload a test image

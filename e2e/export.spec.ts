@@ -9,7 +9,7 @@ test.describe("Export Flow", () => {
     await page.waitForLoadState("domcontentloaded", { timeout: 10000 });
 
     // Click start creating button
-    await page.click("text=Start Creating");
+    await page.click("a:has-text('Launch Snapthumb')");
 
     // Wait for app to load with timeout
     await page.waitForSelector('[data-testid="app-shell"]', { timeout: 15000 });

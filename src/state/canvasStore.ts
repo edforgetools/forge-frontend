@@ -53,7 +53,7 @@ export type ExportPrefs = {
 
 export type CanvasPatch = {
   type: "overlay" | "crop" | "image";
-  data: any;
+  data: unknown; // Flexible type for undo/redo system
   timestamp: number;
   description?: string;
 };
@@ -67,8 +67,8 @@ export type CanvasState = {
   crop: Crop;
   overlays: (LogoOverlay | TextOverlay)[];
   selectedId?: string;
-  undoStack: any[];
-  redoStack: any[];
+  undoStack: CanvasPatch[];
+  redoStack: CanvasPatch[];
   prefs: ExportPrefs;
   projectId: string;
   // New toolbar states
@@ -128,7 +128,7 @@ export type CanvasActions = {
   sendToBack: (id: string) => void;
   lock: (id: string, v?: boolean) => void;
   hide: (id: string, v?: boolean) => void;
-  pushUndo: (p: any) => void;
+  pushUndo: (p: CanvasPatch) => void;
   undo: () => void;
   redo: () => void;
   setPrefs: (p: Partial<ExportPrefs>) => void;
@@ -238,7 +238,7 @@ export const useCanvasStore = create<CanvasStore>()(
         // Push undo state for significant changes
         if (
           overlay &&
-          ((patch as any).text !== undefined ||
+          ((patch as Record<string, unknown>).text !== undefined ||
             patch.x !== undefined ||
             patch.y !== undefined)
         ) {
@@ -354,6 +354,8 @@ export const useCanvasStore = create<CanvasStore>()(
         if (state.undoStack.length === 0) return;
 
         const lastPatch = state.undoStack[state.undoStack.length - 1];
+        if (!lastPatch) return;
+
         const newUndoStack = state.undoStack.slice(0, -1);
         const newRedoStack = [
           ...state.redoStack,
@@ -372,19 +374,19 @@ export const useCanvasStore = create<CanvasStore>()(
         // Apply the undo
         if (lastPatch.type === "overlay") {
           set({
-            overlays: lastPatch.data,
+            overlays: lastPatch.data as (LogoOverlay | TextOverlay)[],
             undoStack: newUndoStack,
             redoStack: newRedoStack,
           });
         } else if (lastPatch.type === "crop") {
           set({
-            crop: lastPatch.data,
+            crop: lastPatch.data as Crop,
             undoStack: newUndoStack,
             redoStack: newRedoStack,
           });
         } else if (lastPatch.type === "image") {
           set({
-            image: lastPatch.data,
+            image: lastPatch.data as HTMLImageElement | ImageBitmap,
             undoStack: newUndoStack,
             redoStack: newRedoStack,
           });
@@ -393,7 +395,7 @@ export const useCanvasStore = create<CanvasStore>()(
         // Track telemetry
         track("undo_action", {
           type: lastPatch.type,
-          description: lastPatch.description,
+          description: lastPatch.description || "",
         });
       },
 
@@ -402,6 +404,8 @@ export const useCanvasStore = create<CanvasStore>()(
         if (state.redoStack.length === 0) return;
 
         const nextPatch = state.redoStack[state.redoStack.length - 1];
+        if (!nextPatch) return;
+
         const newRedoStack = state.redoStack.slice(0, -1);
         const newUndoStack = [
           ...state.undoStack,
@@ -420,19 +424,19 @@ export const useCanvasStore = create<CanvasStore>()(
         // Apply the redo
         if (nextPatch.type === "overlay") {
           set({
-            overlays: nextPatch.data,
+            overlays: nextPatch.data as (LogoOverlay | TextOverlay)[],
             undoStack: newUndoStack,
             redoStack: newRedoStack,
           });
         } else if (nextPatch.type === "crop") {
           set({
-            crop: nextPatch.data,
+            crop: nextPatch.data as Crop,
             undoStack: newUndoStack,
             redoStack: newRedoStack,
           });
         } else if (nextPatch.type === "image") {
           set({
-            image: nextPatch.data,
+            image: nextPatch.data as HTMLImageElement | ImageBitmap,
             undoStack: newUndoStack,
             redoStack: newRedoStack,
           });
@@ -441,7 +445,7 @@ export const useCanvasStore = create<CanvasStore>()(
         // Track telemetry
         track("redo_action", {
           type: nextPatch.type,
-          description: nextPatch.description,
+          description: nextPatch.description || "",
         });
       },
 

@@ -6,8 +6,8 @@ test.describe("Snapthumb Export", () => {
     await page.goto("/");
     // Wait for the page to load
     await page.waitForLoadState("networkidle");
-    // Click the "Start Creating" button to navigate to the app page
-    await page.click('button:has-text("Start Creating")');
+    // Click the "Launch Snapthumb" button to navigate to the app page
+    await page.click('a:has-text("Launch Snapthumb")');
     // Wait for the app page to load
     await page.waitForLoadState("networkidle");
   });
@@ -225,7 +225,7 @@ test.describe("Snapthumb Export", () => {
 
   test("should provide proper error handling", async () => {
     // Skip error handling test for now - requires proper file fixtures
-    // TODO: Implement proper error handling test with fixtures
+    // See GitHub issue #27 for test implementation
     test.skip(true, "Error handling test requires proper fixtures setup");
   });
 });

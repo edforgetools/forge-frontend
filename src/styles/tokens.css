@@ -1,0 +1,217 @@
+/* Design Tokens for Snapthumb - Neutral Substrate Aesthetic */
+
+:root {
+  /* === CORE DESIGN TOKENS === */
+  --radius: 12px;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* === COLOR TOKENS === */
+  /* Neutral Palette */
+  --color-neutral-50: 250 250 250;
+  --color-neutral-100: 245 245 245;
+  --color-neutral-200: 229 229 229;
+  --color-neutral-300: 212 212 212;
+  --color-neutral-400: 163 163 163;
+  --color-neutral-500: 115 115 115;
+  --color-neutral-600: 82 82 82;
+  --color-neutral-700: 64 64 64;
+  --color-neutral-800: 38 38 38;
+  --color-neutral-900: 23 23 23;
+  --color-neutral-950: 10 10 10;
+
+  /* Semantic Colors */
+  --color-background: var(--color-neutral-50);
+  --color-background-elevated: var(--color-neutral-100);
+  --color-surface: var(--color-neutral-100);
+  --color-surface-elevated: 255 255 255;
+  --color-border: var(--color-neutral-200);
+  --color-border-subtle: var(--color-neutral-100);
+  --color-border-strong: var(--color-neutral-300);
+
+  /* Text Colors */
+  --color-text-primary: var(--color-neutral-900);
+  --color-text-secondary: var(--color-neutral-600);
+  --color-text-tertiary: var(--color-neutral-500);
+  --color-text-disabled: var(--color-neutral-400);
+
+  /* Interactive Colors */
+  --color-interactive: var(--color-neutral-700);
+  --color-interactive-hover: var(--color-neutral-800);
+  --color-interactive-active: var(--color-neutral-900);
+  --color-interactive-disabled: var(--color-neutral-300);
+
+  /* Status Colors */
+  --color-success: 34 197 94;
+  --color-success-foreground: 255 255 255;
+  --color-warning: 245 158 11;
+  --color-warning-foreground: 255 255 255;
+  --color-error: 239 68 68;
+  --color-error-foreground: 255 255 255;
+  --color-info: 59 130 246;
+  --color-info-foreground: 255 255 255;
+
+  /* === SPACING TOKENS === */
+  --space-0: 0px;
+  --space-5: 20px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* === FONT SCALE TOKENS === */
+  --font-size-xs: 0.75rem; /* 12px */
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-base: 1rem; /* 16px */
+  --font-size-lg: 1.125rem; /* 18px */
+  --font-size-xl: 1.25rem; /* 20px */
+  --font-size-2xl: 1.5rem; /* 24px */
+  --font-size-3xl: 1.875rem; /* 30px */
+  --font-size-4xl: 2.25rem; /* 36px */
+  --font-size-5xl: 3rem; /* 48px */
+  --font-size-6xl: 3.75rem; /* 60px */
+
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* === BORDER RADIUS TOKENS === */
+  --radius-none: 0px;
+  --radius-sm: 0.125rem; /* 2px */
+  --radius-md: 0.375rem; /* 6px */
+  --radius-lg: 0.5rem; /* 8px */
+  --radius-xl: 0.75rem; /* 12px */
+  --radius-2xl: 1rem; /* 16px */
+  --radius-3xl: 1.5rem; /* 24px */
+  --radius-full: 9999px;
+
+  /* === SHADOW TOKENS === */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl:
+    0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* === Z-INDEX TOKENS === */
+  --z-base: 0;
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+
+  /* === TRANSITION TOKENS === */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+}
+
+/* Base body styles */
+html {
+  font-size: 16px;
+}
+
+/* Typography styles */
+h1 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 18px;
+}
+
+p,
+li {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Dark theme overrides */
+.dark {
+  --color-background: var(--color-neutral-950);
+  --color-background-elevated: var(--color-neutral-900);
+  --color-surface: var(--color-neutral-900);
+  --color-surface-elevated: var(--color-neutral-800);
+  --color-border: var(--color-neutral-800);
+  --color-border-subtle: var(--color-neutral-900);
+  --color-border-strong: var(--color-neutral-700);
+
+  --color-text-primary: var(--color-neutral-50);
+  --color-text-secondary: var(--color-neutral-400);
+  --color-text-tertiary: var(--color-neutral-500);
+  --color-text-disabled: var(--color-neutral-600);
+
+  --color-interactive: var(--color-neutral-300);
+  --color-interactive-hover: var(--color-neutral-200);
+  --color-interactive-active: var(--color-neutral-100);
+  --color-interactive-disabled: var(--color-neutral-700);
+}
+
+/* Utility classes for design tokens */
+.text-neutral-primary {
+  color: rgb(var(--color-text-primary));
+}
+.text-neutral-secondary {
+  color: rgb(var(--color-text-secondary));
+}
+.text-neutral-tertiary {
+  color: rgb(var(--color-text-tertiary));
+}
+.text-neutral-disabled {
+  color: rgb(var(--color-text-disabled));
+}
+
+.bg-neutral-surface {
+  background-color: rgb(var(--color-surface));
+}
+.bg-neutral-elevated {
+  background-color: rgb(var(--color-surface-elevated));
+}
+.bg-neutral-background {
+  background-color: rgb(var(--color-background));
+}
+
+.border-neutral {
+  border-color: rgb(var(--color-border));
+}
+.border-neutral-subtle {
+  border-color: rgb(var(--color-border-subtle));
+}
+.border-neutral-strong {
+  border-color: rgb(var(--color-border-strong));
+}
+
+/* Vertical rhythm utilities */
+.vertical-rhythm-2 > * + * {
+  margin-top: var(--space-2);
+}
+.vertical-rhythm-3 > * + * {
+  margin-top: var(--space-3);
+}
+.vertical-rhythm-4 > * + * {
+  margin-top: var(--space-4);
+}

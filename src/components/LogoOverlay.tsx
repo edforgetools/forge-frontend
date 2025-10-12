@@ -1,5 +1,5 @@
 import React, { useRef, useCallback } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
@@ -25,21 +25,22 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
       const file = event.target.files?.[0];
       if (!file) return;
 
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
+      // Validate file type - PNG only for overlays
+      if (file.type !== "image/png") {
         toast({
-          title: "Invalid file type",
-          description: "Please select an image file for the logo.",
+          title: "Invalid overlay format",
+          description:
+            "Logo overlays must be PNG format. Please convert your image to PNG.",
           variant: "destructive",
         });
         return;
       }
 
-      // Validate file size (max 5MB for logos)
-      if (file.size > 5 * 1024 * 1024) {
+      // Validate file size (max 10MB for overlays)
+      if (file.size > 10 * 1024 * 1024) {
         toast({
-          title: "File too large",
-          description: "Logo files must be smaller than 5MB.",
+          title: "Overlay file too large",
+          description: `Logo file size ${(file.size / 1024 / 1024).toFixed(1)}MB exceeds 10MB limit. Please use a smaller PNG file.`,
           variant: "destructive",
         });
         return;
@@ -116,8 +117,8 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
         </Label>
         <div className="flex gap-2">
           <Button
-            variant="outline"
-            size="sm"
+            variant="secondary"
+            size="md"
             onClick={() => fileInputRef.current?.click()}
             className="flex-1"
           >
@@ -127,15 +128,13 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*"
+            accept="image/png"
             onChange={handleFileUpload}
             className="hidden"
             id="logo-upload"
           />
         </div>
-        <p className="text-xs text-gray-500">
-          PNG, JPG, WebP supported. Max 5MB.
-        </p>
+        <p className="text-xs text-gray-500">PNG format only. Max 10MB.</p>
       </div>
 
       {/* Logo Controls - Only show if logo is selected */}
@@ -145,16 +144,16 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
             <h3 className="text-sm font-medium">Logo Controls</h3>
             <div className="flex gap-2">
               <Button
-                variant="outline"
-                size="sm"
+                variant="secondary"
+                size="md"
                 onClick={resetLogoTransform}
                 className="h-8 w-8 p-0"
               >
                 <RotateCw className="w-4 h-4" />
               </Button>
               <Button
-                variant="outline"
-                size="sm"
+                variant="secondary"
+                size="md"
                 onClick={() => {
                   if (selectedId) {
                     // Remove overlay logic would go here
@@ -240,6 +239,7 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
               max={1}
               step={0.01}
               className="w-full"
+              aria-label={`Logo opacity: ${Math.round(selectedOverlay.opacity * 100)}%`}
             />
           </div>
 
@@ -258,14 +258,15 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
               max={180}
               step={1}
               className="w-full"
+              aria-label={`Logo rotation: ${Math.round(selectedOverlay.rot)} degrees`}
             />
           </div>
 
           {/* Quick Actions */}
           <div className="flex gap-2 pt-2">
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() =>
                 updateOverlay(selectedId!, { locked: !selectedOverlay.locked })
               }
@@ -274,8 +275,8 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
               {selectedOverlay.locked ? "Unlock" : "Lock"}
             </Button>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={() =>
                 updateOverlay(selectedId!, { hidden: !selectedOverlay.hidden })
               }
@@ -312,7 +313,7 @@ export function LogoOverlay({ className }: LogoOverlayProps) {
                   className={`flex items-center justify-between p-2 rounded border cursor-pointer transition-colors ${
                     selectedId === logo.id
                       ? "bg-blue-50 border-blue-300"
-                      : "bg-gray-50 border-gray-200 hover:bg-gray-100"
+                      : "bg-gray-50 border-neutral-200 hover:bg-gray-100"
                   }`}
                   onClick={() => useCanvasStore.getState().select(logo.id)}
                 >

@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Checkbox } from "./checkbox";
+import { Button } from "./Button";
 
 /**
  * Example usage of the Checkbox component
@@ -153,12 +154,9 @@ export function CheckboxExamples() {
               I accept the terms and conditions *
             </label>
           </div>
-          <button
-            type="submit"
-            className="px-3 py-1 bg-blue-500 text-white rounded text-sm"
-          >
+          <Button type="submit" size="sm">
             Submit
-          </button>
+          </Button>
         </form>
       </div>
     </div>

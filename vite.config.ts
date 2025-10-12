@@ -44,6 +44,8 @@ export default defineConfig({
     cssCodeSplit: true,
     // Enable compression
     reportCompressedSize: true,
+    // Optimize for faster LCP
+    assetsInlineLimit: 4096, // Inline small assets
     // Optimize dependencies
     rollupOptions: {
       onwarn(warning, warn) {
@@ -58,55 +60,97 @@ export default defineConfig({
       },
       output: {
         manualChunks: (id) => {
-          // Vendor chunks - more granular splitting
+          // Vendor chunks - more granular splitting for better caching
           if (id.includes("node_modules")) {
-            if (id.includes("react") || id.includes("react-dom")) {
-              return "vendor-react";
+            // React core - keep separate for better caching
+            if (id.includes("react") && !id.includes("react-dom")) {
+              return "vendor-react-core";
             }
-            if (id.includes("@radix-ui/react-dialog")) {
-              return "vendor-dialog";
+            if (id.includes("react-dom")) {
+              return "vendor-react-dom";
             }
-            if (id.includes("@radix-ui/react-select")) {
-              return "vendor-select";
+
+            // Radix UI components - split by usage frequency
+            if (
+              id.includes("@radix-ui/react-dialog") ||
+              id.includes("@radix-ui/react-popover")
+            ) {
+              return "vendor-radix-overlays";
             }
-            if (id.includes("@radix-ui/react-slider")) {
-              return "vendor-slider";
+            if (
+              id.includes("@radix-ui/react-select") ||
+              id.includes("@radix-ui/react-dropdown-menu")
+            ) {
+              return "vendor-radix-forms";
             }
-            if (id.includes("@radix-ui/react-checkbox")) {
-              return "vendor-checkbox";
+            if (
+              id.includes("@radix-ui/react-slider") ||
+              id.includes("@radix-ui/react-checkbox") ||
+              id.includes("@radix-ui/react-switch")
+            ) {
+              return "vendor-radix-controls";
             }
-            if (id.includes("@radix-ui/react-label")) {
-              return "vendor-label";
+            if (
+              id.includes("@radix-ui/react-label") ||
+              id.includes("@radix-ui/react-separator") ||
+              id.includes("@radix-ui/react-tabs")
+            ) {
+              return "vendor-radix-layout";
             }
-            if (id.includes("@radix-ui/react-popover")) {
-              return "vendor-popover";
+            if (
+              id.includes("@radix-ui/react-tooltip") ||
+              id.includes("@radix-ui/react-toast")
+            ) {
+              return "vendor-radix-feedback";
             }
-            if (id.includes("@radix-ui/react-tooltip")) {
-              return "vendor-tooltip";
-            }
-            if (id.includes("@radix-ui/react-toast")) {
-              return "vendor-toast";
-            }
-            if (id.includes("@radix-ui/react-separator")) {
-              return "vendor-separator";
-            }
+
+            // Animation and UI libraries
             if (id.includes("framer-motion")) {
               return "vendor-motion";
             }
             if (id.includes("lucide-react")) {
               return "vendor-icons";
             }
-            if (id.includes("clsx") || id.includes("tailwind")) {
+
+            // Utility libraries
+            if (
+              id.includes("clsx") ||
+              id.includes("tailwind-merge") ||
+              id.includes("class-variance-authority")
+            ) {
               return "vendor-utils";
             }
+            if (id.includes("zod")) {
+              return "vendor-validation";
+            }
+            if (id.includes("zustand")) {
+              return "vendor-state";
+            }
+
+            // External services
             if (id.includes("@vercel/analytics")) {
               return "vendor-analytics";
             }
+            if (id.includes("@supabase/supabase-js")) {
+              return "vendor-supabase";
+            }
+            if (id.includes("react-dropzone")) {
+              return "vendor-upload";
+            }
+            if (id.includes("react-router-dom")) {
+              return "vendor-router";
+            }
+
+            // Everything else
             return "vendor-misc";
           }
+
           // App chunks - more specific splitting
           if (id.includes("src/components/ui")) {
             return "ui-components";
+          }
+          if (id.includes("src/components/SnapthumbCanvas")) {
+            return "snapthumb-components";
           }
           if (id.includes("src/components/Canvas")) {
             return "canvas-components";
@@ -118,8 +162,22 @@ export default defineConfig({
             return "overlay-components";
           }
           if (
+            id.includes("src/components/TextOverlay") ||
+            id.includes("src/components/CanvasTextOverlay")
+          ) {
+            return "text-components";
+          }
+          if (
+            id.includes("src/components/Header") ||
+            id.includes("src/components/StatusBar") ||
+            id.includes("src/components/StickyFooter")
+          ) {
+            return "layout-components";
+          }
+          if (
             id.includes("src/components") &&
-            !id.includes("src/components/ui")
+            !id.includes("src/components/ui") &&
+            !id.includes("src/components/SnapthumbCanvas")
           ) {
             return "components";
           }
@@ -129,6 +187,9 @@ export default defineConfig({
           if (id.includes("src/lib")) {
             return "lib";
           }
+          if (id.includes("src/state")) {
+            return "state";
+          }
           if (id.includes("src/pages/app")) {
             return "editor-page";
           }
@@ -137,10 +198,7 @@ export default defineConfig({
           }
         },
         // Optimize chunk names for better caching
-        chunkFileNames: (chunkInfo) => {
-          const facadeModuleId = chunkInfo.facadeModuleId
-            ? chunkInfo.facadeModuleId.split("/").pop()
-            : "chunk";
+        chunkFileNames: () => {
           return `assets/[name]-[hash].js`;
         },
         entryFileNames: "assets/[name]-[hash].js",

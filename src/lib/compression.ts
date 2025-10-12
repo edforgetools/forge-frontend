@@ -94,7 +94,7 @@ export async function compressCanvasWithSSIM(
 
   // For PNG format, we need to resize instead of reducing quality
   if (format === "image/png") {
-    return compressPNGWithSSIM(canvas, targetSizeBytes, settings);
+    return compressPNGWithSSIM(canvas, targetSizeBytes);
   }
 
   while (quality >= minQuality && iterations < maxIterations) {
@@ -141,7 +141,7 @@ export async function compressCanvasWithSSIM(
 
   // If we couldn't meet both size and SSIM requirements, try resizing
   if (!bestResult || bestResult.sizeBytes > targetSizeBytes) {
-    return compressWithResize(canvas, format, targetSizeBytes, settings);
+    return compressWithResize(canvas, format, targetSizeBytes);
   }
 
   return bestResult;
@@ -152,8 +152,7 @@ export async function compressCanvasWithSSIM(
  */
 async function compressPNGWithSSIM(
   canvas: HTMLCanvasElement,
-  targetSizeBytes: number,
-  _settings: CompressionSettings
+  targetSizeBytes: number
 ): Promise<CompressionResult> {
   const originalBlob = await new Promise<Blob | null>((resolve) => {
     canvas.toBlob(resolve, "image/png");
@@ -204,8 +203,7 @@ async function compressPNGWithSSIM(
 async function compressWithResize(
   canvas: HTMLCanvasElement,
   format: "image/jpeg" | "image/webp",
-  targetSizeBytes: number,
-  _settings: CompressionSettings
+  targetSizeBytes: number
 ): Promise<CompressionResult> {
   // Try with minimum quality first
   const minQualityBlob = await new Promise<Blob | null>((resolve) => {
@@ -292,8 +290,7 @@ async function blobToCanvas(blob: Blob): Promise<HTMLCanvasElement> {
  * Get compression preset recommendations based on content analysis
  */
 export function getRecommendedPreset(
-  canvas: HTMLCanvasElement,
-  _format: "image/jpeg" | "image/webp" | "image/png"
+  canvas: HTMLCanvasElement
 ): CompressionSettings["preset"] {
   const pixelCount = canvas.width * canvas.height;
   const complexity = estimateImageComplexity(canvas);

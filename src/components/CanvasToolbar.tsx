@@ -1,12 +1,5 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Slider } from "@/components/ui/slider";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Grid3X3,
   Shield,
@@ -19,6 +12,7 @@ import {
   useCanvasStore,
   AspectRatio as AspectRatioType,
 } from "@/state/canvasStore";
+import { useTelemetry } from "@/hooks/useTelemetry";
 
 export function CanvasToolbar() {
   const {
@@ -35,6 +29,7 @@ export function CanvasToolbar() {
     toggleGrid,
     toggleSafeZone,
   } = useCanvasStore();
+  const { trackControlChange } = useTelemetry();
 
   const aspectRatioOptions: { value: AspectRatioType; label: string }[] = [
     { value: "16:9", label: "16:9 (Landscape)" },
@@ -45,13 +40,45 @@ export function CanvasToolbar() {
   const zoomPresets = [0.5, 0.75, 1, 1.5, 2];
 
   const handleZoomChange = (value: number[]) => {
-    setZoom(value[0] ?? 1);
+    const newZoom = value[0] ?? 1;
+    setZoom(newZoom);
+    trackControlChange("slider", "zoom", newZoom);
+  };
+
+  const handleAspectRatioChange = (value: AspectRatioType) => {
+    setAspectRatio(value);
+    trackControlChange("select", "aspectRatio", value);
+  };
+
+  const handleToggleGrid = () => {
+    toggleGrid();
+    trackControlChange("button", "showGrid", !showGrid);
+  };
+
+  const handleToggleSafeZone = () => {
+    toggleSafeZone();
+    trackControlChange("button", "showSafeZone", !showSafeZone);
+  };
+
+  const handleZoomIn = () => {
+    zoomIn();
+    trackControlChange("button", "zoomIn", zoom * 1.2);
+  };
+
+  const handleZoomOut = () => {
+    zoomOut();
+    trackControlChange("button", "zoomOut", zoom * 0.8);
+  };
+
+  const handleResetView = () => {
+    resetView();
+    trackControlChange("button", "resetView", { zoom: 1, aspect: "16:9" });
   };
 
   return (
     <div
-      className="toolbar sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 md:px-6 py-2 md:py-3"
-      data-testid="canvas-toolbar"
+      className="z-20 sticky top-0 bg-white/95 backdrop-blur-sm border-b border-neutral-200 px-4 md:px-6 py-2 md:py-3"
+      data-testid="canvas-z-20"
     >
       <div className="max-w-7xl mx-auto">
         {/* Desktop Layout */}
@@ -62,36 +89,30 @@ export function CanvasToolbar() {
               <Monitor className="w-[18px] h-[18px] text-gray-500" />
               <span className="text-sm font-medium text-gray-700">Ratio:</span>
             </div>
-            <Select
-              value={aspect}
-              onValueChange={(value) =>
-                setAspectRatio(value as AspectRatioType)
-              }
-            >
-              <SelectTrigger
-                className="w-40"
-                data-testid="ratio-selector"
-                aria-label="Select aspect ratio"
-                tabIndex={7}
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {aspectRatioOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center space-x-1">
+              {aspectRatioOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={aspect === option.value ? "primary" : "outline"}
+                  size="md"
+                  onClick={() => handleAspectRatioChange(option.value)}
+                  className="h-8 px-2 text-xs"
+                  data-testid={`ratio-${option.value}`}
+                  aria-label={`Set aspect ratio to ${option.label}`}
+                  tabIndex={7 + aspectRatioOptions.indexOf(option)}
+                >
+                  {option.value}
+                </Button>
+              ))}
+            </div>
           </div>
 
           {/* Center - Toggle buttons */}
           <div className="flex items-center space-x-2">
             <Button
-              variant={showGrid ? "default" : "outline"}
-              size="sm"
-              onClick={toggleGrid}
+              variant={showGrid ? "primary" : "outline"}
+              size="md"
+              onClick={handleToggleGrid}
               className="h-8 px-3"
               data-testid="grid-toggle"
               aria-label={`${showGrid ? "Hide" : "Show"} grid overlay`}
@@ -102,9 +123,9 @@ export function CanvasToolbar() {
               Grid
             </Button>
             <Button
-              variant={showSafeZone ? "default" : "outline"}
-              size="sm"
-              onClick={toggleSafeZone}
+              variant={showSafeZone ? "primary" : "outline"}
+              size="md"
+              onClick={handleToggleSafeZone}
               className="h-8 px-3"
               data-testid="safe-zone-toggle"
               aria-label={`${showSafeZone ? "Hide" : "Show"} safe zone overlay`}
@@ -123,8 +144,8 @@ export function CanvasToolbar() {
               {zoomPresets.map((preset) => (
                 <Button
                   key={preset}
-                  variant={zoom === preset ? "default" : "outline"}
-                  size="sm"
+                  variant={zoom === preset ? "primary" : "outline"}
+                  size="md"
                   onClick={() => setZoomPreset(preset)}
                   className="h-8 px-2 text-xs"
                   data-testid={`zoom-preset-${preset}`}
@@ -138,9 +159,9 @@ export function CanvasToolbar() {
 
             <div className="flex items-center space-x-2">
               <Button
-                variant="outline"
-                size="sm"
-                onClick={zoomOut}
+                variant="secondary"
+                size="md"
+                onClick={handleZoomOut}
                 className="h-8 w-8 p-0"
                 data-testid="zoom-out"
                 aria-label="Zoom out (Ctrl/Cmd + -)"
@@ -157,12 +178,13 @@ export function CanvasToolbar() {
                   step={0.1}
                   className="w-full"
                   data-testid="zoom-slider"
+                  aria-label={`Zoom level: ${Math.round(zoom * 100)}%`}
                 />
               </div>
               <Button
-                variant="outline"
-                size="sm"
-                onClick={zoomIn}
+                variant="secondary"
+                size="md"
+                onClick={handleZoomIn}
                 className="h-8 w-8 p-0"
                 data-testid="zoom-in"
                 aria-label="Zoom in (Ctrl/Cmd + +)"
@@ -171,9 +193,9 @@ export function CanvasToolbar() {
                 <ZoomIn className="w-[18px] h-[18px]" />
               </Button>
               <Button
-                variant="outline"
-                size="sm"
-                onClick={resetView}
+                variant="secondary"
+                size="md"
+                onClick={handleResetView}
                 className="h-8 px-2"
                 data-testid="reset-view"
                 aria-label="Reset zoom and pan to default view"
@@ -198,36 +220,30 @@ export function CanvasToolbar() {
           {/* Aspect Ratio Selector */}
           <div className="flex items-center space-x-2">
             <Monitor className="w-[18px] h-[18px] text-gray-500" />
-            <Select
-              value={aspect}
-              onValueChange={(value) =>
-                setAspectRatio(value as AspectRatioType)
-              }
-            >
-              <SelectTrigger
-                className="w-32 min-h-[44px]"
-                data-testid="ratio-selector"
-                aria-label="Select aspect ratio"
-                tabIndex={7}
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {aspectRatioOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center space-x-1">
+              {aspectRatioOptions.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={aspect === option.value ? "primary" : "outline"}
+                  size="md"
+                  onClick={() => handleAspectRatioChange(option.value)}
+                  className="min-h-[44px] px-2 text-xs min-w-[44px]"
+                  data-testid={`ratio-${option.value}`}
+                  aria-label={`Set aspect ratio to ${option.label}`}
+                  tabIndex={7 + aspectRatioOptions.indexOf(option)}
+                >
+                  {option.value}
+                </Button>
+              ))}
+            </div>
           </div>
 
           {/* Toggle Buttons */}
           <div className="flex items-center space-x-2">
             <Button
-              variant={showGrid ? "default" : "outline"}
-              size="sm"
-              onClick={toggleGrid}
+              variant={showGrid ? "primary" : "outline"}
+              size="md"
+              onClick={handleToggleGrid}
               className="min-h-[44px] min-w-[44px] p-0"
               data-testid="grid-toggle"
               aria-label={`${showGrid ? "Hide" : "Show"} grid overlay`}
@@ -237,9 +253,9 @@ export function CanvasToolbar() {
               <Grid3X3 className="w-[18px] h-[18px]" />
             </Button>
             <Button
-              variant={showSafeZone ? "default" : "outline"}
-              size="sm"
-              onClick={toggleSafeZone}
+              variant={showSafeZone ? "primary" : "outline"}
+              size="md"
+              onClick={handleToggleSafeZone}
               className="min-h-[44px] min-w-[44px] p-0"
               data-testid="safe-zone-toggle"
               aria-label={`${showSafeZone ? "Hide" : "Show"} safe zone overlay`}
@@ -257,8 +273,8 @@ export function CanvasToolbar() {
               {zoomPresets.map((preset) => (
                 <Button
                   key={preset}
-                  variant={zoom === preset ? "default" : "outline"}
-                  size="sm"
+                  variant={zoom === preset ? "primary" : "outline"}
+                  size="md"
                   onClick={() => setZoomPreset(preset)}
                   className="min-h-[44px] px-1 text-xs min-w-[44px]"
                   data-testid={`zoom-preset-${preset}`}
@@ -271,8 +287,8 @@ export function CanvasToolbar() {
             </div>
 
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={zoomOut}
               className="min-h-[44px] min-w-[44px] p-0"
               data-testid="zoom-out"
@@ -290,11 +306,12 @@ export function CanvasToolbar() {
                 step={0.1}
                 className="w-full"
                 data-testid="zoom-slider"
+                aria-label={`Zoom level: ${Math.round(zoom * 100)}%`}
               />
             </div>
             <Button
-              variant="outline"
-              size="sm"
+              variant="secondary"
+              size="md"
               onClick={zoomIn}
               className="min-h-[44px] min-w-[44px] p-0"
               data-testid="zoom-in"

@@ -69,7 +69,7 @@ export async function extractFrameFromVideo(
           imageData,
           canvas,
         });
-      } catch (error) {
+      } catch {
         cleanup();
         reject(new Error("Failed to extract frame from video"));
       }
@@ -93,7 +93,7 @@ export async function extractFrameFromVideo(
     // Seek to desired timestamp
     try {
       video.currentTime = timestamp;
-    } catch (error) {
+    } catch {
       cleanup();
       reject(new Error("Failed to set video currentTime"));
     }
@@ -156,7 +156,7 @@ export function validateVideoFile(file: File): {
   valid: boolean;
   error?: string;
 } {
-  const maxSizeBytes = 200 * 1024 * 1024; // 200MB limit for graceful failure
+  const maxSizeBytes = 10 * 1024 * 1024; // 10MB limit as requested
   const allowedTypes = [
     "video/mp4",
     "video/webm",
@@ -167,16 +167,16 @@ export function validateVideoFile(file: File): {
   if (file.size > maxSizeBytes) {
     return {
       valid: false,
-      error: `File size ${(file.size / 1024 / 1024).toFixed(
+      error: `Video file size ${(file.size / 1024 / 1024).toFixed(
         1
-      )}MB exceeds 200MB limit`,
+      )}MB exceeds 10MB limit. Please use a smaller video file.`,
     };
   }
 
   if (!allowedTypes.includes(file.type)) {
     return {
       valid: false,
-      error: `Unsupported file type: ${file.type}`,
+      error: `Unsupported video format: ${file.type}. Please use MP4 or WebM format.`,
     };
   }
 
