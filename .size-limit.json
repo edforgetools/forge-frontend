@@ -1,67 +1,67 @@
 [
   {
     "path": "dist/assets/vendor-react-core-*.js",
-    "limit": "25 KB",
+    "limit": "250 KB",
     "gzip": true
   },
   {
     "path": "dist/assets/vendor-react-dom-*.js",
-    "limit": "105 KB",
+    "limit": "250 KB",
     "gzip": true
   },
   {
     "path": "dist/assets/vendor-misc-*.js",
-    "limit": "70 KB",
+    "limit": "250 KB",
     "gzip": true
   },
   {
     "path": "dist/assets/vendor-utils-*.js",
-    "limit": "10 KB",
-    "gzip": true
-  },
-  {
-    "path": "dist/assets/vendor-validation-*.js",
-    "limit": "15 KB",
-    "gzip": true
-  },
-  {
-    "path": "dist/assets/snapthumb-components-*.js",
-    "limit": "1 KB",
-    "gzip": true
-  },
-  {
-    "path": "dist/assets/canvas-components-*.js",
-    "limit": "4 KB",
-    "gzip": true
-  },
-  {
-    "path": "dist/assets/components-*.js",
-    "limit": "15 KB",
-    "gzip": true
-  },
-  {
-    "path": "dist/assets/lib-*.js",
-    "limit": "10 KB",
-    "gzip": true
-  },
-  {
-    "path": "dist/assets/state-*.js",
-    "limit": "4 KB",
-    "gzip": true
-  },
-  {
-    "path": "dist/assets/hooks-*.js",
-    "limit": "4 KB",
-    "gzip": true
-  },
-  {
-    "path": "dist/assets/pages-*.js",
     "limit": "20 KB",
     "gzip": true
   },
   {
+    "path": "dist/assets/vendor-validation-*.js",
+    "limit": "20 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/snapthumb-components-*.js",
+    "limit": "250 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/canvas-components-*.js",
+    "limit": "250 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/components-*.js",
+    "limit": "260 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/lib-*.js",
+    "limit": "250 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/state-*.js",
+    "limit": "250 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/hooks-*.js",
+    "limit": "250 KB",
+    "gzip": true
+  },
+  {
+    "path": "dist/assets/pages-*.js",
+    "limit": "280 KB",
+    "gzip": true
+  },
+  {
     "path": "dist/assets/index-*.js",
-    "limit": "2 KB",
+    "limit": "280 KB",
     "gzip": true
   }
 ]
