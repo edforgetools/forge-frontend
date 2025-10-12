@@ -6,7 +6,7 @@ import {
   DialogPortal,
   DialogOverlay,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Keyboard, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 

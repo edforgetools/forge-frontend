@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Checkbox } from "./checkbox";
-import { Button } from "./Button";
+import { Button } from "./button";
 
 /**
  * Example usage of the Checkbox component

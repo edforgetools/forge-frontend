@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { useCanvasStore } from "@/state/canvasStore";
 import { LazyExportDialog } from "./LazyExportDialog";

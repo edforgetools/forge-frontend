@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/Layout";
 import Container from "@/components/layout/Container";
 import { Card } from "@/components/ui/card";

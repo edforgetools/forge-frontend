@@ -5,7 +5,7 @@ import {
   Quality,
   QUALITY_COMPRESSION_MAP,
 } from "./types";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";

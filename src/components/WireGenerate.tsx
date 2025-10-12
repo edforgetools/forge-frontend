@@ -24,7 +24,7 @@ import {
 } from "@/lib/wire-generate-settings";
 import { useCanvasStore } from "@/state/canvasStore";
 import { useSnapthumbStore } from "@/lib/snapthumb-state";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import {

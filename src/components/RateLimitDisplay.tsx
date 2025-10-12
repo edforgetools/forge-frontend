@@ -1,5 +1,5 @@
 import { useRateLimitStore } from "@/state/rateLimitStore";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { LazyUpgradeModal } from "@/components/LazyUpgradeModal";
 import { X, Zap, Crown } from "lucide-react";

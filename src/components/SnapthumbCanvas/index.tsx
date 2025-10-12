@@ -1,7 +1,7 @@
 import { SnapthumbCanvas } from "./SnapthumbCanvas";
 import { Controls } from "./Controls";
 import { useSnapthumbURLSync } from "@/lib/snapthumb-state";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 
 interface SnapthumbEditorProps {
   backgroundImage?: string;

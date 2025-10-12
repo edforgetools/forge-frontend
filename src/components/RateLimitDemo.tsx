@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import { RateLimitDisplay } from "@/components/RateLimitDisplay";
 import { rateLimitTestScenarios } from "@/lib/rate-limit-test";
 import {
