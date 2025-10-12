@@ -6,7 +6,8 @@ import { canvasActions } from "@/state/canvasStore";
 import { useInlineToast, InlineToast } from "@/components/ui/inline-toast";
 import { validateImageFile } from "@/lib/image";
 import { validateVideoFile } from "@/lib/video";
-import { healthCheck } from "@/lib/api";
+import { API_BASE } from "@/lib/api";
+import { healthCheck } from "@/lib/forge-layer-sdk";
 
 export default function App() {
   const [layerUnreachable, setLayerUnreachable] = useState(false);
@@ -16,10 +17,8 @@ export default function App() {
   // Check Forge Layer connection status
   useEffect(() => {
     const checkLayerConnection = async () => {
-      const forgeLayerUrl = import.meta.env.VITE_FORGE_LAYER_URL;
-
-      // Only check if FORGE_LAYER_URL is truthy
-      if (!forgeLayerUrl) {
+      // Only check if API_BASE is configured
+      if (!API_BASE) {
         return;
       }
 

@@ -47,6 +47,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.2.8
         version: 1.2.8(@types/react-dom@19.2.0(@types/react@19.2.0))(@types/react@19.2.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@stripe/stripe-js':
+        specifier: ^8.0.0
+        version: 8.0.0
       '@supabase/supabase-js':
         specifier: ^2.74.0
         version: 2.74.0
@@ -1464,6 +1467,10 @@ packages:
     resolution: {integrity: sha512-RFbbIVfv8/QDgTPyXzjo5NKO6CYyK5Uq5xtNLHLbw5RgSKrgo8WpiB/fNivZuNd/5Wk0s91PtaJ9ThNcnFuI3g==}
     peerDependencies:
       size-limit: 11.2.0
+
+  '@stripe/stripe-js@8.0.0':
+    resolution: {integrity: sha512-dLvD55KT1cBmrqzgYRgY42qNcw6zW4HS5oRZs0xRvHw9gBWig5yDnWNop/E+/t2JK+OZO30zsnupVBN2MqW2mg==}
+    engines: {node: '>=12.16'}
 
   '@supabase/auth-js@2.74.0':
     resolution: {integrity: sha512-EJYDxYhBCOS40VJvfQ5zSjo8Ku7JbTICLTcmXt4xHMQZt4IumpRfHg11exXI9uZ6G7fhsQlNgbzDhFN4Ni9NnA==}
@@ -5767,6 +5774,8 @@ snapshots:
       '@size-limit/esbuild': 11.2.0(size-limit@11.2.0)
       '@size-limit/file': 11.2.0(size-limit@11.2.0)
       size-limit: 11.2.0
+
+  '@stripe/stripe-js@8.0.0': {}
 
   '@supabase/auth-js@2.74.0':
     dependencies:

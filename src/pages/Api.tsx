@@ -4,19 +4,16 @@ import Container from "@/components/layout/Container";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useEffect } from "react";
-
-const BASE =
-  import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.VITE_LAYER_BASE_URL ||
-  "http://localhost:3000";
+import { API_BASE } from "@/lib/api";
 
 export default function ApiPage() {
   useEffect(() => {
     document.title = "API • Forge";
   }, []);
 
-  const curlExample = `curl -X POST ${BASE}/api/thumb \\
+  const curlExample = `curl -X POST ${API_BASE}/api/thumb \\
   -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer YOUR_API_KEY" \\
   -d '{
     "source": "https://example.com/video.mp4",
     "timestamp": 5.2,
@@ -24,10 +21,11 @@ export default function ApiPage() {
     "height": 720
   }'`;
 
-  const nodeExample = `const response = await fetch('${BASE}/api/thumb', {
+  const nodeExample = `const response = await fetch('${API_BASE}/api/thumb', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_API_KEY',
   },
   body: JSON.stringify({
     source: 'https://example.com/video.mp4',
@@ -42,12 +40,17 @@ console.log(result.url);`;
 
   const pythonExample = `import requests
 
-response = requests.post('${BASE}/api/thumb', json={
-    'source': 'https://example.com/video.mp4',
-    'timestamp': 5.2,
-    'width': 1280,
-    'height': 720
-})
+response = requests.post('${API_BASE}/api/thumb', 
+    json={
+        'source': 'https://example.com/video.mp4',
+        'timestamp': 5.2,
+        'width': 1280,
+        'height': 720
+    },
+    headers={
+        'Authorization': 'Bearer YOUR_API_KEY'
+    }
+)
 
 result = response.json()
 print(result['url'])`;
@@ -71,14 +74,14 @@ print(result['url'])`;
               <div>
                 <h2 className="font-semibold mb-1">REST endpoint</h2>
                 <code className="text-sm text-muted-foreground font-mono">
-                  POST {`${BASE}/api/thumb`}
+                  POST {`${API_BASE}/api/thumb`}
                 </code>
               </div>
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={() =>
-                  navigator.clipboard.writeText(`${BASE}/api/thumb`)
+                  navigator.clipboard.writeText(`${API_BASE}/api/thumb`)
                 }
               >
                 Copy

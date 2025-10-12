@@ -27,8 +27,9 @@ export interface ApiError {
   statusCode?: number;
 }
 
-const FORGE_LAYER_URL =
-  import.meta.env.VITE_FORGE_LAYER_URL || "https://forge-layer.onrender.com";
+import { API_BASE } from "./api";
+
+const FORGE_LAYER_URL = API_BASE || "https://forge-layer.onrender.com";
 
 // Runtime guard to ensure URL is valid
 if (

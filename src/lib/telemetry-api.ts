@@ -1,5 +1,5 @@
 import type { TelemetryEvent } from "@/types/telemetry";
-import { env } from "@/env";
+import { API_BASE } from "@/lib/api";
 
 // Mock API endpoint for telemetry
 // In a real implementation, this would be replaced with actual API calls
@@ -60,8 +60,7 @@ export const sendLayerUIEvent = async (
   metadata: Record<string, unknown> = {}
 ): Promise<void> => {
   try {
-    const layerUrl = env.VITE_FORGE_LAYER_URL;
-    if (!layerUrl) {
+    if (!API_BASE) {
       // No endpoint exists, queue no-op as requested
       if (import.meta.env.DEV) {
         console.debug("📊 Layer UI event queued (no-op):", { event, metadata });
@@ -69,7 +68,7 @@ export const sendLayerUIEvent = async (
       return;
     }
 
-    const response = await fetch(`${layerUrl}/forge/telemetry/ui-event`, {
+    const response = await fetch(`${API_BASE}/forge/telemetry/ui-event`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

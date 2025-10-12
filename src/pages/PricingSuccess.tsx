@@ -4,7 +4,7 @@ import { Layout } from "@/components/Layout";
 import Container from "@/components/layout/Container";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { env } from "@/env";
+import { buildApiUrl } from "@/lib/api";
 import { copyWithFeedback } from "@/lib/copy-to-clipboard";
 
 interface ApiKeyResponse {
@@ -31,9 +31,8 @@ export default function PricingSuccess() {
       }
 
       try {
-        const layerUrl = env.VITE_FORGE_LAYER_URL || "/api";
         const response = await fetch(
-          `${layerUrl}/billing/key?session_id=${sessionId}`
+          buildApiUrl(`/billing/key?session_id=${sessionId}`)
         );
 
         if (response.ok) {
@@ -194,17 +193,28 @@ const client = new ForgeClient({
           </Card>
 
           {/* Next Steps */}
-          <div className="text-center space-y-4">
-            <h3 className="text-lg font-semibold">What's next?</h3>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <Card className="p-6 space-y-4">
+            <h3 className="text-lg font-semibold">Next Steps</h3>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <p>• Start building with our API using your new key above</p>
+              <p>
+                • Check out the API documentation for examples and endpoints
+              </p>
+              <p>• Join our community for support and updates</p>
+              <p>• Contact support if you need any help getting started</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3">
               <Button asChild variant="primary">
                 <a href="/api">View API Documentation</a>
               </Button>
               <Button asChild variant="outline">
                 <a href="/app">Launch App</a>
               </Button>
+              <Button asChild variant="outline">
+                <a href="mailto:support@forge.com">Get Support</a>
+              </Button>
             </div>
-          </div>
+          </Card>
         </div>
       </Container>
     </Layout>

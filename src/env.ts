@@ -19,6 +19,9 @@ const envSchema = z.object({
   VITE_SUPABASE_URL: z.string().url().optional(),
   VITE_SUPABASE_ANON_KEY: z.string().optional(),
 
+  // Stripe Configuration
+  VITE_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
+
   // Analytics
   VITE_VERCEL_ANALYTICS_ID: z.string().optional(),
   VITE_GOOGLE_ANALYTICS_ID: z.string().optional(),
@@ -45,6 +48,7 @@ const envSchema = z.object({
 
   // Forge Layer API
   VITE_FORGE_LAYER_URL: z.string().url().optional(),
+  VITE_LAYER_BASE: z.string().url().optional(),
 
   // API Keys for authorization
   VITE_FORGE_API_KEYS: z

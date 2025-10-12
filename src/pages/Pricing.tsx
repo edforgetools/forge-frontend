@@ -4,6 +4,8 @@ import Container from "@/components/layout/Container";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { buildApiUrl, API_ENDPOINTS } from "@/lib/api";
+import { stripePromise } from "@/lib/stripe";
 
 interface PricingTier {
   name: string;
@@ -114,19 +116,47 @@ const faqs = [
 export default function Pricing() {
   const handleCheckout = async (plan: string) => {
     try {
-      const response = await fetch("/api/billing/checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ plan }),
-      });
+      const response = await fetch(
+        buildApiUrl(API_ENDPOINTS.BILLING_CHECKOUT),
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            plan: plan.toLowerCase(),
+            label: "website",
+          }),
+        }
+      );
 
       if (response.ok) {
-        const { url } = await response.json();
-        window.location.href = url;
+        const data = await response.json();
+
+        // If response has URL, redirect directly
+        if (data.url) {
+          window.location.href = data.url;
+        }
+        // If response has sessionId, use Stripe redirect
+        else if (data.sessionId) {
+          const stripe = await stripePromise;
+          if (stripe) {
+            try {
+              const result = await stripe.redirectToCheckout({
+                sessionId: data.sessionId,
+              });
+              if (result.error) {
+                console.error("Stripe checkout error:", result.error);
+              }
+            } catch (error) {
+              console.error("Stripe checkout error:", error);
+            }
+          }
+        } else {
+          console.error("Invalid checkout response");
+        }
       } else {
-        console.error("Checkout failed");
+        console.error("Checkout failed:", await response.text());
       }
     } catch (error) {
       console.error("Checkout error:", error);
